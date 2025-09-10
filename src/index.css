@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "116Angdeokjeongjik";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-01@1.0/116angduk_honesty15.woff2")
+    format("woff2");
+  font-weight: normal;
+  font-display: swap;
+}
+
+@theme {
+  --font-sixtyfour: "Sixtyfour", system-ui, sans-serif;
+  --font-vt323: "VT323", system-ui, sans-serif;
+}
+
+:root {
+  font-family: "116Angdeokjeongjik", system-ui, Avenir, Helvetica, Arial,
+    sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
