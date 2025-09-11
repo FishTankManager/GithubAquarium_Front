@@ -1,27 +1,31 @@
-name: Notify Discord on Push
+name: Notify Discord on PR events
 
 on:
-  push:
+  pull_request:
+    types: [opened, closed, reopened]
 
 jobs:
   notify-discord:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Get last commit info
-        id: commit
+      - name: Determine PR event
+        id: msg
         run: |
-          echo "msg=$(git log -1 --pretty=%s)" >> $GITHUB_OUTPUT
-          echo "sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-          echo "full_sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+          if [[ "${{ github.event.action }}" == "opened" ]]; then
+            echo "message= PR Opened: **${{ github.event.pull_request.title }}**" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event.action }}" == "reopened" ]]; then
+            echo "message= PR Reopened: **${{ github.event.pull_request.title }}**" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event.action }}" == "closed" && "${{ github.event.pull_request.merged }}" == "true" ]]; then
+            echo "message= PR Merged: **${{ github.event.pull_request.title }}**" >> $GITHUB_OUTPUT
+          else
+            echo "message= PR Closed without merge: **${{ github.event.pull_request.title }}**" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Send Discord Notification
+      - name: Send Discord notification
         env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
           curl -H "Content-Type: application/json" \
                -X POST \
-               -d "{\"content\": \"[\`${{ steps.commit.outputs.sha }}\`](https://github.com/${{ github.repository }}/commit/${{ steps.commit.outputs.full_sha }}) [Commit] **${{ steps.commit.outputs.msg }}** by @${{ github.actor }}\"}" \
+               -d "{\"content\": \"${{ steps.msg.outputs.message }}\\n[PR #${{ github.event.pull_request.number }}](${{ github.event.pull_request.html_url }}) by @${{ github.actor }}\"}" \
                "$DISCORD_WEBHOOK_URL"
