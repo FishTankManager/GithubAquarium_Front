@@ -12,6 +12,7 @@
   --font-logo: "Sixtyfour", system-ui, sans-serif;
   --font-vt: "VT323", system-ui, sans-serif;
   --font-turret: "Turret Road", system-ui, sans-serif;
+  --font-kor: "116Angdeokjeongjik", system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
 @layer base {
