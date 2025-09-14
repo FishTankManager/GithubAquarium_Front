@@ -9,13 +9,14 @@
 }
 
 @theme {
-  --font-sixtyfour: "Sixtyfour", system-ui, sans-serif;
-  --font-vt323: "VT323", system-ui, sans-serif;
+  --font-logo: "Sixtyfour", system-ui, sans-serif;
+  --font-vt: "VT323", system-ui, sans-serif;
   --font-turret: "Turret Road", system-ui, sans-serif;
+  --font-kor: "116Angdeokjeongjik", system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
 @layer base {
-  .font-sixtyfour {
+  .font-logo {
     font-variation-settings:
       "BLED" 0,
       "SCAN" 20;
