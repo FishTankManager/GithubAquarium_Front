@@ -31,7 +31,7 @@ export default function LogoText({
     <h1 className={`relative ${className}`} {...rest}>
       {/* 위 레이어: 그라데이션 채움 */}
       <span
-        className={`font-sixtyfour relative z-10 inline-block bg-clip-text text-transparent [-webkit-text-fill-color:transparent]`}
+        className={`font-logo relative z-10 inline-block bg-clip-text text-transparent [-webkit-text-fill-color:transparent]`}
         style={{ backgroundImage }}
       >
         {lines.map((line, i) => (
@@ -44,7 +44,7 @@ export default function LogoText({
       {/* 아래 레이어: 외곽선만 (채움 투명) */}
       <span
         aria-hidden
-        className={`font-sixtyfour pointer-events-none absolute inset-0 text-transparent`}
+        className={`font-logo pointer-events-none absolute inset-0 text-transparent`}
         style={{
           WebkitTextStroke:
             typeof strokeWidth === "number"
