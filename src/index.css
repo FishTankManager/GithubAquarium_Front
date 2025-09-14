@@ -11,11 +11,19 @@
 @theme {
   --font-sixtyfour: "Sixtyfour", system-ui, sans-serif;
   --font-vt323: "VT323", system-ui, sans-serif;
+  --font-turret: "Turret Road", system-ui, sans-serif;
+}
+
+@layer base {
+  .font-sixtyfour {
+    font-variation-settings:
+      "BLED" 0,
+      "SCAN" 20;
+  }
 }
 
 :root {
-  font-family: "116Angdeokjeongjik", system-ui, Avenir, Helvetica, Arial,
-    sans-serif;
+  font-family: "116Angdeokjeongjik", system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
