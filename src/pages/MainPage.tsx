@@ -1,6 +1,9 @@
+import { Header } from "@/components";
+
 export default function MainPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-sky-300">
+      <Header />
       <main className="flex flex-col items-center justify-center text-black">
         <p className="text-h1 font-sixtyfour">Main Page</p>
         <p className="text-h1 font-vt323">Main Page</p>
