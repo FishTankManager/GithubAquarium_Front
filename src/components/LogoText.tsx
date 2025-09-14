@@ -12,7 +12,7 @@ type Props = {
   className?: string;
 } & Omit<React.ComponentPropsWithoutRef<"h1">, "children">;
 
-export default function OutlineGradientText({
+export default function LogoText({
   text,
   strokeWidth = "4px",
   strokeColor = "#CA9B9B",
