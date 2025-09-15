@@ -22,7 +22,7 @@ export default function LogoText({
 }: Props) {
   const lines = String(text).split("\n");
 
-  const { from = "#ffffff", to = "#21AAFF", radialSize = "ellipse 280% 260%" } = gradient ?? {};
+  const { from = "#ffffff", to = "#21AAFF", radialSize = "ellipse 420% 340%" } = gradient ?? {};
 
   const stops = `${from}, ${to}`;
   const backgroundImage = `radial-gradient(${radialSize} at 50% 50%, ${stops})`;

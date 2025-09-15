@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { MainPage, MyPage } from "./pages";
+import { MainPage, MyPage, ShopPage } from "./pages";
 
 function App() {
   return (
@@ -7,6 +7,7 @@ function App() {
       <Routes>
         <Route path="/" element={<MainPage />} />
         <Route path="/my" element={<MyPage />} />
+        <Route path="/shop" element={<ShopPage />} />
       </Routes>
     </BrowserRouter>
   );
