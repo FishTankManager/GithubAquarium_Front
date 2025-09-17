@@ -1,15 +1,32 @@
+import { useState } from "react";
 import { Footer, Header } from "@/components";
 
+// MyPage 전용 컴포넌트들
+import Titles from "@/components/MyPage/Titles";
+import FishTankSection from "@/components/MyPage/FishTankSection";
+//import AquariumSection from "@/components/MyPage/AquariumSection";
+
 export default function MyPage() {
+  // 상단 버튼 상태: fishtank | aquarium
+  const [active, setActive] = useState<"fishtank" | "aquarium">("fishtank");
+
   return (
+    // 전체 레이아웃: 헤더/푸터 고정 + 본문 스크롤
     <div className="flex min-h-screen flex-col justify-between bg-sky-300">
       <Header />
-      <main className="flex flex-col items-center justify-center text-black">
-        <p className="text-h1 font-logo">My Page</p>
-        <p className="text-h1 font-vt">My Page</p>
-        <p className="text-h1 font-turret">My Page</p>
-        <p className="text-h1">마이페이지</p>
+
+      {/* 본문 컨테이너 */}
+      <main className="mx-auto w-full max-w-[980px] flex-1 px-4 py-8 text-black">
+        {/* 상단 타이틀 + 탭 버튼 */}
+        <div className="mb-6 flex items-center justify-start">
+          <Titles active={active} onChange={setActive} />
+        </div>
+
+        {/* 탭에 따라 하위 섹션만 교체 렌더링 */}
+        {active === "fishtank" && <FishTankSection />}
+        {/*{active === "aquarium" && <AquariumSection />}*/}
       </main>
+
       <Footer />
     </div>
   );
