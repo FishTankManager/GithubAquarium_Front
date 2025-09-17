@@ -14,19 +14,26 @@ export default function RepoSelect({
   onChange: (r: RepoInfo | null) => void;
 }) {
   return (
-    <div className="w-full">
+    <div className="relative w-full">
       <select
-        className="w-full rounded border bg-white/90 px-3 py-2"
+        className="font-abeezee w-full appearance-none rounded-md border border-white/50 bg-[#3E548E] px-3 py-3 pr-10 pl-7 text-white shadow-xl hover:shadow-2xl focus:ring-2 focus:ring-blue-300 focus:outline-none"
         value={value?.id ?? ""}
         onChange={(e) => onChange(DUMMIES.find((d) => d.id === e.target.value) ?? null)}
       >
-        <option value="">Select a repository to visit!</option>
+        <option value="" disabled hidden className="text-[#B2B2B2]">
+          Select a repository to visit!
+        </option>
         {DUMMIES.map((d) => (
           <option key={d.id} value={d.id}>
             {d.fullName}
           </option>
         ))}
       </select>
+
+      {/* 오른쪽 간격 조절을 위한.. 커스텀 화살표 */}
+      <span className="pointer-events-none absolute inset-y-0 right-10 flex items-center text-white">
+        ▼
+      </span>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 export default function BottomLines() {
   return (
     <section className="space-y-4 text-center">
-      <p className="font-turret text-[#561B51 mb-10 text-xl">
+      <p className="font-turret text-[#561B51 mt-10 mb-10 text-xl">
         🐟 Ready to raise your own Sunfish?
         <br />
         Start your project, adopt a sunfish,

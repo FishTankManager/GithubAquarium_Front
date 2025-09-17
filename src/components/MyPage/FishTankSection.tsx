@@ -18,13 +18,15 @@ export default function FishTankSection() {
 
   return (
     <>
-      <RepoSelect
-        value={repo}
-        onChange={(r) => {
-          setRepo(r);
-          setContrib(r?.contributions ?? 0);
-        }}
-      />
+      <div className="font-abeezee mb-10 text-[#B2B2B2]">
+        <RepoSelect
+          value={repo}
+          onChange={(r) => {
+            setRepo(r);
+            setContrib(r?.contributions ?? 0);
+          }}
+        />
+      </div>
 
       <div className="space-y-3">
         <CanvasControls size={size} onSizeChange={setSize} />
