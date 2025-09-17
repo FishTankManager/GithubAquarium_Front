@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { Footer, Header } from "@/components";
-
-// MyPage 전용 컴포넌트들
 import Titles from "@/components/MyPage/Titles";
 import FishTankSection from "@/components/MyPage/FishTankSection";
-//import AquariumSection from "@/components/MyPage/AquariumSection";
+import AquariumSection from "@/components/MyPage/AquariumSection";
 
 export default function MyPage() {
   // 상단 버튼 상태: fishtank | aquarium
@@ -24,7 +22,7 @@ export default function MyPage() {
 
         {/* 탭에 따라 하위 섹션만 교체 렌더링 */}
         {active === "fishtank" && <FishTankSection />}
-        {/*{active === "aquarium" && <AquariumSection />}*/}
+        {active === "aquarium" && <AquariumSection />}
       </main>
 
       <Footer />

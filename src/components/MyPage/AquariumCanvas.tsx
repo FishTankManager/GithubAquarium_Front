@@ -1,7 +1,7 @@
 export default function AquariumCanvas({
-  width = 600,
-  height = 300,
-  src = "/images/aquarium/aquarium_example.png",
+  width = 990,
+  height = 600,
+  src = "/images/aquarium_example.png",
 }: {
   width?: number;
   height?: number;
