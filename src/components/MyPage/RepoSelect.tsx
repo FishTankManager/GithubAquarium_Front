@@ -15,13 +15,12 @@ export default function RepoSelect({
 }) {
   return (
     <div className="w-full">
-      <label className="font-turret mb-1 block text-sm">Select a repository to visit!</label>
       <select
         className="w-full rounded border bg-white/90 px-3 py-2"
         value={value?.id ?? ""}
         onChange={(e) => onChange(DUMMIES.find((d) => d.id === e.target.value) ?? null)}
       >
-        <option value="">-- Select --</option>
+        <option value="">Select a repository to visit!</option>
         {DUMMIES.map((d) => (
           <option key={d.id} value={d.id}>
             {d.fullName}

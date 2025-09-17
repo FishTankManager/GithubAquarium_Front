@@ -26,14 +26,17 @@ export default function FishTankSection() {
           setContrib(r?.contributions ?? 0);
         }}
       />
-      <div className="flex items-start justify-between gap-6">
-        <div className="flex-1 space-y-3">
-          <CanvasControls size={size} onSizeChange={setSize} />
-          <FishTankCanvas ref={canvasRef} size={size} />
-          <p className="font-turret text-sm">Repo contributions: {contrib}</p>
-        </div>
+
+      <div className="space-y-3">
+        <CanvasControls size={size} onSizeChange={setSize} />
+        <FishTankCanvas ref={canvasRef} size={size} />
+        <p className="font-turret text-sm">Repo contributions: {contrib}</p>
+      </div>
+
+      <div className="mt-6">
         <GrowthTimeline items={timeline} />
       </div>
+
       <BottomLines />
     </>
   );

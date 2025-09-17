@@ -47,7 +47,7 @@ export default function CanvasControls({
         &nbsp;px
       </label>
       {/* EXPORT 버튼 - 현재는 기능 없이 콘솔 로그만 출력 */}
-      // TODO: 클릭 시 코드 모달 띄우거나 copy 되는 기능 추가
+      {/* TODO: 클릭 시 코드 모달 띄우거나 copy 되는 기능 추가 */}
       <button
         onClick={() => console.log("EXPORT clicked")}
         className="ml-auto rounded-full bg-black px-4 py-2 text-white"
