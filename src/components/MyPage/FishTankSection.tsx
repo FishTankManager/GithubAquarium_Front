@@ -4,7 +4,6 @@ import CanvasControls from "./CanvasControls";
 import FishTankCanvas from "./FishTankCanvas";
 import GrowthTimeline from "./GrowthTimeline";
 import { CanvasSize, RepoInfo, TimelineItem } from "@/types/aquarium";
-import BottomLines from "./BottomLines";
 
 export default function FishTankSection() {
   const [repo, setRepo] = useState<RepoInfo | null>(null);
@@ -36,8 +35,6 @@ export default function FishTankSection() {
       <div className="mt-6">
         <GrowthTimeline items={timeline} />
       </div>
-
-      <BottomLines />
     </>
   );
 }

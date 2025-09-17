@@ -4,7 +4,6 @@ import AquariumTabs, { SubTab } from "./AquariumTabs";
 import AquariumFishTable from "./AquariumFishTable";
 // import AquariumBackgroundGrid from "./AquariumBackgroundGrid";
 import AquariumItemGrid from "./AquariumItemGrid";
-import BottomLines from "./BottomLines";
 
 type Item = { id: string; name: string; src: string };
 
@@ -122,8 +121,6 @@ export default function AquariumSection() {
           />
         )}
       </section>
-
-      <BottomLines />
     </>
   );
 }
