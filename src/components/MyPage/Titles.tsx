@@ -10,7 +10,7 @@ export default function Titles({
   const BTN_FISHTANK_W = "w-[380px]"; // FISHTANK 폭
   const BTN_AQUARIUM_W = "w-[380px]"; // AQUARIUM 폭
 
-  const base = `rounded-full border ${BTN_H} flex items-center justify-center px-8 transition-colors duration-150`;
+  const base = `rounded-full border-4 ${BTN_H} flex items-center justify-center px-8 transition-colors duration-150`;
   const onBtn = "bg-[#EDF1F8]/80 border-[#CA9B9B]";
   const offBtn = "bg-transparent border-[#CA9B9B]";
 
