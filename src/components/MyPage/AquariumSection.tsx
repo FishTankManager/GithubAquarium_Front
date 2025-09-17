@@ -2,8 +2,11 @@ import { useMemo, useState } from "react";
 import AquariumCanvas from "./AquariumCanvas";
 import AquariumTabs, { SubTab } from "./AquariumTabs";
 import AquariumFishTable from "./AquariumFishTable";
-import AquariumBackgroundGrid from "./AquariumBackgroundGrid";
+// import AquariumBackgroundGrid from "./AquariumBackgroundGrid";
+import AquariumItemGrid from "./AquariumItemGrid";
 import BottomLines from "./BottomLines";
+
+type Item = { id: string; name: string; src: string };
 
 type BgItem = {
   id: string;
@@ -15,6 +18,7 @@ export default function AquariumSection() {
   const [tab, setTab] = useState<SubTab>("fish");
   const totalContrib = 12987;
 
+  // background 후보 (dummy)
   const bgCandidates: BgItem[] = useMemo(
     () => [
       { id: "blank", name: "Blank", src: "/images/background/bg-blank.png" },
@@ -25,19 +29,47 @@ export default function AquariumSection() {
     [],
   );
 
+  // item 후보 (dummy)
+  const itemCandidates: Item[] = useMemo(
+    () => [
+      { id: "it1", name: "Corals 1", src: "/images/items/coral-1.png" },
+      { id: "it2", name: "Corals 2", src: "/images/items/coral-2.png" },
+      { id: "it3", name: "Corals 3", src: "/images/items/coral-3.png" },
+      { id: "it4", name: "Corals 4", src: "/images/items/coral-4.png" },
+    ],
+    [],
+  );
+
   const [appliedBgId, setAppliedBgId] = useState<string | null>(null); // null이면 기본 이미지 (지금은 aquarium_example.png)
   const [selectedBgId, setSelectedBgId] = useState<string | null>(null);
+
+  const [appliedItemId, setAppliedItemId] = useState<string | null>(null); // null이면 아이템 없음
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
   // 현재 캔버스에 보여줄 src (기본은 aquarium_example.png)
   const appliedBgSrc =
     (appliedBgId && bgCandidates.find((b) => b.id === appliedBgId)?.src) ||
     "/images/aquarium_example.png";
 
+  const appliedItemSrc = appliedItemId
+    ? itemCandidates.find((i) => i.id === appliedItemId)?.src
+    : undefined;
+
+  // APPLY: 현재 탭에 따라 각각 적용
   const handleApply = () => {
-    if (!selectedBgId) return;
-    setAppliedBgId(selectedBgId);
-    console.log("APPLY background:", selectedBgId); // TODO: 추후 실제 저장/호출
+    if (tab === "background") {
+      if (!selectedBgId) return;
+      setAppliedBgId(selectedBgId);
+      console.log("APPLY background:", selectedBgId);
+    } else if (tab === "items") {
+      if (!selectedItemId) return;
+      setAppliedItemId(selectedItemId);
+      console.log("APPLY item:", selectedItemId);
+    }
   };
+
+  const isApplyDisabled =
+    (tab === "background" && !selectedBgId) || (tab === "items" && !selectedItemId);
 
   return (
     <>
@@ -52,20 +84,19 @@ export default function AquariumSection() {
         </button>
       </div>
 
-      {/* 상단 수족관 캔버스 (적용된 배경 반영) */}
-      <AquariumCanvas width={600} height={300} src={appliedBgSrc} />
+      {/* 상단 수족관 미리보기 (배경 + 아이템 오버레이) */}
+      <AquariumCanvas width={600} height={300} bgSrc={appliedBgSrc} itemSrc={appliedItemSrc} />
       <p className="font-turret mt-2 text-sm">
         Total contributions: {totalContrib.toLocaleString()}
       </p>
 
-      {/* 서브 탭 + APPLY 버튼 */}
+      {/* 서브 탭 + APPLY */}
       <div className="mt-4 flex items-center justify-between">
         <AquariumTabs tab={tab} onChange={setTab} />
         <button
           onClick={handleApply}
-          // BACKGROUND 탭일 때 활성 느낌, 선택 없으면 반투명
-          className={`font-turret rounded-full border px-4 py-2 ${tab === "background" ? "bg-black text-white" : "bg-white/60 text-black"} ${tab === "background" && !selectedBgId ? "opacity-50" : ""}`}
-          disabled={tab !== "background" || !selectedBgId}
+          className={`font-turret rounded-full border px-4 py-2 ${tab === "background" || tab === "items" ? "bg-black text-white" : "bg-white/60 text-black"} ${isApplyDisabled ? "opacity-50" : ""}`}
+          disabled={isApplyDisabled}
         >
           APPLY
         </button>
@@ -76,14 +107,20 @@ export default function AquariumSection() {
         {tab === "fish" && <AquariumFishTable />}
 
         {tab === "background" && (
-          <AquariumBackgroundGrid
+          <AquariumItemGrid
             items={bgCandidates}
             selectedId={selectedBgId}
             onSelect={setSelectedBgId}
           />
         )}
 
-        {tab === "items" && <div className="text-sm">보유 아이템 목록(dummy)</div>}
+        {tab === "items" && (
+          <AquariumItemGrid
+            items={itemCandidates}
+            selectedId={selectedItemId}
+            onSelect={setSelectedItemId}
+          />
+        )}
       </section>
 
       <BottomLines />
