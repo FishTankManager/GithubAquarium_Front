@@ -2,7 +2,7 @@ import { forwardRef } from "react";
 import { CanvasSize } from "@/types/aquarium";
 
 export default forwardRef<HTMLDivElement, { size: CanvasSize; bowlSrc?: string }>(
-  function FishTankCanvas({ size, bowlSrc = "/images/bowl.png" }, ref) {
+  function FishTankCanvas({ size, bowlSrc = "/images/fishtank_example.png" }, ref) {
     return (
       <div
         ref={ref}
