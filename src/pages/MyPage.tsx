@@ -16,7 +16,7 @@ export default function MyPage() {
       {/* 본문 컨테이너 */}
       <main className="mx-auto w-full max-w-[980px] flex-1 px-4 py-8 text-black">
         {/* 상단 타이틀 + 탭 버튼 */}
-        <div className="mb-6 flex items-center justify-start">
+        <div className="mb-6 flex items-center justify-center">
           <Titles active={active} onChange={setActive} />
         </div>
 
