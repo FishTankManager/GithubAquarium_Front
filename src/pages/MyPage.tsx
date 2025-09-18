@@ -22,14 +22,11 @@ export default function MyPage() {
       </main>
 
       {/* Footer 바로 위 영역 */}
-      <div
-        className="h-[300px] w-full bg-cover bg-center"
-        style={{ backgroundImage: "url('/images/mypage-background.png')" }}
-      >
-        <div className="mx-auto flex h-full max-w-[980px] items-center justify-center">
+      <section className="relative h-[600px] w-full bg-[url('/images/mypage-background.png')] bg-cover bg-bottom bg-no-repeat">
+        <div className="relative z-10 mx-auto flex h-full max-w-[980px] items-center justify-center">
           <BottomLines />
         </div>
-      </div>
+      </section>
 
       <Footer />
     </div>
