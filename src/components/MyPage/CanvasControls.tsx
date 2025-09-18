@@ -1,56 +1,56 @@
 import { CanvasSize } from "@/types/aquarium";
 
 export default function CanvasControls({
-  size, // 현재 width/height 값
-  onSizeChange, // 크기 변경 시 부모에 알려주는 콜백
+  size,
+  onSizeChange,
 }: {
   size: CanvasSize;
   onSizeChange: (s: CanvasSize) => void;
 }) {
   return (
-    <div className="font-turret flex items-center gap-4">
-      {/* WIDTH 입력 영역 */}
-      <label>
-        WIDTH:&nbsp;
+    <div className="font-vt flex items-center gap-6 text-2xl text-[#D7B9B9]">
+      {/* WIDTH */}
+      <label className="flex items-center gap-2">
+        <span className="font-bold">WIDTH:</span>
         <input
-          className="w-24 rounded border px-2 py-1"
+          className="w-24 rounded border-2 border-[#CA9B9B] bg-transparent px-2 py-1 text-center text-[#D7B9B9] focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
           type="number"
           min={200}
-          step={10} // 10 단위 증가,감소
+          step={10}
           value={size.width}
-          // 입력값 변경 시 onSizeChange 호출 -> 부모의 state 업데이트
           onChange={(e) =>
             onSizeChange({
-              ...size, // 기존 height 값은 그대로 유지
-              width: Number(e.target.value), // width만 새로운 값으로 변경
+              ...size,
+              width: Number(e.target.value),
             })
           }
         />
-        &nbsp;px
+        <span className="font-bold">px</span>
       </label>
-      {/* HEIGHT 입력 영역 */}
-      <label>
-        HEIGHT:&nbsp;
+
+      {/* HEIGHT */}
+      <label className="flex items-center gap-2">
+        <span className="font-bold">HEIGHT:</span>
         <input
-          className="w-24 rounded border px-2 py-1"
+          className="w-24 rounded border-2 border-[#CA9B9B] bg-transparent px-2 py-1 text-center text-[#D7B9B9] focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
           type="number"
           min={150}
-          step={10} // 10 단위 증가/감소
+          step={10}
           value={size.height}
           onChange={(e) =>
             onSizeChange({
-              ...size, // 기존 width 값은 그대로 유지
-              height: Number(e.target.value), // height만 새로운 값으로 변경
+              ...size,
+              height: Number(e.target.value),
             })
           }
         />
-        &nbsp;px
+        <span className="font-bold">px</span>
       </label>
-      {/* EXPORT 버튼 - 현재는 기능 없이 콘솔 로그만 출력 */}
-      {/* TODO: 클릭 시 코드 모달 띄우거나 copy 되는 기능 추가 */}
+
+      {/* EXPORT 버튼 - 현재는 기능 없이 콘솔 로그만 출력되게 해놨음 */}
       <button
         onClick={() => console.log("EXPORT clicked")}
-        className="ml-auto rounded-full bg-black px-4 py-2 text-white"
+        className="font-vt ml-auto rounded-full bg-[#3F3F3F]/80 px-10 py-2 text-2xl text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
       >
         EXPORT
       </button>
