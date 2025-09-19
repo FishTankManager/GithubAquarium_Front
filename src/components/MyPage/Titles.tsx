@@ -6,9 +6,9 @@ export default function Titles({
   onChange: (v: "fishtank" | "aquarium") => void;
 }) {
   // 고정 사이즈
-  const BTN_H = "h-20"; // 버튼 높이
-  const BTN_FISHTANK_W = "w-[380px]"; // FISHTANK 폭
-  const BTN_AQUARIUM_W = "w-[380px]"; // AQUARIUM 폭
+  const BTN_H = "h-18"; // 버튼 높이
+  const BTN_FISHTANK_W = "w-[300px]"; // FISHTANK 폭
+  const BTN_AQUARIUM_W = "w-[300px]"; // AQUARIUM 폭
 
   const base = `rounded-full border-4 ${BTN_H} flex items-center justify-center px-8 transition-colors duration-150`;
   const onBtn = "bg-[#EDF1F8]/80 border-[#CA9B9B]";
@@ -34,9 +34,9 @@ export default function Titles({
   );
 
   return (
-    <div className="flex items-center gap-8">
+    <div className="flex items-center gap-6">
       {/* MY */}
-      <StrokeText className="text-8xl">MY</StrokeText>
+      <StrokeText className="text-7xl">MY</StrokeText>
 
       {/* FISHTANK */}
       <button
@@ -44,9 +44,9 @@ export default function Titles({
         onClick={() => onChange("fishtank")}
       >
         {active === "fishtank" ? (
-          <StrokeText className="text-5xl">FISHTANK</StrokeText>
+          <StrokeText className="text-4xl">FISHTANK</StrokeText>
         ) : (
-          <span className="font-abeezee text-5xl text-[#CA9B9B]">FISHTANK</span>
+          <span className="font-abeezee text-4xl text-[#CA9B9B]">FISHTANK</span>
         )}
       </button>
 
@@ -56,9 +56,9 @@ export default function Titles({
         onClick={() => onChange("aquarium")}
       >
         {active === "aquarium" ? (
-          <StrokeText className="text-5xl">AQUARIUM</StrokeText>
+          <StrokeText className="text-4xl">AQUARIUM</StrokeText>
         ) : (
-          <span className="font-abeezee text-5xl text-[#CA9B9B]">AQUARIUM</span>
+          <span className="font-abeezee text-4xl text-[#CA9B9B]">AQUARIUM</span>
         )}
       </button>
     </div>
