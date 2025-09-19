@@ -77,17 +77,19 @@ export default function AquariumSection() {
         <div />
         <button
           onClick={() => console.log("EXPORT clicked")}
-          className="font-turret rounded-full bg-black px-4 py-2 text-white"
+          className="font-vt mb-4 ml-auto rounded-full bg-[#3F3F3F]/80 px-10 py-2 text-2xl text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
         >
           EXPORT
         </button>
       </div>
 
       {/* 상단 수족관 미리보기 (배경 + 아이템 오버레이) */}
-      <AquariumCanvas width={600} height={300} bgSrc={appliedBgSrc} itemSrc={appliedItemSrc} />
-      <p className="font-turret mt-2 text-sm">
-        Total contributions: {totalContrib.toLocaleString()}
-      </p>
+      <div className="flex justify-center">
+        <AquariumCanvas width={750} height={440} bgSrc={appliedBgSrc} itemSrc={appliedItemSrc} />
+      </div>
+      <div className="space-y-3">
+        <p className="font-vt text-3xl text-white">Repo contributions: {totalContrib}</p>
+      </div>
 
       {/* 서브 탭 + APPLY */}
       <div className="mt-4 flex items-center justify-between">
