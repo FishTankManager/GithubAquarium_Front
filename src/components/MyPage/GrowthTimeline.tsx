@@ -6,7 +6,7 @@ export default function GrowthTimeline({ items }: { items: TimelineItem[] }) {
     <section className="w-[770px]">
       {/* 상단 라벨 */}
       <div className="mt-5 mb-5 inline-block rounded-lg bg-[#C7D6FF]/60 px-5 py-1 shadow">
-        <span className="font-vt text-2xl tracking-wide text-black/80">GROWTH TIMELINE</span>
+        <span className="font-vt text-xl tracking-wide text-black/80">GROWTH TIMELINE</span>
       </div>
 
       {/* 유리(서리) 카드 */}

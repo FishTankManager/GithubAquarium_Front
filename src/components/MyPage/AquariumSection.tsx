@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import AquariumCanvas from "./AquariumCanvas";
 import AquariumTabs, { SubTab } from "./AquariumTabs";
 import AquariumFishTable from "./AquariumFishTable";
-// import AquariumBackgroundGrid from "./AquariumBackgroundGrid";
+import AquariumBackgroundGrid from "./AquariumBackgroundGrid";
 import AquariumItemGrid from "./AquariumItemGrid";
 
 type Item = { id: string; name: string; src: string };
@@ -67,8 +67,8 @@ export default function AquariumSection() {
     }
   };
 
-  const isApplyDisabled =
-    (tab === "background" && !selectedBgId) || (tab === "items" && !selectedItemId);
+  // const isApplyDisabled =
+  //   (tab === "background" && !selectedBgId) || (tab === "items" && !selectedItemId);
 
   return (
     <>
@@ -77,7 +77,7 @@ export default function AquariumSection() {
         <div />
         <button
           onClick={() => console.log("EXPORT clicked")}
-          className="font-vt mb-4 ml-auto rounded-full bg-[#3F3F3F]/80 px-10 py-2 text-2xl text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
+          className="font-vt mb-4 ml-auto rounded-full bg-[#3F3F3F]/80 px-8 py-1.5 text-2xl text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
         >
           EXPORT
         </button>
@@ -88,33 +88,34 @@ export default function AquariumSection() {
         <AquariumCanvas width={750} height={440} bgSrc={appliedBgSrc} itemSrc={appliedItemSrc} />
       </div>
       <div className="space-y-3">
-        <p className="font-vt text-3xl text-white">Repo contributions: {totalContrib}</p>
+        <p className="font-vt mt-3 text-2xl text-white">Repo contributions: {totalContrib}</p>
       </div>
 
       {/* 서브 탭 + APPLY */}
-      <div className="mt-4 flex items-center justify-between">
+      <div className="mt-4 mb-4 flex items-center justify-between">
         <AquariumTabs tab={tab} onChange={setTab} />
-        <button
-          onClick={handleApply}
-          className={`font-turret rounded-full border px-4 py-2 ${tab === "background" || tab === "items" ? "bg-black text-white" : "bg-white/60 text-black"} ${isApplyDisabled ? "opacity-50" : ""}`}
-          disabled={isApplyDisabled}
-        >
-          APPLY
-        </button>
+
+        {tab !== "fish" && (
+          <button
+            onClick={handleApply}
+            className="font-vt mb-0 ml-auto rounded-full bg-[#3F3F3F]/80 px-8 py-1.5 text-2xl text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
+          >
+            APPLY
+          </button>
+        )}
       </div>
 
       {/* 탭 컨텐츠 */}
-      <section className="mt-3 rounded-xl bg-white/60 p-4 shadow">
+      <section className="mt-3 rounded-xl">
         {tab === "fish" && <AquariumFishTable />}
 
         {tab === "background" && (
-          <AquariumItemGrid
+          <AquariumBackgroundGrid
             items={bgCandidates}
             selectedId={selectedBgId}
             onSelect={setSelectedBgId}
           />
         )}
-
         {tab === "items" && (
           <AquariumItemGrid
             items={itemCandidates}

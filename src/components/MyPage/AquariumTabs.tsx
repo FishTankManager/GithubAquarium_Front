@@ -8,9 +8,12 @@ export default function AquariumTabs({
   onChange: (t: SubTab) => void;
 }) {
   const btn = (is: boolean) =>
-    `font-turret rounded px-3 py-1 border ${is ? "bg-pink-200/60 border-pink-300" : "bg-white/70"}`;
+    `font-vt rounded-md px-6 py-1 text-xl shadow transition-transform duration-200 
+     ${is ? "bg-[#D7B9B9] text-black shadow-md" : "bg-[#C7D6FF]/80 text-black/80"} 
+     hover:scale-105 hover:shadow-lg`;
+
   return (
-    <div className="mt-4 flex gap-3">
+    <div className="mt-4 flex gap-4">
       <button className={btn(tab === "fish")} onClick={() => onChange("fish")}>
         FISH
       </button>
