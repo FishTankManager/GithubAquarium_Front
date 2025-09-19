@@ -6,8 +6,11 @@ export default forwardRef<HTMLDivElement, { size: CanvasSize; bowlSrc?: string }
     return (
       <div
         ref={ref}
-        className="relative rounded border-[#CA9B9B]/50"
-        style={{ width: size.width, height: size.height }}
+        className="relative rounded"
+        style={{
+          width: typeof size.width === "number" ? `${size.width}px` : size.width,
+          height: typeof size.height === "number" ? `${size.height}px` : size.height,
+        }}
       >
         <img
           src={bowlSrc}

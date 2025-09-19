@@ -1,9 +1,9 @@
 export type Maturity = "Hatchling" | "Juvenile" | "Youngling" | "Adult" | "Advanced" | "Master";
 
-export interface CanvasSize {
-  width: number;
-  height: number;
-}
+export type CanvasSize = {
+  width: number | string; // px 숫자 or "100%" 같은 CSS 단위 문자열
+  height: number | string; // px 숫자 or "auto"
+};
 
 export interface RepoInfo {
   id: string;
