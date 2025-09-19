@@ -6,7 +6,7 @@ export default function Titles({
   onChange: (v: "fishtank" | "aquarium") => void;
 }) {
   // 고정 사이즈
-  const BTN_H = "h-18"; // 버튼 높이
+  const BTN_H = "h-17"; // 버튼 높이
   const BTN_FISHTANK_W = "w-[300px]"; // FISHTANK 폭
   const BTN_AQUARIUM_W = "w-[300px]"; // AQUARIUM 폭
 

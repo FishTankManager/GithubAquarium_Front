@@ -3,7 +3,7 @@ import FishIcon from "./FishIcon";
 
 export default function GrowthTimeline({ items }: { items: TimelineItem[] }) {
   return (
-    <section className="w-[750px]">
+    <section className="w-[770px]">
       {/* 상단 라벨 */}
       <div className="mt-5 mb-5 inline-block rounded-lg bg-[#C7D6FF]/60 px-5 py-1 shadow">
         <span className="font-vt text-2xl tracking-wide text-black/80">GROWTH TIMELINE</span>
@@ -20,34 +20,31 @@ export default function GrowthTimeline({ items }: { items: TimelineItem[] }) {
         }}
       >
         {/* 헤더 행 */}
-        <div className="grid grid-cols-[180px_1fr_220px] items-end pb-6">
-          <h4 className="font-vt text-2xl tracking-wider text-[#5A2B55]">TIME</h4>
-          <h4 className="font-vt justify-self-center text-2xl tracking-wider text-[#5A2B55]">
-            FISH
-          </h4>
-          <h4 className="font-vt text-2xl tracking-wider text-[#5A2B55]">MATURITY</h4>
+        <div className="grid grid-cols-[180px_1fr_220px] items-center pb-6">
+          <h4 className="font-vt text-center text-2xl tracking-wider text-[#5A2B55]">TIME</h4>
+          <h4 className="font-vt text-center text-2xl tracking-wider text-[#5A2B55]">FISH</h4>
+          <h4 className="font-vt text-center text-2xl tracking-wider text-[#5A2B55]">MATURITY</h4>
         </div>
 
         {/* 아이템 목록 */}
         <div className="space-y-8">
           {items.map((it) => (
-            <div key={it.id} className="grid grid-cols-[180px_1fr_220px] items-center">
+            <div key={it.id} className="grid grid-cols-[180px_1fr_220px] items-center py-6">
               {/* TIME */}
-              <div className="font-vt text-2xl leading-relaxed text-white">
-                {it.at.split(" ")[0]}
-                <br />
-                {it.at.split(" ")[1]}
+              <div className="font-vt flex flex-col justify-center text-center text-2xl text-white">
+                <span>{it.at.split(" ")[0]}</span>
+                <span>{it.at.split(" ")[1]}</span>
               </div>
 
               {/* FISH 썸네일 박스 */}
               <div className="justify-self-center">
-                <div className="flex h-33 w-33 items-center justify-center rounded-2xl bg-white/25 shadow-inner transition-transform duration-300 hover:scale-110">
+                <div className="flex h-36 w-36 items-center justify-center rounded-2xl bg-white/25 shadow-inner transition-transform duration-300 hover:scale-110">
                   <FishIcon maturity={it.fish.maturity} />
                 </div>
               </div>
 
               {/* MATURITY */}
-              <div className="font-vt text-2xl text-white">{it.fish.maturity}</div>
+              <div className="font-vt text-center text-2xl text-white">{it.fish.maturity}</div>
             </div>
           ))}
         </div>
