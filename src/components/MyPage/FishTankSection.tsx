@@ -7,7 +7,7 @@ import { CanvasSize, RepoInfo, TimelineItem } from "@/types/aquarium";
 
 export default function FishTankSection() {
   const [repo, setRepo] = useState<RepoInfo | null>(null);
-  const [size, setSize] = useState<CanvasSize>({ width: 980, height: 590 });
+  const [size, setSize] = useState<CanvasSize>({ width: 950, height: 550 });
   const [contrib, setContrib] = useState<number>(914);
   const [timeline] = useState<TimelineItem[]>([
     { id: "t1", at: "25/09/14 00:00", fish: { id: "f1", maturity: "Juvenile" } },
@@ -31,7 +31,7 @@ export default function FishTankSection() {
       <div className="space-y-3">
         <CanvasControls size={size} onSizeChange={setSize} />
         <FishTankCanvas ref={canvasRef} size={size} />
-        <p className="font-turret text-sm">Repo contributions: {contrib}</p>
+        <p className="font-vt text-3xl text-white">Repo contributions: {contrib}</p>
       </div>
 
       <div className="mt-6">
