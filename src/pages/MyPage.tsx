@@ -22,7 +22,7 @@ export default function MyPage() {
       </main>
 
       {/* Footer 바로 위 영역 */}
-      <section className="relative h-[600px] w-full bg-[url('/images/mypage-background.png')] bg-cover bg-bottom bg-no-repeat">
+      <section className="relative h-[400px] w-full bg-[url('/images/mypage-background.png')] bg-cover bg-bottom bg-no-repeat">
         <div className="relative z-10 mx-auto flex h-full max-w-[980px] items-center justify-center">
           <BottomLines />
         </div>
