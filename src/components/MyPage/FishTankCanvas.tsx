@@ -6,7 +6,7 @@ export default forwardRef<HTMLDivElement, { size: CanvasSize; bowlSrc?: string }
     return (
       <div
         ref={ref}
-        className="relative rounded border bg-white/70"
+        className="relative rounded border-[#CA9B9B]/50"
         style={{ width: size.width, height: size.height }}
       >
         <img
