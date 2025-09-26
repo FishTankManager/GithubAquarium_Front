@@ -14,7 +14,7 @@ export default function AquariumItemGrid({
   onSelect: (id: string) => void;
 }) {
   return (
-    <section className="w-[770px]">
+    <section className="w-full">
       {/* 유리(서리) 카드 컨테이너 */}
       <div
         className="rounded-2xl p-6 shadow-lg ring-1 ring-white/40"

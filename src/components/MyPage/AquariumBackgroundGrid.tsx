@@ -7,28 +7,22 @@ type BgItem = {
 export default function AquariumBackgroundGrid({
   items,
   selectedId,
-  onSelect,
+  // onSelect,
 }: {
   items: BgItem[];
   selectedId: string | null;
   onSelect: (id: string) => void;
 }) {
   return (
-    <section className="w-[770px]">
-      <div
-        className="rounded-2xl bg-[linear-gradient(180deg,rgba(255,255,255,0.45)_0%,rgba(255,255,255,0.25)_100%)] p-6 shadow-lg ring-1 ring-white/40 backdrop-blur-md"
-        style={{ WebkitBackdropFilter: "blur(6px)" }}
-      >
-        <div className="grid grid-cols-2 gap-5 p-2 sm:p-4">
+    <section className="w-full">
+      <div className="rounded-2xl p-2 sm:p-4" style={{ WebkitBackdropFilter: "blur(6px)" }}>
+        <div className="grid grid-cols-2 gap-5">
           {items.map((bg) => {
             const isSelected = selectedId === bg.id;
             return (
               <button
-                key={bg.id}
-                onClick={() => onSelect(bg.id)}
-                title={bg.name}
                 className={[
-                  "group relative aspect-[17/10] w-full overflow-hidden rounded-xl border-3 transition duration-200 ease-out",
+                  "group relative aspect-[17/10] w-full overflow-hidden rounded-xl border-2 transition duration-200 ease-out",
                   isSelected ? "border-[#D7B9B9]" : "border-transparent",
                   "hover:scale-[1.03] hover:border-[#D7B9B9]",
                   "bg-white/50",

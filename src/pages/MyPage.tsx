@@ -7,12 +7,19 @@ import BottomLines from "@/components/MyPage/BottomLines";
 
 export default function MyPage() {
   const [active, setActive] = useState<"fishtank" | "aquarium">("fishtank");
+  const isAquarium = active === "aquarium";
 
   return (
     <div className="mb-12 flex min-h-screen flex-col justify-between bg-[#4A68AF]">
       <Header />
 
-      <main className="mx-auto w-full max-w-[800px] flex-1 px-4 py-8 text-black">
+      {/* aquarium일 때만 더 넓은 컨테이너 사용 */}
+      <main
+        className={[
+          "mx-auto w-full flex-1 px-4 py-8 text-black",
+          isAquarium ? "max-w-[1500px]" : "max-w-[800px]",
+        ].join(" ")}
+      >
         <div className="mb-6 flex items-center justify-center">
           <Titles active={active} onChange={setActive} />
         </div>
@@ -21,7 +28,6 @@ export default function MyPage() {
         {active === "aquarium" && <AquariumSection />}
       </main>
 
-      {/* Footer 바로 위 영역 */}
       <section className="relative h-[400px] w-full bg-[url('/images/mypage-background.png')] bg-cover bg-bottom bg-no-repeat">
         <div className="relative z-10 mx-auto flex h-full max-w-[980px] items-center justify-center">
           <BottomLines />
