@@ -15,17 +15,8 @@ export default function AquariumItemGrid({
 }) {
   return (
     <section className="w-full">
-      {/* 유리(서리) 카드 컨테이너 */}
-      <div
-        className="rounded-2xl p-6 shadow-lg ring-1 ring-white/40"
-        style={{
-          background:
-            "linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.25) 100%)",
-          backdropFilter: "blur(6px)",
-          WebkitBackdropFilter: "blur(6px)", // Safari 대응
-        }}
-      >
-        <div className="grid grid-cols-2 gap-5 p-2 sm:p-4">
+      <div className="rounded-2xl p-2 sm:p-4" style={{ WebkitBackdropFilter: "blur(6px)" }}>
+        <div className="grid grid-cols-2 gap-5">
           {items.map((it) => {
             const isSelected = selectedId === it.id;
             return (
@@ -33,11 +24,12 @@ export default function AquariumItemGrid({
                 key={it.id}
                 onClick={() => onSelect(it.id)}
                 title={it.name}
+                aria-pressed={isSelected}
                 className={[
-                  "group relative aspect-[17/10] w-full overflow-hidden rounded-xl border-2 transition",
-                  "bg-white/50 duration-200 ease-out",
+                  "group relative aspect-[17/10] w-full overflow-hidden rounded-xl border-2 transition duration-200 ease-out",
                   isSelected ? "border-[#D7B9B9]" : "border-transparent",
                   "hover:scale-[1.03] hover:border-[#D7B9B9]",
+                  "bg-white/50",
                 ].join(" ")}
               >
                 <img src={it.src} alt={it.name} className="h-full w-full object-cover" />
