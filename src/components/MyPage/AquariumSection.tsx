@@ -3,6 +3,7 @@ import AquariumCanvas from "./AquariumCanvas";
 import { SubTab } from "./AquariumTabs";
 import AquariumBackgroundGrid from "./AquariumBackgroundGrid";
 import AquariumItemGrid from "./AquariumItemGrid";
+import AquariumFishTable from "./AquariumFishTable";
 
 type Item = { id: string; name: string; src: string };
 type BgItem = { id: string; name: string; src: string };
@@ -128,6 +129,9 @@ export default function AquariumSection() {
             </div>
           </div>
         </aside>
+      </div>
+      <div className="mt-10 flex justify-center">
+        <AquariumFishTable />
       </div>
     </div>
   );
