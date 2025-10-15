@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { MainPage, MyPage, ShopPage } from "./pages";
+import { MainPage, MyPage, ShopPage, TestPage } from "./pages";
 
 function App() {
   return (
@@ -8,6 +8,7 @@ function App() {
         <Route path="/" element={<MainPage />} />
         <Route path="/my" element={<MyPage />} />
         <Route path="/shop" element={<ShopPage />} />
+        <Route path="/test" element={<TestPage />} />
       </Routes>
     </BrowserRouter>
   );

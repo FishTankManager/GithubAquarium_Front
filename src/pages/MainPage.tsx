@@ -8,7 +8,7 @@ export default function MainPage() {
         <p className="text-h1 font-logo">Main Page</p>
         <p className="text-h1 font-vt">Main Page</p>
         <p className="text-h1 font-turret">Main Page</p>
-        <p className="text-h1">메인 페이지</p>
+        <p className="text-h1 font-kor">메인 페이지</p>
       </main>
       <Footer />
     </div>
