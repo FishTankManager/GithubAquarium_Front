@@ -5,7 +5,7 @@ import FishTankCanvas from "./FishTankCanvas";
 import GrowthTimeline from "./GrowthTimeline";
 import AquariumBackgroundGrid from "./AquariumBackgroundGrid";
 import AquariumItemGrid from "./AquariumItemGrid";
-import { CanvasSize, RepoInfo, TimelineItem } from "@/types/aquarium";
+import { CanvasSize, RepoInfo } from "@/types/aquarium";
 
 type Item = { id: string; name: string; src: string };
 type BgItem = { id: string; name: string; src: string };
@@ -15,10 +15,10 @@ export default function FishTankSection() {
   const [repo, setRepo] = useState<RepoInfo | null>(null);
   const [size, setSize] = useState<CanvasSize>({ width: 770, height: 400 });
   const [contrib, setContrib] = useState<number>(914);
-  const [timeline] = useState<TimelineItem[]>([
-    { id: "t1", at: "25/09/14 00:00", fish: { id: "f1", maturity: "Juvenile" } },
-    { id: "t0", at: "25/09/12 00:00", fish: { id: "f0", maturity: "Hatchling" } },
-  ]);
+  // const [timeline] = useState<TimelineItem[]>([
+  //   { id: "t1", at: "25/09/14 00:00", fish: { id: "f1", maturity: "Juvenile" } },
+  //   { id: "t0", at: "25/09/12 00:00", fish: { id: "f0", maturity: "Hatchling" } },
+  // ]);
 
   // 배경/아이템 관련 상태
   const [tab, setTab] = useState<SubTab>("background");
@@ -184,7 +184,7 @@ export default function FishTankSection() {
 
       {/* GrowthTimeline */}
       <div className="mt-10 flex justify-center">
-        <GrowthTimeline items={timeline} />
+        <GrowthTimeline />
       </div>
     </div>
   );
