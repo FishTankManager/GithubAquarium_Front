@@ -29,6 +29,7 @@ export default function AquariumSection() {
       { id: "it2", name: "Corals 2", src: "/images/items/coral-2.png" },
       { id: "it3", name: "Corals 3", src: "/images/items/coral-3.png" },
       { id: "it4", name: "Corals 4", src: "/images/items/coral-4.png" },
+      { id: "locked", name: "Locked", src: "/images/items/item-locked.png" },
     ],
     [],
   );
@@ -57,6 +58,11 @@ export default function AquariumSection() {
       setAppliedBgId(selectedBgId);
       setMessage(null); // 성공적으로 적용되면 메시지 제거
     } else if (tab === "items" && selectedItemId) {
+      if (selectedItemId === "locked") {
+        setMessage("This item is locked.");
+        setTimeout(() => setMessage(null), 3000); // 3초 후 메시지 자동 제거
+        return;
+      }
       setAppliedItemId(selectedItemId);
       setMessage(null); // 성공적으로 적용되면 메시지 제거
     }
@@ -97,9 +103,9 @@ export default function AquariumSection() {
             </button>
           </div>
 
-          {/* 잠겨있는 배경 선택 시 메시지 표시 영역 */}
+          {/* 잠겨있는 아이템/배경 선택 시 메시지 표시 영역 - 우측 정렬 */}
           {message && (
-            <div className="flex justify-center">
+            <div className="flex justify-end">
               <div className="font-vt rounded-md bg-[#00355B] px-6 py-1 text-xl text-white shadow-lg">
                 {message}
               </div>
