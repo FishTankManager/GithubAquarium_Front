@@ -71,7 +71,7 @@ export default function AquariumFishTable() {
 
               {/* FISH 썸네일 */}
               <div className="justify-self-center">
-                <div className="flex h-30 w-30 items-center justify-center rounded-2xl bg-white/25 shadow-inner transition-transform duration-300 hover:scale-110">
+                <div className="flex h-30 w-45 items-center justify-center rounded-2xl bg-white/25 shadow-inner transition-transform duration-300 hover:scale-110">
                   <FishIcon maturity={r.maturity} />
                 </div>
               </div>
