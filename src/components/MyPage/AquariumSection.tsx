@@ -10,7 +10,7 @@ type BgItem = { id: string; name: string; src: string };
 
 export default function AquariumSection() {
   const [tab, setTab] = useState<SubTab>("background"); // 기본 background
-  const totalContrib = 12987;
+  const totalContrib = 12987; // dummy
 
   const bgCandidates: BgItem[] = useMemo(
     () => [
@@ -18,6 +18,7 @@ export default function AquariumSection() {
       { id: "ocean", name: "Pixel Ocean", src: "/images/background/bg-ocean.png" },
       { id: "deep1", name: "Deep Sea 1", src: "/images/background/bg-deep-1.png" },
       { id: "deep2", name: "Deep Sea 2", src: "/images/background/bg-deep-2.png" },
+      { id: "locked", name: "Locked", src: "/images/background/bg-locked.png" },
     ],
     [],
   );
@@ -36,6 +37,7 @@ export default function AquariumSection() {
   const [selectedBgId, setSelectedBgId] = useState<string | null>(null);
   const [appliedItemId, setAppliedItemId] = useState<string | null>(null);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
 
   const appliedBgSrc =
     (appliedBgId && bgCandidates.find((b) => b.id === appliedBgId)?.src) ||
@@ -47,9 +49,16 @@ export default function AquariumSection() {
 
   const handleApply = () => {
     if (tab === "background" && selectedBgId) {
+      if (selectedBgId === "locked") {
+        setMessage("This background is locked.");
+        setTimeout(() => setMessage(null), 3000); // 3초 후 메시지 자동 제거
+        return;
+      }
       setAppliedBgId(selectedBgId);
+      setMessage(null); // 성공적으로 적용되면 메시지 제거
     } else if (tab === "items" && selectedItemId) {
       setAppliedItemId(selectedItemId);
+      setMessage(null); // 성공적으로 적용되면 메시지 제거
     }
   };
 
@@ -87,6 +96,15 @@ export default function AquariumSection() {
               ITEMS
             </button>
           </div>
+
+          {/* 잠겨있는 배경 선택 시 메시지 표시 영역 */}
+          {message && (
+            <div className="flex justify-center">
+              <div className="font-vt rounded-md bg-[#00355B] px-6 py-1 text-xl text-white shadow-lg">
+                {message}
+              </div>
+            </div>
+          )}
 
           <button
             onClick={handleApply}
