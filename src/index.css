@@ -13,6 +13,8 @@
   --font-vt: "VT323", system-ui, sans-serif;
   --font-turret: "Turret Road", system-ui, sans-serif;
   --font-kor: "116Angdeokjeongjik", system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --font-bungee: "Bungee", system-ui, sans-serif;
+  --font-abeezee: "ABeeZee", system-ui, sans-serif;
 }
 
 @layer base {
