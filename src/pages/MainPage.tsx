@@ -22,7 +22,6 @@ export default function MainPage() {
           <img src="/bottomIcon.png" alt="down arrow" className="mt-4 h-6 w-6 animate-bounce" />
         </div>
       </section>
-      {/* Showcase Card */}
       <section className="mt-6 flex w-full justify-center px-4 md:mt-10">
         <div className="relative w-full max-w-4xl rounded-[4.5rem] border border-white/60 bg-white/70 p-8 shadow-2xl backdrop-blur md:p-12">
           <img src="/example.png" className="h-full w-full object-cover" />
@@ -76,7 +75,6 @@ export default function MainPage() {
           raise your Sunfish now!
         </button>
       </section>
-
       <div className="relative h-[28rem] w-full md:h-[56rem]">
         <div className="absolute right-0 bottom-0 left-0 flex w-full items-end justify-between">
           <img src="/sand-left.png" alt="sand left" className="z-30 w-[28rem] md:w-[45rem]" />
