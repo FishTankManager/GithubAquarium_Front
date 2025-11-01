@@ -15,7 +15,7 @@ export default forwardRef<HTMLDivElement, { size: CanvasSize; bowlSrc?: string }
         <img
           src={bowlSrc}
           alt="fish bowl"
-          className="pointer-events-none absolute inset-0 h-full w-full object-contain select-none"
+          className="pointer-events-none absolute inset-0 h-full w-full border border-white/50 object-contain select-none"
         />
       </div>
     );
