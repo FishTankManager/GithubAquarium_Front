@@ -1,5 +1,5 @@
 import { Footer, Header, FishTankTest, FishSpriteTest } from "@/components";
-import fishSvgText from "@/assets/svg/fish_test.svg?raw";
+import { LaptopSunfish, SpaceOcto_1, SpaceOcto_5 } from "@/assets/svg/FishSprites";
 
 export default function TestPage() {
   return (
@@ -14,20 +14,20 @@ export default function TestPage() {
         <FishTankTest width={400} height={400} className="bg-sky-200">
           <FishSpriteTest
             id="demo-01"
-            svgSource={fishSvgText}
+            svgSource={LaptopSunfish}
             personaWidthPercent={16}
             label="user123"
           />
           <FishSpriteTest
             id="demo-02"
-            svgSource={fishSvgText}
-            personaWidthPercent={12}
+            svgSource={SpaceOcto_1}
+            personaWidthPercent={16}
             label="user456"
           />
           <FishSpriteTest
             id="demo-03"
-            svgSource={fishSvgText}
-            personaWidthPercent={10}
+            svgSource={SpaceOcto_5}
+            personaWidthPercent={16}
             label="user789"
           />
         </FishTankTest>
