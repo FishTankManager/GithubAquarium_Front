@@ -13,7 +13,7 @@ type SubTab = "background" | "items";
 
 export default function FishTankSection() {
   const [repo, setRepo] = useState<RepoInfo | null>(null);
-  const [size, setSize] = useState<CanvasSize>({ width: 770, height: 400 });
+  const [size, setSize] = useState<CanvasSize>({ width: 700, height: 400 });
   const [contrib, setContrib] = useState<number>(914);
   // const [timeline] = useState<TimelineItem[]>([
   //   { id: "t1", at: "25/09/14 00:00", fish: { id: "f1", maturity: "Juvenile" } },
@@ -81,8 +81,14 @@ export default function FishTankSection() {
 
   const canvasRef = useRef<HTMLDivElement>(null);
 
+  const handleSizeChange = (newSize: CanvasSize) => {
+    const limitedWidth =
+      typeof newSize.width === "number" && newSize.width > 700 ? 700 : newSize.width;
+    setSize({ ...newSize, width: limitedWidth });
+  };
+
   return (
-    <div className="flex w-full flex-col">
+    <div className="flex w-full flex-col px-20">
       {/* RepoSelect */}
       <div className="font-abeezee mb-10 flex justify-center text-[#B2B2B2]">
         <RepoSelect
@@ -95,20 +101,28 @@ export default function FishTankSection() {
       </div>
 
       {/* 상단 공용 툴바: CanvasControls + EXPORT + 탭 + APPLY */}
-      <div className="mb-4 grid grid-cols-[770px_minmax(420px,1fr)] items-center gap-6">
-        {/* 좌: CanvasControls + EXPORT (고정 위치) */}
-        <div className="relative">
-          <CanvasControls size={size} onSizeChange={setSize} />
-          <button
-            onClick={() => console.log("EXPORT clicked")}
-            className="font-vt absolute top-0 right-0 rounded-full bg-[#3F3F3F]/80 px-8 py-1 text-2xl text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
-          >
-            EXPORT
-          </button>
+      <div className="relative mb-4">
+        {/* 좌: CanvasControls */}
+        <div
+          style={{
+            width: typeof size.width === "number" ? `${Math.min(size.width, 700)}px` : size.width,
+            maxWidth: "700px",
+          }}
+        >
+          <CanvasControls size={size} onSizeChange={handleSizeChange} />
         </div>
 
-        {/* 우: 탭(Background & Items) + APPLY */}
-        <div className="flex items-center gap-4">
+        {/* EXPORT 버튼 - 고정 위치 */}
+        <button
+          onClick={() => console.log("EXPORT clicked")}
+          className="font-vt absolute top-0 rounded-full bg-[#3F3F3F]/80 px-8 py-1 text-2xl text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
+          style={{ right: "530px" }}
+        >
+          EXPORT
+        </button>
+
+        {/* 우: 탭(Background & Items) + APPLY - 고정 위치 */}
+        <div className="absolute top-0 right-0 flex items-center gap-4" style={{ width: "500px" }}>
           <div className="flex gap-3">
             <button
               className={`font-vt rounded-md px-6 py-1 text-xl ${
@@ -147,17 +161,27 @@ export default function FishTankSection() {
       </div>
 
       {/* 본문: 캔버스 / 그리드 */}
-      <div className="grid grid-cols-[770px_minmax(420px,1fr)] items-start gap-6">
-        {/* 좌측: FishTankCanvas (최대 너비 770px 제한) */}
-        <div className="justify-self-start">
-          <div className="max-w-[770px]">
+      <div className="relative">
+        {/* 좌측: FishTankCanvas */}
+        <div
+          style={{
+            width: typeof size.width === "number" ? `${Math.min(size.width, 700)}px` : size.width,
+            maxWidth: "700px",
+          }}
+        >
+          <div
+            style={{
+              maxWidth:
+                typeof size.width === "number" ? `${Math.min(size.width, 700)}px` : size.width,
+            }}
+          >
             <FishTankCanvas ref={canvasRef} size={size} />
           </div>
           <p className="font-vt mt-3 text-2xl text-white">Repo contributions: {contrib}</p>
         </div>
 
-        {/* 우측: 스크롤 영역만 */}
-        <aside className="w-full max-w-[700px]">
+        {/* 우측: 스크롤 영역만 - 고정 위치 */}
+        <aside className="absolute top-0 right-0 w-[500px]">
           <div
             className="rounded-2xl bg-[linear-gradient(180deg,rgba(255,255,255,0.45)_0%,rgba(255,255,255,0.25)_100%)] p-4 shadow-lg ring-1 ring-white/40 backdrop-blur-md"
             style={{ WebkitBackdropFilter: "blur(6px)" }}
