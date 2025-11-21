@@ -17,7 +17,6 @@
           values="0 8 18; -24 8 18; -2 8 18; 0 8 18"
           keyTimes="0; 0.30; 0.60; 1"
           dur="1.4s" repeatCount="indefinite" />
-        <!-- (도트 그대로) -->
         <rect x="5" y="18" width="1" height="1" fill="rgb(68,58,66)"/>
         <rect x="6" y="18" width="1" height="1" fill="rgb(66,57,63)"/>
         <rect x="7" y="18" width="1" height="1" fill="rgb(69,57,65)"/>
@@ -65,7 +64,6 @@
           values="0 18 18; 24 18 18; 2 18 18; 0 18 18"
           keyTimes="0; 0.30; 0.60; 1"
           dur="1.4s" repeatCount="indefinite" />
-        <!-- (도트 그대로) -->
         <rect x="19" y="18" width="1" height="1" fill="rgb(58,49,58)"/>
         <rect x="20" y="18" width="1" height="1" fill="rgb(58,49,58)"/>
         <rect x="18" y="19" width="1" height="1" fill="rgb(66,55,62)"/>
@@ -98,8 +96,7 @@
         <rect x="23" y="23" width="1" height="1" fill="rgb(59,48,55)"/>
       </g>
 
-      <g id="img203-*{id}-body">
-        <!-- (도트 그대로) -->
+      <g id="img203-*{id}-head">
         <rect x="7" y="2" width="1" height="1" fill="rgb(58,49,58)"/>
         <rect x="8" y="2" width="1" height="1" fill="rgb(58,49,58)"/>
         <rect x="9" y="2" width="1" height="1" fill="rgb(58,49,58)"/>
@@ -232,7 +229,7 @@
         <rect x="16" y="9" width="1" height="1" fill="rgb(79,196,233)"/>
         <rect x="17" y="9" width="1" height="1" fill="rgb(79,196,233)"/>
         <rect x="18" y="9" width="1" height="1" fill="rgb(79,196,233)"/>
-        <rect x="19" y="9" width="1" height="1" fill="rgb(79,196,233)"/>
+        <rect x="19" y="9" width="1" height="1" fill="rgb(253,250,233)"/>
         <rect x="20" y="9" width="1" height="1" fill="rgb(67,139,175)"/>
         <rect x="21" y="9" width="1" height="1" fill="rgb(58,49,58)"/>
         <rect x="2" y="10" width="1" height="1" fill="rgb(69,58,66)"/>
@@ -398,7 +395,6 @@
           values="0 11 22; -12 11 22; -1.2 11 22; 0 11 22"
           keyTimes="0; 0.30; 0.60; 1"
           dur="1.4s" repeatCount="indefinite" />
-        <!-- (도트 그대로) -->
         <rect x="7" y="22" width="1" height="1" fill="rgb(77,58,67)"/>
         <rect x="8" y="22" width="1" height="1" fill="rgb(194,113,120)"/>
         <rect x="6" y="23" width="1" height="1" fill="rgb(72,58,64)"/>
@@ -445,7 +441,6 @@
           values="0 14 23; 12 14 23; 1.2 14 23; 0 14 23"
           keyTimes="0; 0.30; 0.60; 1"
           dur="1.4s" repeatCount="indefinite" />
-        <!-- (도트 그대로) -->
         <rect x="18" y="23" width="1" height="1" fill="rgb(211,115,124)"/>
         <rect x="19" y="23" width="1" height="1" fill="rgb(68,54,63)"/>
         <rect x="14" y="24" width="1" height="1" fill="rgb(66,46,53)"/>
@@ -479,8 +474,7 @@
         <rect x="19" y="28" width="1" height="1" fill="rgb(63,55,62)"/>
       </g>
 
-      <g id="img203-*{id}-head">
-        <!-- (도트 그대로) -->
+      <g id="img203-*{id}-body">
         <rect x="9" y="19" width="1" height="1" fill="rgb(211,183,162)"/>
         <rect x="10" y="19" width="1" height="1" fill="rgb(230,200,177)"/>
         <rect x="11" y="19" width="1" height="1" fill="rgb(227,198,172)"/>
