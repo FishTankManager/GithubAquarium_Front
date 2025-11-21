@@ -1,21 +1,12 @@
 import { GithubLogo } from "@/assets/svg";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { LogoText, GithubLoginModal } from "@/components";
+import { LogoText } from "@/components";
+import { redirectToGitHubLogin } from "@/auth/githubAuth";
+import { useAuth } from "@/auth/AuthContext";
 
 export default function Header() {
   const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
-
-  const handleSubmit = async ({ username, password }: { username: string; password: string }) => {
-    console.log(username, password);
-    setOpen(false);
-  };
-
-  const handleGoogle = () => {
-    // TODO: 구글 Auth 시작
-    console.log("google");
-  };
+  const { user, loading, logout } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 flex h-24 w-full items-start justify-between bg-white/30 px-8 pt-6 backdrop-blur">
@@ -56,20 +47,35 @@ export default function Header() {
         </button>
       </nav>
 
-      <button
-        onClick={() => setOpen(true)}
-        className="font-turret flex w-54 items-center justify-center gap-2.5 rounded-full border bg-white px-4 py-2 text-lg text-black"
-      >
-        <GithubLogo className="h-6 w-6" />
-        <p>Login with GitHub</p>
-      </button>
-
-      <GithubLoginModal
-        isOpen={open}
-        onClose={() => setOpen(false)}
-        onSubmit={handleSubmit}
-        onGoogle={handleGoogle}
-      />
+      {loading ? (
+        <div className="font-turret flex items-center justify-center text-sm text-gray-600">
+          loading...
+        </div>
+      ) : user ? (
+        <div className="flex items-center gap-3">
+          {user.avatar_url && (
+            <img src={user.avatar_url} alt="avatar" className="h-8 w-8 rounded-full" />
+          )}
+          <span className="text-sm text-gray-800">{user.github_username ?? "Unknown"}</span>
+          <button
+            onClick={async () => {
+              await logout();
+              navigate("/");
+            }}
+            className="font-turret rounded-full border bg-white px-4 py-2 text-sm text-black"
+          >
+            Logout
+          </button>
+        </div>
+      ) : (
+        <button
+          onClick={redirectToGitHubLogin}
+          className="font-turret flex w-54 items-center justify-center gap-2.5 rounded-full border bg-white px-4 py-2 text-lg text-black"
+        >
+          <GithubLogo className="h-6 w-6" />
+          <p>Login with GitHub</p>
+        </button>
+      )}
     </header>
   );
 }
