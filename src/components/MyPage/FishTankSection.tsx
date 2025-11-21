@@ -13,7 +13,7 @@ type SubTab = "background" | "items";
 
 export default function FishTankSection() {
   const [repo, setRepo] = useState<RepoInfo | null>(null);
-  const [size, setSize] = useState<CanvasSize>({ width: 770, height: 400 });
+  const [size, setSize] = useState<CanvasSize>({ width: 700, height: 400 });
   const [contrib, setContrib] = useState<number>(914);
   // const [timeline] = useState<TimelineItem[]>([
   //   { id: "t1", at: "25/09/14 00:00", fish: { id: "f1", maturity: "Juvenile" } },
@@ -82,7 +82,7 @@ export default function FishTankSection() {
   const canvasRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="flex w-full flex-col">
+    <div className="flex w-full flex-col px-20">
       {/* RepoSelect */}
       <div className="font-abeezee mb-10 flex justify-center text-[#B2B2B2]">
         <RepoSelect
@@ -95,7 +95,12 @@ export default function FishTankSection() {
       </div>
 
       {/* 상단 공용 툴바: CanvasControls + EXPORT + 탭 + APPLY */}
-      <div className="mb-4 grid grid-cols-[770px_minmax(420px,1fr)] items-center gap-6">
+      <div
+        className="mb-4 grid items-center gap-6"
+        style={{
+          gridTemplateColumns: `${typeof size.width === "number" ? `${size.width}px` : size.width} minmax(420px, 1fr)`,
+        }}
+      >
         {/* 좌: CanvasControls + EXPORT (고정 위치) */}
         <div className="relative">
           <CanvasControls size={size} onSizeChange={setSize} />
@@ -147,10 +152,19 @@ export default function FishTankSection() {
       </div>
 
       {/* 본문: 캔버스 / 그리드 */}
-      <div className="grid grid-cols-[770px_minmax(420px,1fr)] items-start gap-6">
-        {/* 좌측: FishTankCanvas (최대 너비 770px 제한) */}
+      <div
+        className="grid items-start gap-6"
+        style={{
+          gridTemplateColumns: `${typeof size.width === "number" ? `${size.width}px` : size.width} minmax(420px, 1fr)`,
+        }}
+      >
+        {/* 좌측: FishTankCanvas */}
         <div className="justify-self-start">
-          <div className="max-w-[770px]">
+          <div
+            style={{
+              maxWidth: typeof size.width === "number" ? `${size.width}px` : size.width,
+            }}
+          >
             <FishTankCanvas ref={canvasRef} size={size} />
           </div>
           <p className="font-vt mt-3 text-2xl text-white">Repo contributions: {contrib}</p>

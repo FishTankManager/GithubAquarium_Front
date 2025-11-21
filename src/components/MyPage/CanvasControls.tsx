@@ -17,6 +17,7 @@ export default function CanvasControls({
           type="number"
           min={200}
           step={10}
+          placeholder="700"
           value={size.width}
           onChange={(e) =>
             onSizeChange({
@@ -36,6 +37,7 @@ export default function CanvasControls({
           type="number"
           min={150}
           step={10}
+          placeholder="400"
           value={size.height}
           onChange={(e) =>
             onSizeChange({

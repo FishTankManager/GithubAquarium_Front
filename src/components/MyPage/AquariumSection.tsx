@@ -69,9 +69,9 @@ export default function AquariumSection() {
   };
 
   return (
-    <div className="flex w-full flex-col">
+    <div className="flex w-full flex-col px-20">
       {/* 상단 공용 툴바: 버튼들 y좌표 통일하기 위해 만들었음 === */}
-      <div className="mt-5 mb-3 grid grid-cols-[750px_minmax(420px,1fr)] items-center gap-6">
+      <div className="mt-5 mb-3 grid grid-cols-[700px_minmax(420px,1fr)] items-center gap-6">
         {/* 좌: EXPORT */}
         <div className="justify-self-end">
           <button
@@ -122,10 +122,10 @@ export default function AquariumSection() {
       </div>
 
       {/* 본문: 캔버스 / 그리드 === */}
-      <div className="grid grid-cols-[750px_minmax(420px,1fr)] items-start gap-6">
+      <div className="grid grid-cols-[700px_minmax(420px,1fr)] items-start gap-6">
         {/* 좌측: AquariumCanvas */}
         <div className="justify-self-start">
-          <AquariumCanvas width={750} height={440} bgSrc={appliedBgSrc} itemSrc={appliedItemSrc} />
+          <AquariumCanvas width={700} height={440} bgSrc={appliedBgSrc} itemSrc={appliedItemSrc} />
           <p className="font-vt mt-3 text-2xl text-white">Repo contributions: {totalContrib}</p>
         </div>
 
