@@ -81,6 +81,12 @@ export default function FishTankSection() {
 
   const canvasRef = useRef<HTMLDivElement>(null);
 
+  const handleSizeChange = (newSize: CanvasSize) => {
+    const limitedWidth =
+      typeof newSize.width === "number" && newSize.width > 700 ? 700 : newSize.width;
+    setSize({ ...newSize, width: limitedWidth });
+  };
+
   return (
     <div className="flex w-full flex-col px-20">
       {/* RepoSelect */}
@@ -96,19 +102,24 @@ export default function FishTankSection() {
 
       {/* 상단 공용 툴바: CanvasControls + EXPORT + 탭 + APPLY */}
       <div className="relative mb-4">
-        {/* 좌: CanvasControls + EXPORT */}
+        {/* 좌: CanvasControls */}
         <div
-          className="relative"
-          style={{ width: typeof size.width === "number" ? `${size.width}px` : size.width }}
+          style={{
+            width: typeof size.width === "number" ? `${Math.min(size.width, 700)}px` : size.width,
+            maxWidth: "700px",
+          }}
         >
-          <CanvasControls size={size} onSizeChange={setSize} />
-          <button
-            onClick={() => console.log("EXPORT clicked")}
-            className="font-vt absolute top-0 right-0 rounded-full bg-[#3F3F3F]/80 px-8 py-1 text-2xl text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
-          >
-            EXPORT
-          </button>
+          <CanvasControls size={size} onSizeChange={handleSizeChange} />
         </div>
+
+        {/* EXPORT 버튼 - 고정 위치 */}
+        <button
+          onClick={() => console.log("EXPORT clicked")}
+          className="font-vt absolute top-0 rounded-full bg-[#3F3F3F]/80 px-8 py-1 text-2xl text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
+          style={{ right: "530px" }}
+        >
+          EXPORT
+        </button>
 
         {/* 우: 탭(Background & Items) + APPLY - 고정 위치 */}
         <div className="absolute top-0 right-0 flex items-center gap-4" style={{ width: "500px" }}>
@@ -154,12 +165,14 @@ export default function FishTankSection() {
         {/* 좌측: FishTankCanvas */}
         <div
           style={{
-            width: typeof size.width === "number" ? `${size.width}px` : size.width,
+            width: typeof size.width === "number" ? `${Math.min(size.width, 700)}px` : size.width,
+            maxWidth: "700px",
           }}
         >
           <div
             style={{
-              maxWidth: typeof size.width === "number" ? `${size.width}px` : size.width,
+              maxWidth:
+                typeof size.width === "number" ? `${Math.min(size.width, 700)}px` : size.width,
             }}
           >
             <FishTankCanvas ref={canvasRef} size={size} />

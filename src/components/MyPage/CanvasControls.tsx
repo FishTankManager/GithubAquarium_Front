@@ -16,15 +16,17 @@ export default function CanvasControls({
           className="w-24 rounded border-2 border-[#CA9B9B] bg-transparent px-2 py-1 text-center text-[#D7B9B9] focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
           type="number"
           min={200}
+          max={700}
           step={10}
           placeholder="700"
           value={size.width}
-          onChange={(e) =>
+          onChange={(e) => {
+            const newWidth = Number(e.target.value);
             onSizeChange({
               ...size,
-              width: Number(e.target.value),
-            })
-          }
+              width: newWidth > 700 ? 700 : newWidth,
+            });
+          }}
         />
         <span className="font-bold">px</span>
       </label>
