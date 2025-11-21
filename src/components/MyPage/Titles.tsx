@@ -6,11 +6,11 @@ export default function Titles({
   onChange: (v: "fishtank" | "aquarium") => void;
 }) {
   // 고정 사이즈
-  const BTN_H = "h-17"; // 버튼 높이
-  const BTN_FISHTANK_W = "w-[300px]"; // FISHTANK 폭
-  const BTN_AQUARIUM_W = "w-[300px]"; // AQUARIUM 폭
+  const BTN_H = "h-13"; // 버튼 높이
+  const BTN_FISHTANK_W = "w-[260px]"; // FISHTANK 폭
+  const BTN_AQUARIUM_W = "w-[260px]"; // AQUARIUM 폭
 
-  const base = `rounded-full border-4 ${BTN_H} flex items-center justify-center px-8 transition-colors duration-150`;
+  const base = `rounded-full border-3 ${BTN_H} flex items-center justify-center px-6 transition-colors duration-150`;
   const onBtn = "bg-[#EDF1F8]/80 border-[#CA9B9B]";
   const offBtn = "bg-transparent border-[#CA9B9B]";
 
@@ -25,7 +25,7 @@ export default function Titles({
     <span
       className={`font-bungee leading-none ${className}`}
       style={{
-        WebkitTextStroke: "4px #CA9B9B",
+        WebkitTextStroke: "2px #CA9B9B",
         color: "#FFFFFF",
       }}
     >
@@ -34,9 +34,9 @@ export default function Titles({
   );
 
   return (
-    <div className="flex items-center gap-6">
+    <div className="flex items-center gap-4">
       {/* MY */}
-      <StrokeText className="text-7xl">MY</StrokeText>
+      <StrokeText className="text-5xl">MY</StrokeText>
 
       {/* FISHTANK */}
       <button
@@ -44,9 +44,9 @@ export default function Titles({
         onClick={() => onChange("fishtank")}
       >
         {active === "fishtank" ? (
-          <StrokeText className="text-4xl">FISHTANK</StrokeText>
+          <StrokeText className="text-3xl">FISHTANK</StrokeText>
         ) : (
-          <span className="font-abeezee text-4xl text-[#CA9B9B]">FISHTANK</span>
+          <span className="font-abeezee text-3xl text-[#CA9B9B]">FISHTANK</span>
         )}
       </button>
 
@@ -56,9 +56,9 @@ export default function Titles({
         onClick={() => onChange("aquarium")}
       >
         {active === "aquarium" ? (
-          <StrokeText className="text-4xl">AQUARIUM</StrokeText>
+          <StrokeText className="text-3xl">AQUARIUM</StrokeText>
         ) : (
-          <span className="font-abeezee text-4xl text-[#CA9B9B]">AQUARIUM</span>
+          <span className="font-abeezee text-3xl text-[#CA9B9B]">AQUARIUM</span>
         )}
       </button>
     </div>
