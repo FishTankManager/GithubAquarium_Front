@@ -37,11 +37,11 @@ export default function AquariumFishTable() {
       >
         {/* 헤더 행 */}
         <div className="grid grid-cols-[100px_120px_1fr_180px_160px] items-center gap-4 pb-4">
-          <h4 className="font-vt text-center text-xl tracking-wider text-[#5A2B55]">SELECT</h4>
-          <h4 className="font-vt text-center text-xl tracking-wider text-[#5A2B55]">FISH</h4>
-          <h4 className="font-vt text-center text-xl tracking-wider text-[#5A2B55]">MATURITY</h4>
-          <h4 className="font-vt text-center text-xl tracking-wider text-[#5A2B55]">REPO</h4>
-          <h4 className="font-vt text-center text-xl tracking-wider text-[#5A2B55]">
+          <h4 className="font-vt text-center text-2xl tracking-wider text-[#5A2B55]">SELECT</h4>
+          <h4 className="font-vt text-center text-2xl tracking-wider text-[#5A2B55]">FISH</h4>
+          <h4 className="font-vt text-center text-2xl tracking-wider text-[#5A2B55]">MATURITY</h4>
+          <h4 className="font-vt text-center text-2xl tracking-wider text-[#5A2B55]">REPO</h4>
+          <h4 className="font-vt text-center text-2xl tracking-wider text-[#5A2B55]">
             CONTRIBUTION
           </h4>
         </div>
@@ -77,10 +77,10 @@ export default function AquariumFishTable() {
               </div>
 
               {/* MATURITY */}
-              <div className="font-vt text-center text-lg text-white">{r.maturity}</div>
+              <div className="font-vt text-center text-xl text-white">{r.maturity}</div>
 
               {/* REPO 링크 느낌 */}
-              <div className="font-vt text-center text-lg text-white/90">
+              <div className="font-vt text-center text-xl text-white/90">
                 <button
                   className="underline decoration-white/60 underline-offset-2 transition-colors hover:text-white hover:decoration-white"
                   onClick={() => console.log("go repo:", r.repo)}
@@ -90,7 +90,7 @@ export default function AquariumFishTable() {
               </div>
 
               {/* CONTRIBUTION */}
-              <div className="font-vt text-center text-lg text-white">{r.contribution} commits</div>
+              <div className="font-vt text-center text-xl text-white">{r.contribution} commits</div>
             </div>
           ))}
         </div>
