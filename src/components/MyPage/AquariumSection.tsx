@@ -72,11 +72,11 @@ export default function AquariumSection() {
     <div className="flex w-full flex-col px-20">
       {/* 상단 공용 툴바: 버튼들 y좌표 통일하기 위해 만들었음 === */}
       <div className="relative mt-5 mb-3">
-        {/* 좌: EXPORT */}
+        {/* 좌: EXPORT 버튼 - 왼쪽 캔버스 영역 오른쪽 끝 */}
         <div className="flex justify-end" style={{ width: "700px" }}>
           <button
             onClick={() => console.log("EXPORT clicked")}
-            className="font-vt ml-4 rounded-full bg-[#3F3F3F]/80 px-8 py-1 text-2xl text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
+            className="font-vt rounded-full bg-[#3F3F3F]/80 px-8 py-1 text-2xl text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
           >
             EXPORT
           </button>
