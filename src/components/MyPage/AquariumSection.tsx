@@ -155,7 +155,15 @@ export default function AquariumSection() {
         </aside>
       </div>
       <div className="mt-10 flex justify-center">
-        <AquariumFishTable />
+        <div className="relative pb-16" style={{ maxWidth: "1000px", width: "100%" }}>
+          <AquariumFishTable />
+          <button
+            onClick={() => console.log("SAVE & APPLY clicked")}
+            className="font-vt absolute top-full right-0 -mt-10 rounded-full bg-[#3F3F3F]/80 px-8 py-1 text-2xl text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
+          >
+            SAVE & APPLY
+          </button>
+        </div>
       </div>
     </div>
   );
