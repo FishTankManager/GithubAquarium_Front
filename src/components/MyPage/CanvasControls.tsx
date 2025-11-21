@@ -46,14 +46,6 @@ export default function CanvasControls({
         />
         <span className="font-bold">px</span>
       </label>
-
-      {/* EXPORT 버튼 - 현재는 기능 없이 콘솔 로그만 출력되게 해놨음 */}
-      <button
-        onClick={() => console.log("EXPORT clicked")}
-        className="font-vt ml-auto rounded-full bg-[#3F3F3F]/80 px-8 py-1.5 text-2xl text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
-      >
-        EXPORT
-      </button>
     </div>
   );
 }
