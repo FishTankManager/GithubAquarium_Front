@@ -4,3 +4,115 @@
   padding: 2rem;
   text-align: center;
 }
+
+/* Pixel Art Styles */
+.pixel-art {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+.pixel-border {
+  border-style: solid;
+  border-width: 2px;
+  image-rendering: pixelated;
+}
+
+.pixel-text {
+  font-family: "Courier New", monospace;
+  text-rendering: optimizeSpeed;
+  font-smooth: never;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
+}
+
+/* Pixel Art Button */
+.pixel-button {
+  background: #4a5568;
+  border: 3px solid #2d3748;
+  color: white;
+  font-family: "Courier New", monospace;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.1s ease;
+  image-rendering: pixelated;
+}
+
+.pixel-button:hover {
+  background: #2d3748;
+  border-color: #1a202c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.pixel-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Pixel Art Speech Bubble */
+.pixel-speech-bubble {
+  background: white;
+  border: 3px solid #9ca3af;
+  border-radius: 8px;
+  position: relative;
+  image-rendering: pixelated;
+}
+
+.pixel-speech-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid #9ca3af;
+}
+
+/* My Aquarium Speech Bubble specific positioning */
+.my-aquarium-bubble::after {
+  left: 25%;
+}
+
+/* Shop Speech Bubble specific positioning */
+.shop-bubble::after {
+  left: 75%;
+}
+
+/* Pixel Art Building */
+.pixel-building {
+  background: #92400e;
+  border: 4px solid #78350f;
+  image-rendering: pixelated;
+}
+
+.pixel-awning {
+  background: #1d4ed8;
+  border: 4px solid #1e40af;
+  image-rendering: pixelated;
+}
+
+/* Pixel Art Character */
+.pixel-character {
+  image-rendering: pixelated;
+}
+
+.pixel-character-body {
+  background: #3b82f6;
+  border: 2px solid #2563eb;
+}
+
+.pixel-character-head {
+  background: #fbbf24;
+  border: 2px solid #f59e0b;
+}
+
+/* Pixel Art Marine Elements */
+.pixel-marine {
+  image-rendering: pixelated;
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
+}

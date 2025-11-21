@@ -39,7 +39,7 @@ export default function AquariumCanvas({
           className="pointer-events-none absolute left-1/2 block -translate-x-1/2 object-contain select-none"
           style={{
             height: `${Math.round(itemHeight * 100)}%`,
-            bottom: -1, // 하단 경계에 생기는 1px 틈 보정
+            bottom: -8, // 하단 경계에 생기는 1px 틈 보정
           }}
         />
       )}

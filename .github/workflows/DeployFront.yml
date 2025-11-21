@@ -1,0 +1,44 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches: [ "develop" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Notify Discord - Deploy Started
+      if: always()
+      run: |
+        curl -H "Content-Type: application/json" \
+        -d "{\"content\": \"🚀 **Frontend Deploy Started**\nRepository: $GITHUB_REPOSITORY\nCommit: $GITHUB_SHA\"}" \
+        ${{ secrets.DISCORD_WEBHOOK }}
+
+    - name: Deploy to EC2
+      id: deploy_script
+      uses: appleboy/ssh-action@v0.1.10
+      with:
+        host: githubaquarium.store
+        username: ubuntu
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          ~/deploy_front.sh
+
+    - name: Notify Discord - Deploy Success
+      if: success()
+      run: |
+        curl -H "Content-Type: application/json" \
+        -d "{\"content\": \"🟢 **Frontend Deploy Success!**\nRepository: $GITHUB_REPOSITORY\nCommit: $GITHUB_SHA\"}" \
+        ${{ secrets.DISCORD_WEBHOOK }}
+
+    - name: Notify Discord - Deploy Failed
+      if: failure()
+      run: |
+        curl -H "Content-Type: application/json" \
+        -d "{\"content\": \"🔴 **Frontend Deploy FAILED**\nRepository: $GITHUB_REPOSITORY\nCommit: $GITHUB_SHA\nCheck GitHub Actions logs!\"}" \
+        ${{ secrets.DISCORD_WEBHOOK }}
