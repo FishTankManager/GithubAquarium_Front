@@ -1,15 +1,19 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { MainPage, MyPage, ShopPage } from "./pages";
+import { MainPage, MyPage, ShopPage, GitHubCallbackPage } from "./pages";
+import { AuthProvider } from "@/auth/AuthContext";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<MainPage />} />
-        <Route path="/my" element={<MyPage />} />
-        <Route path="/shop" element={<ShopPage />} />
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<MainPage />} />
+          <Route path="/my" element={<MyPage />} />
+          <Route path="/shop" element={<ShopPage />} />
+          <Route path="/auth/github/callback" element={<GitHubCallbackPage />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
