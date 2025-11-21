@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo } from "react";
+import { useRef, useState, useMemo, useEffect } from "react";
 import RepoSelect from "./RepoSelect";
 import CanvasControls from "./CanvasControls";
 import FishTankCanvas from "./FishTankCanvas";
@@ -6,6 +6,7 @@ import GrowthTimeline from "./GrowthTimeline";
 import AquariumBackgroundGrid from "./AquariumBackgroundGrid";
 import AquariumItemGrid from "./AquariumItemGrid";
 import { CanvasSize, RepoInfo } from "@/types/aquarium";
+import { getFishtankBackgrounds, type FishtankBackground } from "@/apis/fishtank";
 
 type Item = { id: string; name: string; src: string };
 type BgItem = { id: string; name: string; src: string };
@@ -27,17 +28,39 @@ export default function FishTankSection() {
   // const [appliedItemId, setAppliedItemId] = useState<string | null>(null);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [bgCandidates, setBgCandidates] = useState<BgItem[]>([]);
+  const [loadingBg, setLoadingBg] = useState(true);
 
-  const bgCandidates: BgItem[] = useMemo(
-    () => [
-      { id: "blank", name: "Blank", src: "/images/background/bg-blank.png" },
-      { id: "ocean", name: "Pixel Ocean", src: "/images/background/bg-ocean.png" },
-      { id: "deep1", name: "Deep Sea 1", src: "/images/background/bg-deep-1.png" },
-      { id: "deep2", name: "Deep Sea 2", src: "/images/background/bg-deep-2.png" },
-      { id: "locked", name: "Locked", src: "/images/background/bg-locked.png" },
-    ],
-    [],
-  );
+  // API에서 배경 목록 가져오기
+  useEffect(() => {
+    const fetchBackgrounds = async () => {
+      try {
+        setLoadingBg(true);
+        const backgrounds = await getFishtankBackgrounds();
+
+        // FishtankBackground를 BgItem으로 변환
+        // svg_template을 data URL로 변환하여 src에 사용
+        const convertedBackgrounds: BgItem[] = backgrounds.map((bg: FishtankBackground) => {
+          // SVG 템플릿을 data URL로 변환 (encodeURIComponent 사용)
+          const svgDataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(bg.svg_template)}`;
+          return {
+            id: bg.id.toString(),
+            name: bg.name,
+            src: svgDataUrl,
+          };
+        });
+
+        setBgCandidates(convertedBackgrounds);
+      } catch (e) {
+        console.error("Failed to fetch fishtank backgrounds:", e);
+        setBgCandidates([]); // 에러 시 빈 배열
+      } finally {
+        setLoadingBg(false);
+      }
+    };
+
+    fetchBackgrounds();
+  }, []);
 
   const itemCandidates: Item[] = useMemo(
     () => [
@@ -187,13 +210,18 @@ export default function FishTankSection() {
             style={{ WebkitBackdropFilter: "blur(6px)" }}
           >
             <div className="max-h-[440px] overflow-y-auto pr-2">
-              {tab === "background" && (
-                <AquariumBackgroundGrid
-                  items={bgCandidates}
-                  selectedId={selectedBgId}
-                  onSelect={setSelectedBgId}
-                />
-              )}
+              {tab === "background" &&
+                (loadingBg ? (
+                  <div className="flex items-center justify-center py-10 text-white">
+                    배경 목록을 불러오는 중...
+                  </div>
+                ) : (
+                  <AquariumBackgroundGrid
+                    items={bgCandidates}
+                    selectedId={selectedBgId}
+                    onSelect={setSelectedBgId}
+                  />
+                ))}
               {tab === "items" && (
                 <AquariumItemGrid
                   items={itemCandidates}
