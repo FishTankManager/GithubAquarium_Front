@@ -58,7 +58,10 @@ export default function Header() {
           )}
           <span className="text-sm text-gray-800">{user.github_username ?? "Unknown"}</span>
           <button
-            onClick={logout}
+            onClick={async () => {
+              await logout();
+              navigate("/");
+            }}
             className="font-turret rounded-full border bg-white px-4 py-2 text-sm text-black"
           >
             Logout

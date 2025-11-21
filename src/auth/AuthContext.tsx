@@ -1,18 +1,8 @@
-// src/auth/AuthContext.tsx
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
-
-export interface User {
-  id: number;
-  email: string | null;
-  github_id: number | null;
-  github_username: string | null;
-  avatar_url: string | null;
-}
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { getCurrentUser, logoutUser, type UserProfile } from "@/apis/auth";
 
 interface AuthContextValue {
-  user: User | null;
+  user: UserProfile | null;
   loading: boolean;
   refreshUser: () => Promise<void>;
   logout: () => Promise<void>;
@@ -21,33 +11,14 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchUser = async () => {
+  const refreshUser = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/dj-rest-auth/user/`, {
-        method: "GET",
-        credentials: "include",
-      });
-
-      if (!res.ok) {
-        setUser(null);
-        return;
-      }
-
-      const data = await res.json();
-
-      const cleanUser: User = {
-        id: data.id,
-        email: data.email,
-        github_id: data.github_id,
-        github_username: data.github_username,
-        avatar_url: data.avatar_url,
-      };
-
-      setUser(cleanUser);
+      const me = await getCurrentUser();
+      setUser(me);
     } catch (e) {
       console.error("유저 정보 조회 실패:", e);
       setUser(null);
@@ -56,21 +27,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  function clearClientState() {
+    localStorage.removeItem("githubaquarium:lastVisitedTank");
+    localStorage.removeItem("githubaquarium:uiState");
+    sessionStorage.removeItem("githubaquarium:temp");
+  }
+
   const logout = async () => {
     try {
-      await fetch(`${API_BASE_URL}/dj-rest-auth/logout/`, {
-        method: "POST",
-        credentials: "include",
-      });
+      await logoutUser();
     } catch (e) {
       console.error("로그아웃 요청 실패:", e);
     } finally {
+      clearClientState();
       setUser(null);
     }
   };
 
   useEffect(() => {
-    fetchUser();
+    void refreshUser();
   }, []);
 
   return (
@@ -78,7 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         loading,
-        refreshUser: fetchUser,
+        refreshUser,
         logout,
       }}
     >
@@ -91,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth() {
   const ctx = useContext(AuthContext);
   if (!ctx) {
-    throw new Error("useAuth는 AuthProvider 내부에서만 사용해야 합니다.");
+    throw new Error("useAuth는 AuthProvider 안에서만 사용해야 합니다.");
   }
   return ctx;
 }

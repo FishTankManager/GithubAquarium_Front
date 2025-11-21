@@ -12,7 +12,8 @@
     "noFallthroughCasesInSwitch": true,
     "resolveJsonModule": true,
     "baseUrl": ".",
-    "paths": { "@/*": ["src/*"] }
+    "paths": { "@/*": ["src/*"] },
+    "noEmit": true
   },
   "include": ["src", "vite.config.ts", "env.d.ts"]
 }
