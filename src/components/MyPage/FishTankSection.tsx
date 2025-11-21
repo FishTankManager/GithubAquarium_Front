@@ -95,14 +95,12 @@ export default function FishTankSection() {
       </div>
 
       {/* 상단 공용 툴바: CanvasControls + EXPORT + 탭 + APPLY */}
-      <div
-        className="mb-4 grid items-center gap-6"
-        style={{
-          gridTemplateColumns: `${typeof size.width === "number" ? `${size.width}px` : size.width} minmax(420px, 1fr)`,
-        }}
-      >
-        {/* 좌: CanvasControls + EXPORT (고정 위치) */}
-        <div className="relative">
+      <div className="relative mb-4">
+        {/* 좌: CanvasControls + EXPORT */}
+        <div
+          className="relative"
+          style={{ width: typeof size.width === "number" ? `${size.width}px` : size.width }}
+        >
           <CanvasControls size={size} onSizeChange={setSize} />
           <button
             onClick={() => console.log("EXPORT clicked")}
@@ -112,8 +110,8 @@ export default function FishTankSection() {
           </button>
         </div>
 
-        {/* 우: 탭(Background & Items) + APPLY */}
-        <div className="flex items-center gap-4">
+        {/* 우: 탭(Background & Items) + APPLY - 고정 위치 */}
+        <div className="absolute top-0 right-0 flex items-center gap-4" style={{ width: "500px" }}>
           <div className="flex gap-3">
             <button
               className={`font-vt rounded-md px-6 py-1 text-xl ${
@@ -152,14 +150,13 @@ export default function FishTankSection() {
       </div>
 
       {/* 본문: 캔버스 / 그리드 */}
-      <div
-        className="grid items-start gap-6"
-        style={{
-          gridTemplateColumns: `${typeof size.width === "number" ? `${size.width}px` : size.width} minmax(420px, 1fr)`,
-        }}
-      >
+      <div className="relative">
         {/* 좌측: FishTankCanvas */}
-        <div className="justify-self-start">
+        <div
+          style={{
+            width: typeof size.width === "number" ? `${size.width}px` : size.width,
+          }}
+        >
           <div
             style={{
               maxWidth: typeof size.width === "number" ? `${size.width}px` : size.width,
@@ -170,8 +167,8 @@ export default function FishTankSection() {
           <p className="font-vt mt-3 text-2xl text-white">Repo contributions: {contrib}</p>
         </div>
 
-        {/* 우측: 스크롤 영역만 */}
-        <aside className="w-full max-w-[700px]">
+        {/* 우측: 스크롤 영역만 - 고정 위치 */}
+        <aside className="absolute top-0 right-0 w-[500px]">
           <div
             className="rounded-2xl bg-[linear-gradient(180deg,rgba(255,255,255,0.45)_0%,rgba(255,255,255,0.25)_100%)] p-4 shadow-lg ring-1 ring-white/40 backdrop-blur-md"
             style={{ WebkitBackdropFilter: "blur(6px)" }}
