@@ -8,6 +8,22 @@ export interface FishtankBackground {
   svg_template: string;
 }
 
+export interface Repository {
+  id: number;
+  github_id: number;
+  name: string;
+  full_name: string;
+  description: string | null;
+  html_url: string;
+  stargazers_count: number;
+  language: string | null;
+  commit_count: number;
+  created_at: string;
+  updated_at: string;
+  last_synced_at: string;
+  owner: number | null;
+}
+
 /** AxiosError 타입 가드 */
 const isAxiosError = (e: unknown): e is AxiosError =>
   typeof e === "object" && e !== null && "isAxiosError" in e;
@@ -37,6 +53,23 @@ function throwMapped(error: unknown, map: Record<number, string> = {}): never {
     }
   }
   throw error;
+}
+
+/**
+ * 내가 커밋한 모든 레포지토리 리스트를 반환합니다.
+ * Contributor 테이블에서 commit_count > 0인 레포지토리를 조회합니다.
+ * @returns 사용자가 커밋한 레포지토리 목록
+ */
+export async function getRepositories(): Promise<Repository[]> {
+  try {
+    const res = await api.get<Repository[]>("/repositories/");
+    return res.data;
+  } catch (e) {
+    throwMapped(e, {
+      401: "로그인이 필요합니다.",
+      500: "서버 오류로 레포지토리 목록을 불러오지 못했습니다.",
+    });
+  }
 }
 
 /**
