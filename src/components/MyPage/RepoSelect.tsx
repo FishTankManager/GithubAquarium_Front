@@ -1,11 +1,6 @@
+import { useEffect, useState } from "react";
 import { RepoInfo } from "@/types/aquarium";
-
-const REPOS: RepoInfo[] = [
-  // dummy
-  { id: "r1", fullName: "Repo1", contributions: 120 },
-  { id: "r2", fullName: "Repo2", contributions: 914 },
-  { id: "r3", fullName: "Repo3", contributions: 42 },
-];
+import { getRepositories, type Repository } from "@/apis/fishtank";
 
 export default function RepoSelect({
   value,
@@ -14,22 +9,62 @@ export default function RepoSelect({
   value: RepoInfo | null;
   onChange: (r: RepoInfo | null) => void;
 }) {
+  const [repos, setRepos] = useState<RepoInfo[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchRepositories = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const repositories = await getRepositories();
+
+        // Repository 타입을 RepoInfo 타입으로 변환
+        const repoInfos: RepoInfo[] = repositories.map((repo: Repository) => ({
+          id: repo.id.toString(),
+          fullName: repo.full_name,
+          contributions: repo.commit_count,
+        }));
+
+        setRepos(repoInfos);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "레포지토리 목록을 불러오는데 실패했습니다.");
+        console.error("Failed to fetch repositories:", e);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRepositories();
+  }, []);
+
   return (
     <div className="mt-5 mb-5">
-      <select
-        className="font-abeezee w-[700px] appearance-none rounded-md border border-white/50 bg-[#3E548E] px-3 py-2 pr-10 pl-7 text-white shadow-xl hover:shadow-2xl focus:ring-2 focus:ring-blue-300 focus:outline-none"
-        value={value?.id ?? ""}
-        onChange={(e) => onChange(REPOS.find((d) => d.id === e.target.value) ?? null)}
-      >
-        <option value="" disabled hidden className="text-[#B2B2B2]">
-          Select a repository to visit!
-        </option>
-        {REPOS.map((d) => (
-          <option key={d.id} value={d.id}>
-            {d.fullName}
+      {loading ? (
+        <div className="font-abeezee w-[700px] rounded-md border border-white/50 bg-[#3E548E] px-3 py-2 text-center text-white">
+          레포지토리 목록을 불러오는 중...
+        </div>
+      ) : error ? (
+        <div className="font-abeezee w-[700px] rounded-md border border-red-500/50 bg-[#3E548E] px-3 py-2 text-center text-red-300">
+          {error}
+        </div>
+      ) : (
+        <select
+          className="font-abeezee w-[700px] appearance-none rounded-md border border-white/50 bg-[#3E548E] px-3 py-2 pr-10 pl-7 text-white shadow-xl hover:shadow-2xl focus:ring-2 focus:ring-blue-300 focus:outline-none"
+          value={value?.id ?? ""}
+          onChange={(e) => onChange(repos.find((d) => d.id === e.target.value) ?? null)}
+        >
+          <option value="" disabled hidden className="text-[#B2B2B2]">
+            Select a repository to visit!
           </option>
-        ))}
-      </select>
+          {repos.map((d) => (
+            <option key={d.id} value={d.id}>
+              {d.fullName}
+            </option>
+          ))}
+        </select>
+      )}
     </div>
   );
 }
