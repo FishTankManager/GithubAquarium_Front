@@ -20,7 +20,7 @@ export default function Header() {
         />
       </div>
 
-      <nav className="font-turret flex items-center justify-center gap-24 text-lg text-black">
+      <nav className="font-turret flex h-full items-center justify-center gap-24 pb-6 text-lg text-black">
         <button
           onClick={() => {
             navigate("/");
@@ -44,6 +44,14 @@ export default function Header() {
           className="cursor-pointer"
         >
           SHOP
+        </button>
+        <button
+          onClick={() => {
+            navigate("/collection");
+          }}
+          className="cursor-pointer"
+        >
+          COLLECTION
         </button>
       </nav>
 
