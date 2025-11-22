@@ -17,7 +17,7 @@ export default function RepoSelect({
   return (
     <div className="mt-5 mb-5">
       <select
-        className="font-abeezee w-[1000px] appearance-none rounded-md border border-white/50 bg-[#3E548E] px-3 py-3 pr-10 pl-7 text-white shadow-xl hover:shadow-2xl focus:ring-2 focus:ring-blue-300 focus:outline-none"
+        className="font-abeezee w-[700px] appearance-none rounded-md border border-white/50 bg-[#3E548E] px-3 py-2 pr-10 pl-7 text-white shadow-xl hover:shadow-2xl focus:ring-2 focus:ring-blue-300 focus:outline-none"
         value={value?.id ?? ""}
         onChange={(e) => onChange(REPOS.find((d) => d.id === e.target.value) ?? null)}
       >
