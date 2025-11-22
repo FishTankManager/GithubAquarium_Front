@@ -24,6 +24,26 @@ export interface Repository {
   owner: number | null;
 }
 
+export interface ContributionFish {
+  id: number;
+  is_visible: boolean;
+  species: string;
+}
+
+export interface Contributor {
+  id: number;
+  user: string;
+  commit_count: number;
+  fish: ContributionFish | null;
+}
+
+export interface FishtankDetail {
+  id: number;
+  repository: string;
+  svg_path: string | null;
+  contributors: Contributor[];
+}
+
 /** AxiosError 타입 가드 */
 const isAxiosError = (e: unknown): e is AxiosError =>
   typeof e === "object" && e !== null && "isAxiosError" in e;
@@ -84,6 +104,24 @@ export async function getFishtankBackgrounds(): Promise<FishtankBackground[]> {
     throwMapped(e, {
       401: "로그인이 필요합니다.",
       500: "서버 오류로 배경 목록을 불러오지 못했습니다.",
+    });
+  }
+}
+
+/**
+ * repo ID를 기반으로 FishTank 내부 정보(기여자, 물고기)를 조회합니다.
+ * @param repoId repo ID
+ * @returns FishTank 상세 정보
+ */
+export async function getFishtankDetail(repoId: string): Promise<FishtankDetail> {
+  try {
+    const res = await api.get<FishtankDetail>(`/aquatics/fishtank/${repoId}/`);
+    return res.data;
+  } catch (e) {
+    throwMapped(e, {
+      401: "로그인이 필요합니다.",
+      404: "피쉬탱크를 찾을 수 없습니다.",
+      500: "서버 오류로 피쉬탱크 정보를 불러오지 못했습니다.",
     });
   }
 }
