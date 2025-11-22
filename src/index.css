@@ -39,3 +39,16 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+.outline-title {
+  /* #CA9B9B 테두리, 두께 3px (원하는 두께로 조절) */
+  text-shadow:
+    -3px -3px 0 #ca9b9b,
+    3px -3px 0 #ca9b9b,
+    -3px 3px 0 #ca9b9b,
+    3px 3px 0 #ca9b9b,
+    0px -3px 0 #ca9b9b,
+    0px 3px 0 #ca9b9b,
+    -3px 0px 0 #ca9b9b,
+    3px 0px 0 #ca9b9b;
+}
