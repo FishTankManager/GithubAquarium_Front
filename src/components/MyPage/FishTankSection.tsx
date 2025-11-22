@@ -75,7 +75,9 @@ export default function FishTankSection() {
       }
 
       try {
+        console.log("Fetching fishtank detail for repo:", repo.id, repo.fullName);
         const fishtankDetail = await getFishtankDetail(repo.id);
+        console.log("Fishtank detail received:", fishtankDetail);
 
         // contributors의 각 commit_count를 합산
         const totalContributions = fishtankDetail.contributors.reduce(
@@ -83,10 +85,14 @@ export default function FishTankSection() {
           0,
         );
 
+        console.log("Total contributions:", totalContributions);
         setContrib(totalContributions);
-      } catch (e) {
-        console.error("Failed to fetch fishtank detail:", e);
-        setContrib(0);
+      } catch {
+        // 피쉬탱크가 없는 경우 레포지토리 정보의 contributions 사용
+        console.warn("Fishtank not found for repo:", repo.id, repo.fullName);
+        console.warn("Using repository contributions as fallback:", repo.contributions);
+        // 레포지토리 정보의 contributions를 사용 (피쉬탱크가 없어도 해당 레포의 commit 수는 알 수 있음)
+        setContrib(repo.contributions || 0);
       }
     };
 
@@ -148,6 +154,7 @@ export default function FishTankSection() {
         <RepoSelect
           value={repo}
           onChange={(r) => {
+            console.log("Repo selected:", r);
             setRepo(r);
           }}
         />

@@ -125,3 +125,23 @@ export async function getFishtankDetail(repoId: string): Promise<FishtankDetail>
     });
   }
 }
+
+/**
+ * 사용자가 소유한 OwnBackground 중 하나를 fishtank 배경으로 적용합니다.
+ * @param repoId 레포지토리 ID
+ * @param backgroundId 유저가 소유한 OwnBackground.background.id
+ */
+export async function applyFishtankBackground(repoId: string, backgroundId: number): Promise<void> {
+  try {
+    await api.post(`/aquatics/fishtank/${repoId}/apply-background/`, {
+      background_id: backgroundId,
+    });
+  } catch (e) {
+    throwMapped(e, {
+      400: "잘못된 요청입니다. 배경 ID를 확인해주세요.",
+      401: "로그인이 필요합니다.",
+      404: "피쉬탱크 또는 배경을 찾을 수 없습니다.",
+      500: "서버 오류로 배경을 적용하지 못했습니다.",
+    });
+  }
+}
