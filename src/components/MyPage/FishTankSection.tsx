@@ -6,7 +6,11 @@ import GrowthTimeline from "./GrowthTimeline";
 import AquariumBackgroundGrid from "./AquariumBackgroundGrid";
 import AquariumItemGrid from "./AquariumItemGrid";
 import { CanvasSize, RepoInfo } from "@/types/aquarium";
-import { getFishtankBackgrounds, type FishtankBackground } from "@/apis/fishtank";
+import {
+  getFishtankBackgrounds,
+  getFishtankDetail,
+  type FishtankBackground,
+} from "@/apis/fishtank";
 
 type Item = { id: string; name: string; src: string };
 type BgItem = { id: string; name: string; src: string };
@@ -15,7 +19,7 @@ type SubTab = "background" | "items";
 export default function FishTankSection() {
   const [repo, setRepo] = useState<RepoInfo | null>(null);
   const [size, setSize] = useState<CanvasSize>({ width: 700, height: 400 });
-  const [contrib, setContrib] = useState<number>(914);
+  const [contrib, setContrib] = useState<number>(0);
   // const [timeline] = useState<TimelineItem[]>([
   //   { id: "t1", at: "25/09/14 00:00", fish: { id: "f1", maturity: "Juvenile" } },
   //   { id: "t0", at: "25/09/12 00:00", fish: { id: "f0", maturity: "Hatchling" } },
@@ -61,6 +65,33 @@ export default function FishTankSection() {
 
     fetchBackgrounds();
   }, []);
+
+  // 레포지토리 선택 시 피쉬탱크 상세 정보 가져오기 및 contributions 합산
+  useEffect(() => {
+    const fetchFishtankDetail = async () => {
+      if (!repo) {
+        setContrib(0);
+        return;
+      }
+
+      try {
+        const fishtankDetail = await getFishtankDetail(repo.id);
+
+        // contributors의 각 commit_count를 합산
+        const totalContributions = fishtankDetail.contributors.reduce(
+          (sum, contributor) => sum + contributor.commit_count,
+          0,
+        );
+
+        setContrib(totalContributions);
+      } catch (e) {
+        console.error("Failed to fetch fishtank detail:", e);
+        setContrib(0);
+      }
+    };
+
+    fetchFishtankDetail();
+  }, [repo]);
 
   const itemCandidates: Item[] = useMemo(
     () => [
@@ -118,7 +149,6 @@ export default function FishTankSection() {
           value={repo}
           onChange={(r) => {
             setRepo(r);
-            setContrib(r?.contributions ?? 0);
           }}
         />
       </div>
