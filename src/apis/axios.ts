@@ -11,6 +11,9 @@ const baseURL = import.meta.env.VITE_API_BASE_URL;
 const config: AxiosRequestConfig = {
   baseURL,
   withCredentials: true,
+  xsrfCookieName: "csrftoken",
+  xsrfHeaderName: "X-CSRFToken",
+  withXSRFToken: true,
 };
 
 export const api: AxiosInstance = axios.create(config);
@@ -25,11 +28,7 @@ const flushQueue = (success: boolean) => {
 
 async function refreshToken() {
   try {
-    await axios.post(
-      `${baseURL}/dj-rest-auth/token/refresh/`,
-      {}, // body 없음
-      { withCredentials: true },
-    );
+    await axios.post(`${baseURL}/dj-rest-auth/token/refresh/`, {}, { withCredentials: true });
     return true;
   } catch {
     return false;
@@ -38,6 +37,7 @@ async function refreshToken() {
 
 api.interceptors.response.use(
   (res) => res,
+
   async (error: AxiosError) => {
     const original = error.config;
 
@@ -56,15 +56,11 @@ api.interceptors.response.use(
       }
 
       isRefreshing = true;
-
       const success = await refreshToken();
-
       isRefreshing = false;
       flushQueue(success);
 
-      if (!success) {
-        return Promise.reject(error);
-      }
+      if (!success) return Promise.reject(error);
 
       return api(original);
     }
