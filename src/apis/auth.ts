@@ -56,7 +56,9 @@ export async function githubLogin(code: string): Promise<void> {
 // 2) 현재 로그인된 유저 정보 가져오기
 export async function getCurrentUser(): Promise<UserProfile | null> {
   try {
-    const res = await api.get<UserProfile>("/dj-rest-auth/user/");
+    const res = await api.get<UserProfile>("/dj-rest-auth/user/", {
+      skipAuthRefresh: true,
+    });
     return res.data;
   } catch (e) {
     if (isFinal401(e)) {

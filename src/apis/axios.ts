@@ -1,6 +1,7 @@
 declare module "axios" {
   export interface AxiosRequestConfig {
     _retry?: boolean;
+    skipAuthRefresh?: boolean;
   }
 }
 
@@ -39,11 +40,17 @@ api.interceptors.response.use(
   (res) => res,
 
   async (error: AxiosError) => {
-    const original = error.config;
+    const original = error.config as AxiosRequestConfig | undefined;
 
-    if (!error.response) return Promise.reject(error);
+    if (!error.response || !original) {
+      return Promise.reject(error);
+    }
 
-    if (error.response.status === 401 && original && !original._retry) {
+    if (original.skipAuthRefresh) {
+      return Promise.reject(error);
+    }
+
+    if (error.response.status === 401 && !original._retry) {
       original._retry = true;
 
       if (isRefreshing) {
@@ -60,7 +67,9 @@ api.interceptors.response.use(
       isRefreshing = false;
       flushQueue(success);
 
-      if (!success) return Promise.reject(error);
+      if (!success) {
+        return Promise.reject(error);
+      }
 
       return api(original);
     }
