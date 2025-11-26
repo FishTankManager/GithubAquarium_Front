@@ -1,7 +1,10 @@
 import { Footer, Header } from "@/components";
 import LogoText from "@/components/LogoText";
+import { useNavigate } from "react-router-dom";
 
 export default function MainPage() {
+  const navigate = useNavigate();
+
   return (
     <div className="relative flex min-h-screen flex-col justify-between bg-sky-300 bg-[url('/background.png')] bg-cover bg-center">
       <div className="fixed top-0 left-0 z-50 w-full">
@@ -22,7 +25,6 @@ export default function MainPage() {
           <img src="/bottomIcon.png" alt="down arrow" className="mt-4 h-6 w-6 animate-bounce" />
         </div>
       </section>
-      {/* Showcase Card */}
       <section className="mt-6 flex w-full justify-center px-4 md:mt-10">
         <div className="relative w-full max-w-4xl rounded-[4.5rem] border border-white/60 bg-white/70 p-8 shadow-2xl backdrop-blur md:p-12">
           <img src="/example.png" className="h-full w-full object-cover" />
@@ -47,6 +49,7 @@ export default function MainPage() {
             src="/myaquariumtextbox.png"
             alt="my aquarium"
             className="z-20 -mb-30 -ml-8 w-[9rem] md:-ml-16 md:w-[15rem]"
+            onClick={() => navigate("/my")}
           />
           <img
             src="/explore.png"
@@ -57,14 +60,15 @@ export default function MainPage() {
             src="/shoptextbox.png"
             alt="shop"
             className="z-10 -mb-160 -ml-8 w-[9rem] object-cover md:-ml-16 md:w-[15rem]"
+            onClick={() => navigate("/shop")}
           />
         </div>
       </section>
 
       <section className="mx-auto mt-20 w-full max-w-3xl px-6 text-center text-[#561B51] md:mt-32">
         <div className="font-vt323 space-y-2 text-3xl leading-7">
-          <p>🐟 Ready to raise your own Sunfish?</p>
-          <p>Start your project, adopt a sunfish,</p>
+          <p>🐟 Ready to raise your own fish?</p>
+          <p>Start your project, adopt a fish,</p>
           <p>and grow it with every commit.</p>
           <p>🌊 50+ unique species are waiting for you.</p>
           <p>Show off your contributions at a glance</p>
@@ -73,10 +77,9 @@ export default function MainPage() {
           className="font-vt323 mt-6 inline-flex items-center justify-center rounded-full bg-[#3F3F3F] px-6 py-3 text-2xl text-[#D7B9B9] shadow-lg transition-colors hover:bg-[#7A7A7A]"
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         >
-          raise your Sunfish now!
+          raise your own fish now!
         </button>
       </section>
-
       <div className="relative h-[28rem] w-full md:h-[56rem]">
         <div className="absolute right-0 bottom-0 left-0 flex w-full items-end justify-between">
           <img src="/sand-left.png" alt="sand left" className="z-30 w-[28rem] md:w-[45rem]" />

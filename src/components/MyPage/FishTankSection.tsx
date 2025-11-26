@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo } from "react";
+import { useRef, useState, useMemo, useEffect } from "react";
 import RepoSelect from "./RepoSelect";
 import CanvasControls from "./CanvasControls";
 import FishTankCanvas from "./FishTankCanvas";
@@ -6,6 +6,11 @@ import GrowthTimeline from "./GrowthTimeline";
 import AquariumBackgroundGrid from "./AquariumBackgroundGrid";
 import AquariumItemGrid from "./AquariumItemGrid";
 import { CanvasSize, RepoInfo } from "@/types/aquarium";
+import {
+  getFishtankBackgrounds,
+  getFishtankDetail,
+  type FishtankBackground,
+} from "@/apis/fishtank";
 
 type Item = { id: string; name: string; src: string };
 type BgItem = { id: string; name: string; src: string };
@@ -14,7 +19,7 @@ type SubTab = "background" | "items";
 export default function FishTankSection() {
   const [repo, setRepo] = useState<RepoInfo | null>(null);
   const [size, setSize] = useState<CanvasSize>({ width: 700, height: 400 });
-  const [contrib, setContrib] = useState<number>(914);
+  const [contrib, setContrib] = useState<number>(0);
   // const [timeline] = useState<TimelineItem[]>([
   //   { id: "t1", at: "25/09/14 00:00", fish: { id: "f1", maturity: "Juvenile" } },
   //   { id: "t0", at: "25/09/12 00:00", fish: { id: "f0", maturity: "Hatchling" } },
@@ -27,17 +32,72 @@ export default function FishTankSection() {
   // const [appliedItemId, setAppliedItemId] = useState<string | null>(null);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [bgCandidates, setBgCandidates] = useState<BgItem[]>([]);
+  const [loadingBg, setLoadingBg] = useState(true);
 
-  const bgCandidates: BgItem[] = useMemo(
-    () => [
-      { id: "blank", name: "Blank", src: "/images/background/bg-blank.png" },
-      { id: "ocean", name: "Pixel Ocean", src: "/images/background/bg-ocean.png" },
-      { id: "deep1", name: "Deep Sea 1", src: "/images/background/bg-deep-1.png" },
-      { id: "deep2", name: "Deep Sea 2", src: "/images/background/bg-deep-2.png" },
-      { id: "locked", name: "Locked", src: "/images/background/bg-locked.png" },
-    ],
-    [],
-  );
+  // API에서 배경 목록 가져오기
+  useEffect(() => {
+    const fetchBackgrounds = async () => {
+      try {
+        setLoadingBg(true);
+        const backgrounds = await getFishtankBackgrounds();
+
+        // FishtankBackground를 BgItem으로 변환
+        // svg_template을 data URL로 변환하여 src에 사용
+        const convertedBackgrounds: BgItem[] = backgrounds.map((bg: FishtankBackground) => {
+          // SVG 템플릿을 data URL로 변환 (encodeURIComponent 사용)
+          const svgDataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(bg.svg_template)}`;
+          return {
+            id: bg.id.toString(),
+            name: bg.name,
+            src: svgDataUrl,
+          };
+        });
+
+        setBgCandidates(convertedBackgrounds);
+      } catch (e) {
+        console.error("Failed to fetch fishtank backgrounds:", e);
+        setBgCandidates([]); // 에러 시 빈 배열
+      } finally {
+        setLoadingBg(false);
+      }
+    };
+
+    fetchBackgrounds();
+  }, []);
+
+  // 레포지토리 선택 시 피쉬탱크 상세 정보 가져오기 및 contributions 합산
+  useEffect(() => {
+    const fetchFishtankDetail = async () => {
+      if (!repo) {
+        setContrib(0);
+        return;
+      }
+
+      try {
+        console.log("Fetching fishtank detail for repo:", repo.id, repo.fullName);
+        const fishtankDetail = await getFishtankDetail(repo.id);
+        console.log("Fishtank detail received:", fishtankDetail);
+
+        // contributors의 각 commit_count를 합산
+        const totalContributions = fishtankDetail.contributors.reduce(
+          (sum, contributor) => sum + contributor.commit_count,
+          0,
+        );
+
+        console.log("Total contributions:", totalContributions);
+        setContrib(totalContributions);
+      } catch {
+        // 피쉬탱크가 없는 경우 레포지토리 정보의 contributions 사용
+        console.warn("Fishtank not found for repo:", repo.id, repo.fullName);
+        console.warn("Using repository contributions as fallback:", repo.contributions);
+        // 레포지토리 정보의 contributions를 사용 (피쉬탱크가 없어도 해당 레포의 commit 수는 알 수 있음)
+        setContrib(repo.contributions || 0);
+      }
+    };
+
+    fetchFishtankDetail();
+  }, [repo]);
 
   const itemCandidates: Item[] = useMemo(
     () => [
@@ -94,8 +154,8 @@ export default function FishTankSection() {
         <RepoSelect
           value={repo}
           onChange={(r) => {
+            console.log("Repo selected:", r);
             setRepo(r);
-            setContrib(r?.contributions ?? 0);
           }}
         />
       </div>
@@ -187,13 +247,18 @@ export default function FishTankSection() {
             style={{ WebkitBackdropFilter: "blur(6px)" }}
           >
             <div className="max-h-[440px] overflow-y-auto pr-2">
-              {tab === "background" && (
-                <AquariumBackgroundGrid
-                  items={bgCandidates}
-                  selectedId={selectedBgId}
-                  onSelect={setSelectedBgId}
-                />
-              )}
+              {tab === "background" &&
+                (loadingBg ? (
+                  <div className="flex items-center justify-center py-10 text-white">
+                    배경 목록을 불러오는 중...
+                  </div>
+                ) : (
+                  <AquariumBackgroundGrid
+                    items={bgCandidates}
+                    selectedId={selectedBgId}
+                    onSelect={setSelectedBgId}
+                  />
+                ))}
               {tab === "items" && (
                 <AquariumItemGrid
                   items={itemCandidates}
