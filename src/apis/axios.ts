@@ -1,6 +1,7 @@
 declare module "axios" {
   export interface AxiosRequestConfig {
     _retry?: boolean;
+    skipAuthRefresh?: boolean;
   }
 }
 
@@ -11,6 +12,9 @@ const baseURL = import.meta.env.VITE_API_BASE_URL;
 const config: AxiosRequestConfig = {
   baseURL,
   withCredentials: true,
+  xsrfCookieName: "csrftoken",
+  xsrfHeaderName: "X-CSRFToken",
+  withXSRFToken: true,
 };
 
 export const api: AxiosInstance = axios.create(config);
@@ -25,11 +29,7 @@ const flushQueue = (success: boolean) => {
 
 async function refreshToken() {
   try {
-    await axios.post(
-      `${baseURL}/dj-rest-auth/token/refresh/`,
-      {}, // body 없음
-      { withCredentials: true },
-    );
+    await axios.post(`${baseURL}/dj-rest-auth/token/refresh/`, {}, { withCredentials: true });
     return true;
   } catch {
     return false;
@@ -38,12 +38,19 @@ async function refreshToken() {
 
 api.interceptors.response.use(
   (res) => res,
+
   async (error: AxiosError) => {
-    const original = error.config;
+    const original = error.config as AxiosRequestConfig | undefined;
 
-    if (!error.response) return Promise.reject(error);
+    if (!error.response || !original) {
+      return Promise.reject(error);
+    }
 
-    if (error.response.status === 401 && original && !original._retry) {
+    if (original.skipAuthRefresh) {
+      return Promise.reject(error);
+    }
+
+    if (error.response.status === 401 && !original._retry) {
       original._retry = true;
 
       if (isRefreshing) {
@@ -56,9 +63,7 @@ api.interceptors.response.use(
       }
 
       isRefreshing = true;
-
       const success = await refreshToken();
-
       isRefreshing = false;
       flushQueue(success);
 

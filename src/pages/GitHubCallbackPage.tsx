@@ -1,5 +1,4 @@
-// src/pages/GitHubCallbackPage.tsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/auth/AuthContext";
 
@@ -10,24 +9,34 @@ export default function GitHubCallbackPage() {
   const navigate = useNavigate();
   const { refreshUser } = useAuth();
   const [error, setError] = useState<string | null>(null);
+  const hasRunRef = useRef(false);
 
   useEffect(() => {
+    if (hasRunRef.current) return;
+    hasRunRef.current = true;
+    const params = new URLSearchParams(location.search);
+    const code = params.get("code");
+    const state = params.get("state");
+
+    if (!code) {
+      setError("GitHub에서 authorization code를 받지 못했습니다.");
+      return;
+    }
+
+    const handledKey = `github_oauth_handled_${code}`;
+    if (sessionStorage.getItem(handledKey)) {
+      navigate("/my", { replace: true });
+      return;
+    }
+    sessionStorage.setItem(handledKey, "true");
+
+    const savedState = localStorage.getItem("github_oauth_state");
+    if (savedState && state !== savedState) {
+      setError("OAuth state 값이 일치하지 않습니다.");
+      return;
+    }
+
     const run = async () => {
-      const params = new URLSearchParams(location.search);
-      const code = params.get("code");
-      const state = params.get("state");
-
-      if (!code) {
-        setError("GitHub에서 authorization code를 받지 못했습니다.");
-        return;
-      }
-
-      const savedState = localStorage.getItem("github_oauth_state");
-      if (savedState && state !== savedState) {
-        setError("OAuth state 값이 일치하지 않습니다.");
-        return;
-      }
-
       try {
         const loginRes = await fetch(`${API_BASE_URL}/dj-rest-auth/github/`, {
           method: "POST",
@@ -46,7 +55,6 @@ export default function GitHubCallbackPage() {
         }
 
         await refreshUser();
-
         navigate("/my", { replace: true });
       } catch (e) {
         console.error(e);
@@ -54,7 +62,7 @@ export default function GitHubCallbackPage() {
       }
     };
 
-    run();
+    void run();
   }, [location.search, navigate, refreshUser]);
 
   if (error) {

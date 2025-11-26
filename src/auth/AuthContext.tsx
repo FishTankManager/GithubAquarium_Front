@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import axios from "axios";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { getCurrentUser, logoutUser, type UserProfile } from "@/apis/auth";
 
 interface AuthContextValue {
@@ -13,6 +14,7 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const hasFetchedRef = useRef(false);
 
   const refreshUser = async () => {
     setLoading(true);
@@ -20,6 +22,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const me = await getCurrentUser();
       setUser(me);
     } catch (e) {
+      if (axios.isAxiosError(e)) {
+        const status = e.response?.status;
+
+        if (status === 401 || status === 403) {
+          setUser(null);
+          return;
+        }
+      }
+
       console.error("유저 정보 조회 실패:", e);
       setUser(null);
     } finally {
@@ -45,7 +56,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    void refreshUser();
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
+    refreshUser();
   }, []);
 
   return (
