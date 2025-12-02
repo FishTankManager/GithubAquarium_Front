@@ -9,23 +9,23 @@
 #Fishbun-2-*{id}-wrapper {
   transform-box: fill-box;
   transform-origin: center;
-  animation: Fishbun-2-*{id}-flip 2.2s ease-in infinite;
+  animation: Fishbun-2-*{id}-flip 5s ease-in infinite;
 }
 
 @keyframes Fishbun-2-*{id}-flip {
-  0%,10% {
+  0%,40% {
     transform: rotateX(0deg);
   }
-  40% {
+  45% {
     transform: rotateX(70deg) scaleY(0.4);
   }
   50% {
     transform: rotateX(90deg) scaleY(0.1);
   }
-  60% {
+  55% {
     transform: rotateX(70deg) scaleY(0.4);
   }
-  90%, 100% {
+  60%, 100% {
     transform: rotateX(0deg) scaleY(1);
   }
 }
