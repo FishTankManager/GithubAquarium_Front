@@ -12,6 +12,14 @@ import ShrimpWich_4 from "@/assets/svg/FishSprites/ShrimpWich/ShrimpWich_4.svg?r
 import ShrimpWich_5 from "@/assets/svg/FishSprites/ShrimpWich/ShrimpWich_5.svg?raw";
 import ShrimpWich_6 from "@/assets/svg/FishSprites/ShrimpWich/ShrimpWich_6.svg?raw";
 
+import RBFishbun_1 from "@/assets/svg/FishSprites/Fishbun/RBFishbun_1.svg?raw";
+import RBFishbun_3 from "@/assets/svg/FishSprites/Fishbun/RBFishbun_3.svg?raw";
+import CPFishbun_1 from "@/assets/svg/FishSprites/Fishbun/CPFishbun_1.svg?raw";
+import CPFishbun_3 from "@/assets/svg/FishSprites/Fishbun/CPFishbun_3.svg?raw";
+import SPFishbun_1 from "@/assets/svg/FishSprites/Fishbun/SPFishbun_1.svg?raw";
+import SPFishbun_3 from "@/assets/svg/FishSprites/Fishbun/SPFishbun_3.svg?raw";
+import Fishbun_2 from "@/assets/svg/FishSprites/Fishbun/Fishbun_2.svg?raw";
+
 export {
   LaptopSunfish,
   SpaceOcto_1,
@@ -26,4 +34,11 @@ export {
   ShrimpWich_4,
   ShrimpWich_5,
   ShrimpWich_6,
+  RBFishbun_1,
+  RBFishbun_3,
+  CPFishbun_1,
+  CPFishbun_3,
+  SPFishbun_1,
+  SPFishbun_3,
+  Fishbun_2,
 };
