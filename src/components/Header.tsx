@@ -9,7 +9,7 @@ export default function Header() {
   const { user, loading, logout } = useAuth();
 
   return (
-    <header className="sticky top-0 z-50 flex h-24 w-full items-start justify-between bg-white/30 px-8 pt-6 backdrop-blur">
+    <header className="sticky top-0 z-50 flex h-24 w-full items-center justify-between bg-white/30 px-8 backdrop-blur">
       <div className="flex w-50 pt-1">
         <LogoText
           onClick={() => {

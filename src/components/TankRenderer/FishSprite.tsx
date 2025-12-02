@@ -1,4 +1,3 @@
-// FishSpriteTest.tsx
 import React, { useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import { TankContext } from "@/contexts/TankContext";
 
@@ -46,8 +45,10 @@ export default function FishSpriteTest({
 
   // 현재 탱크 픽셀 크기 (ref로만 저장: 리렌더 유발 X)
   const tankSizeRef = useRef({ w: 0, h: 0 });
-  const spriteWRef = useRef(0);
+  const spriteWRef = useRef(0); // 실제 렌더되는 스프라이트 폭 (2배 적용 후)
   const spriteHRef = useRef(0);
+  // 캡션 크기 계산 기준 (확대 전 기준 폭)
+  const labelBaseWRef = useRef(0);
 
   // 위치/방향 (ref로만 관리)
   const posRef = useRef({ x: 0, y: 0 });
@@ -65,7 +66,13 @@ export default function FishSpriteTest({
     const box = labelBoxRef.current;
     if (!host || !box) return;
 
-    const anchor = host.querySelector(`#test-${id}-anchor-label-top`) as SVGGraphicsElement | null;
+    // ★ prefix 무시하고, *{id}-anchor-label-top / *{id}-anchor-center 만 본다
+    // 예: spaceocto-1-*{id}-anchor-label-top, test-*{id}-anchor-label-top 모두 인식
+    let anchor = host.querySelector(`[id$="${id}-anchor-label-top"]`) as SVGGraphicsElement | null;
+
+    if (!anchor) {
+      anchor = host.querySelector(`[id$="${id}-anchor-center"]`) as SVGGraphicsElement | null;
+    }
 
     // 기본값: 정중앙 위쪽
     let ax = viewBox.w / 2;
@@ -84,10 +91,11 @@ export default function FishSpriteTest({
     box.style.left = `${px}px`;
     box.style.top = `${py}px`;
 
-    // 라벨 폰트 크기를 스프라이트 폭 비례로 살짝 조정
+    // 라벨 폰트 크기: 물고기 2배 확대한 뒤에도, 기존 느낌 유지
     const labelInner = box.firstElementChild as HTMLElement | null;
     if (labelInner) {
-      labelInner.style.fontSize = `${Math.max(10, spriteWRef.current * 0.22)}px`;
+      const basisW = labelBaseWRef.current || spriteWRef.current / 2; // fallback
+      labelInner.style.fontSize = `${Math.max(10, basisW * 0.22)}px`;
       labelInner.style.lineHeight = "1";
       labelInner.style.whiteSpace = "nowrap";
     }
@@ -102,8 +110,15 @@ export default function FishSpriteTest({
       const r = el.getBoundingClientRect();
       tankSizeRef.current = { w: r.width, h: r.height };
 
-      spriteWRef.current = r.width * (personaWidthPercent / 100);
+      // ① 기준 폭: 기존 personaWidthPercent 기준
+      const baseW = r.width * (personaWidthPercent / 100);
+
+      // ② 물고기(도트 영역) 실제 렌더링 폭: 2배
+      spriteWRef.current = baseW * 2;
       spriteHRef.current = viewBox.h * (spriteWRef.current / viewBox.w);
+
+      // ③ 캡션 크기 계산 기준: 확대 전 폭
+      labelBaseWRef.current = baseW;
 
       if (flipRef.current) {
         flipRef.current.style.width = `${spriteWRef.current}px`;
