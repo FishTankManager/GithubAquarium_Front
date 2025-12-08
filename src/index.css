@@ -52,3 +52,27 @@
     -3px 0px 0 #ca9b9b,
     3px 0px 0 #ca9b9b;
 }
+
+@keyframes waterMove {
+  0% {
+    background-position: 0 0;
+  }
+  50% {
+    background-position: 5px 2px;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+
+/* @keyframes shimmer {
+  0% { filter: hue-rotate(0deg) brightness(1); transform: scale(1); }
+  50% { filter: hue-rotate(10deg) brightness(1.1); transform: scale(1.03); }
+  100% { filter: hue-rotate(0deg) brightness(1); transform: scale(1); }
+} */
+
+/* @keyframes wave {
+  0%   { background-position: 0px 0px;   transform: scale(1); }
+  50%  { background-position: 20px 30px; transform: scale(1.03); }
+  100% { background-position: 0px 0px;   transform: scale(1); }
+} */
