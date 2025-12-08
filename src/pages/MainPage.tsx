@@ -6,7 +6,7 @@ export default function MainPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="relative flex min-h-screen flex-col justify-between bg-sky-300 bg-[url('/background.png')] bg-cover bg-center">
+    <div className="relative flex min-h-screen flex-col justify-between bg-sky-300 bg-[url('/images/main/background.png')] bg-cover bg-center">
       <div className="fixed top-0 left-0 z-50 w-full">
         <Header />
       </div>
@@ -22,12 +22,16 @@ export default function MainPage() {
           <div className="inline-flex items-center justify-center rounded-md px-4 py-2 text-2xl text-white backdrop-blur">
             Own your Aquarium in Github.
           </div>
-          <img src="/bottomIcon.png" alt="down arrow" className="mt-4 h-6 w-6 animate-bounce" />
+          <img
+            src="/images/main/bottomIcon.png"
+            alt="down arrow"
+            className="mt-4 h-6 w-6 animate-bounce"
+          />
         </div>
       </section>
       <section className="mt-6 flex w-full justify-center px-4 md:mt-10">
         <div className="relative w-full max-w-4xl rounded-[4.5rem] border border-white/60 bg-white/70 p-8 shadow-2xl backdrop-blur md:p-12">
-          <img src="/example.png" className="h-full w-full object-cover" />
+          <img src="/images/main/example.png" className="h-full w-full object-cover" />
           <div className="absolute -right-4 -bottom-4 -left-4 h-8 rounded-3xl bg-black/10 blur" />
         </div>
       </section>
@@ -37,7 +41,7 @@ export default function MainPage() {
           className="font-sixtyfour text-center text-4xl leading-tight tracking-wide drop-shadow-[0_3px_0_rgba(0,0,0,0.25)] md:text-6xl"
         />
         <img
-          src="/seaweed-green.png"
+          src="/images/main/seaweed-green.png"
           alt="seaweed"
           className="absolute top-1/2 right-0 w-[21rem] -translate-y-1/2 md:w-[35rem]"
           style={{ pointerEvents: "none" }}
@@ -46,18 +50,18 @@ export default function MainPage() {
       <section className="mt-10 mb-20 flex w-full justify-center px-4 md:mt-20 md:mb-40">
         <div className="relative flex w-full max-w-4xl items-center">
           <img
-            src="/myaquariumtextbox.png"
+            src="/images/main/myaquariumtextbox.png"
             alt="my aquarium"
             className="z-20 -mb-30 -ml-8 w-[9rem] md:-ml-16 md:w-[15rem]"
             onClick={() => navigate("/my")}
           />
           <img
-            src="/explore.png"
+            src="/images/main/explore.png"
             alt="explore"
             className="z-10 mx-auto -ml-25 w-full rounded-[3rem] object-cover md:-ml-50"
           />
           <img
-            src="/shoptextbox.png"
+            src="/images/main/shoptextbox.png"
             alt="shop"
             className="z-10 -mb-160 -ml-8 w-[9rem] object-cover md:-ml-16 md:w-[15rem]"
             onClick={() => navigate("/shop")}
@@ -82,16 +86,24 @@ export default function MainPage() {
       </section>
       <div className="relative h-[28rem] w-full md:h-[56rem]">
         <div className="absolute right-0 bottom-0 left-0 flex w-full items-end justify-between">
-          <img src="/sand-left.png" alt="sand left" className="z-30 w-[28rem] md:w-[45rem]" />
-          <img src="/sand-right.png" alt="sand right" className="z-30 w-[28rem] md:w-[45rem]" />
+          <img
+            src="/images/main/sand-left.png"
+            alt="sand left"
+            className="z-30 w-[28rem] md:w-[45rem]"
+          />
+          <img
+            src="/images/main/sand-right.png"
+            alt="sand right"
+            className="z-30 w-[28rem] md:w-[45rem]"
+          />
         </div>
         <div className="absolute right-0 bottom-0 left-0 flex w-full items-end justify-between">
           <img
-            src="/seaweed-green2.png"
+            src="/images/main/seaweed-green2.png"
             alt="seaweed left"
             className="z-30 w-[28rem] md:w-[30rem]"
           />
-          <img src="/clam.png" alt="clam" className="z-30 w-[28rem] md:w-[30rem]" />
+          <img src="/images/main/clam.png" alt="clam" className="z-30 w-[28rem] md:w-[30rem]" />
         </div>
       </div>
       <Footer />
