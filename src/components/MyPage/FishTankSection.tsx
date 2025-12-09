@@ -11,15 +11,20 @@ import {
   getFishtankDetail,
   type FishtankBackground,
 } from "@/apis/fishtank";
+import { useViewport } from "@/contexts/useViewport";
 
 type Item = { id: string; name: string; src: string };
 type BgItem = { id: string; name: string; src: string };
 type SubTab = "background" | "items";
 
 export default function FishTankSection() {
+  const { isMobile, width } = useViewport();
   const [repo, setRepo] = useState<RepoInfo | null>(null);
   const [size, setSize] = useState<CanvasSize>({ width: 700, height: 400 });
   const [contrib, setContrib] = useState<number>(0);
+
+  // 중간 크기 화면에서도 세로 레이아웃 사용 (캔버스 700px + 우측 500px + 패딩 = 약 1400px 필요)
+  const useVerticalLayout = isMobile || width < 1400;
   // const [timeline] = useState<TimelineItem[]>([
   //   { id: "t1", at: "25/09/14 00:00", fish: { id: "f1", maturity: "Juvenile" } },
   //   { id: "t0", at: "25/09/12 00:00", fish: { id: "f0", maturity: "Hatchling" } },
@@ -148,7 +153,7 @@ export default function FishTankSection() {
   };
 
   return (
-    <div className="flex w-full flex-col px-20">
+    <div className={`flex w-full flex-col ${useVerticalLayout ? "px-2 sm:px-4" : "px-20"}`}>
       {/* RepoSelect */}
       <div className="font-abeezee mb-10 flex justify-center text-[#B2B2B2]">
         <RepoSelect
@@ -161,31 +166,46 @@ export default function FishTankSection() {
       </div>
 
       {/* 상단 공용 툴바: CanvasControls + EXPORT + 탭 + APPLY */}
-      <div className="relative mb-4">
+      <div className={`relative mb-4 ${useVerticalLayout ? "flex flex-col gap-4" : ""}`}>
         {/* 좌: CanvasControls */}
         <div
-          style={{
-            width: typeof size.width === "number" ? `${Math.min(size.width, 700)}px` : size.width,
-            maxWidth: "700px",
-          }}
+          className={useVerticalLayout ? "w-full" : ""}
+          style={
+            !useVerticalLayout
+              ? {
+                  width:
+                    typeof size.width === "number" ? `${Math.min(size.width, 700)}px` : size.width,
+                  maxWidth: "700px",
+                }
+              : {}
+          }
         >
           <CanvasControls size={size} onSizeChange={handleSizeChange} />
         </div>
 
-        {/* EXPORT 버튼 - 고정 위치 */}
-        <button
-          onClick={() => console.log("EXPORT clicked")}
-          className="font-vt absolute top-0 rounded-full bg-[#3F3F3F]/80 px-8 py-1 text-2xl text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
-          style={{ right: "530px" }}
-        >
-          EXPORT
-        </button>
+        {/* EXPORT 버튼 */}
+        {!useVerticalLayout && (
+          <button
+            onClick={() => console.log("EXPORT clicked")}
+            className="font-vt absolute top-0 rounded-full bg-[#3F3F3F]/80 px-8 py-1 text-2xl text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
+            style={{ right: "530px" }}
+          >
+            EXPORT
+          </button>
+        )}
 
-        {/* 우: 탭(Background & Items) + APPLY - 고정 위치 */}
-        <div className="absolute top-0 right-0 flex items-center gap-4" style={{ width: "500px" }}>
-          <div className="flex gap-3">
+        {/* 우: 탭(Background & Items) + APPLY */}
+        <div
+          className={
+            useVerticalLayout
+              ? "flex w-full flex-col gap-3"
+              : "absolute top-0 right-0 flex items-center gap-4"
+          }
+          style={!useVerticalLayout ? { width: "500px" } : {}}
+        >
+          <div className={`flex gap-3 ${useVerticalLayout ? "w-full" : ""}`}>
             <button
-              className={`font-vt rounded-md px-6 py-1 text-xl ${
+              className={`font-vt flex-1 rounded-md px-6 py-1 ${useVerticalLayout ? "text-lg" : "text-xl"} ${
                 tab === "background" ? "bg-[#D7B9B9] text-black" : "bg-[#C7D6FF]/80 text-black/80"
               }`}
               onClick={() => setTab("background")}
@@ -193,7 +213,7 @@ export default function FishTankSection() {
               BACKGROUND
             </button>
             <button
-              className={`font-vt rounded-md px-6 py-1 text-xl ${
+              className={`font-vt flex-1 rounded-md px-6 py-1 ${useVerticalLayout ? "text-lg" : "text-xl"} ${
                 tab === "items" ? "bg-[#D7B9B9] text-black" : "bg-[#C7D6FF]/80 text-black/80"
               }`}
               onClick={() => setTab("items")}
@@ -202,10 +222,12 @@ export default function FishTankSection() {
             </button>
           </div>
 
-          {/* 잠겨있는 아이템/배경 선택 시 메시지 표시 영역 - 우측 정렬 */}
+          {/* 잠겨있는 아이템/배경 선택 시 메시지 표시 영역 */}
           {message && (
             <div className="flex justify-end">
-              <div className="font-vt rounded-md bg-[#00355B] px-6 py-1 text-xl text-white shadow-lg">
+              <div
+                className={`font-vt rounded-md bg-[#00355B] px-6 py-1 ${useVerticalLayout ? "text-lg" : "text-xl"} text-white shadow-lg`}
+              >
                 {message}
               </div>
             </div>
@@ -213,7 +235,7 @@ export default function FishTankSection() {
 
           <button
             onClick={handleApply}
-            className="font-vt ml-auto rounded-full bg-[#3F3F3F]/80 px-8 py-1 text-2xl text-[#D7B9B9] hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
+            className={`font-vt ${useVerticalLayout ? "w-full" : "ml-auto"} rounded-full bg-[#3F3F3F]/80 px-8 py-1 ${useVerticalLayout ? "text-xl" : "text-2xl"} text-[#D7B9B9] hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none`}
           >
             APPLY
           </button>
@@ -221,32 +243,48 @@ export default function FishTankSection() {
       </div>
 
       {/* 본문: 캔버스 / 그리드 */}
-      <div className="relative">
+      <div className={useVerticalLayout ? "flex flex-col gap-4" : "relative"}>
         {/* 좌측: FishTankCanvas */}
         <div
-          style={{
-            width: typeof size.width === "number" ? `${Math.min(size.width, 700)}px` : size.width,
-            maxWidth: "700px",
-          }}
+          className={useVerticalLayout ? "w-full" : ""}
+          style={
+            !useVerticalLayout
+              ? {
+                  width:
+                    typeof size.width === "number" ? `${Math.min(size.width, 700)}px` : size.width,
+                  maxWidth: "700px",
+                }
+              : { width: "100%" }
+          }
         >
           <div
-            style={{
-              maxWidth:
-                typeof size.width === "number" ? `${Math.min(size.width, 700)}px` : size.width,
-            }}
+            style={
+              !useVerticalLayout
+                ? {
+                    maxWidth:
+                      typeof size.width === "number"
+                        ? `${Math.min(size.width, 700)}px`
+                        : size.width,
+                  }
+                : { width: "100%" }
+            }
           >
             <FishTankCanvas ref={canvasRef} size={size} />
           </div>
-          <p className="font-vt mt-3 text-2xl text-white">Repo contributions: {contrib}</p>
+          <p className={`font-vt mt-3 ${useVerticalLayout ? "text-lg" : "text-2xl"} text-white`}>
+            Repo contributions: {contrib}
+          </p>
         </div>
 
-        {/* 우측: 스크롤 영역만 - 고정 위치 */}
-        <aside className="absolute top-0 right-0 w-[500px]">
+        {/* 우측: 스크롤 영역 */}
+        <aside className={useVerticalLayout ? "w-full" : "absolute top-0 right-0 w-[500px]"}>
           <div
             className="rounded-2xl bg-[linear-gradient(180deg,rgba(255,255,255,0.45)_0%,rgba(255,255,255,0.25)_100%)] p-4 shadow-lg ring-1 ring-white/40 backdrop-blur-md"
             style={{ WebkitBackdropFilter: "blur(6px)" }}
           >
-            <div className="max-h-[440px] overflow-y-auto pr-2">
+            <div
+              className={`overflow-y-auto pr-2 ${useVerticalLayout ? "max-h-[300px]" : "max-h-[440px]"}`}
+            >
               {tab === "background" &&
                 (loadingBg ? (
                   <div className="flex items-center justify-center py-10 text-white">
