@@ -30,6 +30,18 @@ export interface ContributionFish {
   species: string;
 }
 
+export interface SelectableFish {
+  id: number | null; // 할당되지 않은 물고기는 null
+  username: string | null; // 할당되지 않은 물고기는 null
+  species: string;
+  commit_count: number;
+  selected: boolean;
+  maturity?: number; // 0: Hatchling, 1: Juvenile, 2: Youngling, 3: Adult, 4: Advanced, 5: Master
+  required_commits?: number;
+  group_code?: string; // 물고기 그룹 코드 (예: "C-KRAKEN")
+  is_assigned?: boolean; // 실제로 할당된 물고기인지 여부
+}
+
 export interface Contributor {
   id: number;
   user: string;
@@ -142,6 +154,26 @@ export async function applyFishtankBackground(repoId: string, backgroundId: numb
       401: "로그인이 필요합니다.",
       404: "피쉬탱크 또는 배경을 찾을 수 없습니다.",
       500: "서버 오류로 배경을 적용하지 못했습니다.",
+    });
+  }
+}
+
+/**
+ * 특정 Repository의 Fishtank에서 선택 가능한 물고기 목록을 조회합니다.
+ * @param repoId 레포지토리 ID
+ * @returns 선택 가능한 물고기 목록
+ */
+export async function getSelectableFish(repoId: string): Promise<SelectableFish[]> {
+  try {
+    const res = await api.get<{ fishes: SelectableFish[] }>(
+      `/aquatics/fishtank/${repoId}/selectable-fish/`,
+    );
+    return res.data.fishes;
+  } catch (e) {
+    throwMapped(e, {
+      401: "로그인이 필요합니다.",
+      404: "피쉬탱크를 찾을 수 없습니다.",
+      500: "서버 오류로 물고기 목록을 불러오지 못했습니다.",
     });
   }
 }

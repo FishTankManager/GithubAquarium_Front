@@ -273,7 +273,7 @@ export default function FishTankSection() {
 
       {/* GrowthTimeline */}
       <div className="mt-10 flex justify-center">
-        <GrowthTimeline />
+        <GrowthTimeline repoId={repo?.id || null} />
       </div>
     </div>
   );
