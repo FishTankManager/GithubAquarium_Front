@@ -11,11 +11,9 @@ type BgItem = { id: string; name: string; src: string };
 
 export default function AquariumSection() {
   const { isMobile, width } = useViewport();
-  const [tab, setTab] = useState<SubTab>("background"); // 기본 background
-  const totalContrib = 12987; // dummy
-
-  // 중간 크기 화면에서도 세로 레이아웃 사용 (캔버스 700px + 우측 500px + 패딩 = 약 1400px 필요)
   const useVerticalLayout = isMobile || width < 1400;
+  const [tab, setTab] = useState<SubTab>(useVerticalLayout ? "fish" : "background"); // 모바일: fish, 와이드: background
+  const totalContrib = 12987; // dummy
 
   const bgCandidates: BgItem[] = useMemo(
     () => [
@@ -108,9 +106,17 @@ export default function AquariumSection() {
 
         {/* 서브 탭 + APPLY */}
         <div className="mt-4 mb-4 flex items-center justify-between gap-3">
-          <div className="flex flex-1 gap-3">
+          <div className="flex gap-4">
             <button
-              className={`font-vt flex-1 rounded-md px-4 py-1 text-base sm:text-lg ${
+              className={`font-vt rounded-md px-6 py-1 text-lg ${
+                tab === "fish" ? "bg-[#D7B9B9] text-black" : "bg-[#C7D6FF]/80 text-black/80"
+              }`}
+              onClick={() => setTab("fish")}
+            >
+              FISH
+            </button>
+            <button
+              className={`font-vt rounded-md px-6 py-1 text-lg ${
                 tab === "background" ? "bg-[#D7B9B9] text-black" : "bg-[#C7D6FF]/80 text-black/80"
               }`}
               onClick={() => setTab("background")}
@@ -118,7 +124,7 @@ export default function AquariumSection() {
               BACKGROUND
             </button>
             <button
-              className={`font-vt flex-1 rounded-md px-4 py-1 text-base sm:text-lg ${
+              className={`font-vt rounded-md px-6 py-1 text-lg ${
                 tab === "items" ? "bg-[#D7B9B9] text-black" : "bg-[#C7D6FF]/80 text-black/80"
               }`}
               onClick={() => setTab("items")}
@@ -130,7 +136,7 @@ export default function AquariumSection() {
           {tab !== "fish" && (
             <button
               onClick={handleApply}
-              className="font-vt mb-0 ml-auto rounded-full bg-[#3F3F3F]/80 px-6 py-1.5 text-base whitespace-nowrap text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none sm:text-xl"
+              className="font-vt rounded-full bg-[#3F3F3F]/80 px-6 py-1.5 text-base whitespace-nowrap text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none sm:text-xl"
             >
               APPLY
             </button>
@@ -148,6 +154,11 @@ export default function AquariumSection() {
 
         {/* 탭 컨텐츠 */}
         <section className="mt-3 rounded-xl">
+          {tab === "fish" && (
+            <div className="w-full overflow-x-auto">
+              <AquariumFishTable />
+            </div>
+          )}
           {tab === "background" && (
             <AquariumBackgroundGrid
               items={bgCandidates}
@@ -163,19 +174,6 @@ export default function AquariumSection() {
             />
           )}
         </section>
-
-        {/* Fish Table */}
-        <div className="mt-10 flex justify-center">
-          <div className="relative w-full px-2 pb-16">
-            <AquariumFishTable />
-            <button
-              onClick={() => console.log("SAVE & APPLY clicked")}
-              className="font-vt mt-4 w-full rounded-full bg-[#3F3F3F]/80 px-8 py-1 text-xl text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
-            >
-              SAVE & APPLY
-            </button>
-          </div>
-        </div>
       </div>
     );
   }
@@ -196,7 +194,10 @@ export default function AquariumSection() {
         </div>
 
         {/* 우: 탭(Background & Items) + APPLY */}
-        <div className="absolute top-0 right-0 flex items-center gap-4" style={{ width: "500px" }}>
+        <div
+          className="absolute top-0 right-0 flex items-center justify-between gap-4"
+          style={{ width: "500px" }}
+        >
           <div className="flex gap-3">
             <button
               className={`font-vt rounded-md px-6 py-1 text-xl ${
@@ -227,7 +228,7 @@ export default function AquariumSection() {
 
           <button
             onClick={handleApply}
-            className="font-vt ml-auto rounded-full bg-[#3F3F3F]/80 px-8 py-1 text-2xl text-[#D7B9B9] hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
+            className="font-vt rounded-full bg-[#3F3F3F]/80 px-8 py-1 text-2xl text-[#D7B9B9] hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
           >
             APPLY
           </button>
@@ -267,6 +268,7 @@ export default function AquariumSection() {
           </div>
         </aside>
       </div>
+      {/* 하단: Fish Table */}
       <div className="mt-10 flex justify-center">
         <div className="relative pb-16" style={{ maxWidth: "1000px", width: "100%" }}>
           <AquariumFishTable />
