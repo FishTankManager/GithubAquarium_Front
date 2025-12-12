@@ -35,37 +35,41 @@ export default function GrowthTimeline() {
         {/* 유리(서리) 카드 - 가로 스크롤 가능 */}
         <div className="overflow-x-auto">
           <div
-            className="rounded-2xl p-4 shadow-lg ring-1 ring-white/40"
+            className="rounded-2xl p-5 shadow-lg ring-1 ring-white/40 sm:p-6"
             style={{
               background:
                 "linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.25) 100%)",
               backdropFilter: "blur(6px)",
-              minWidth: "600px",
+              minWidth: "700px",
             }}
           >
             {/* 단계별 헤더 */}
-            <div className="mb-4 grid grid-cols-[60px_repeat(6,minmax(80px,1fr))] gap-2">
+            <div className="mb-4 grid grid-cols-[80px_repeat(6,minmax(100px,1fr))] gap-3">
               <div></div> {/* 빈 공간 */}
               {stages.map((stage) => (
                 <div key={stage} className="text-center">
-                  <h4 className="font-vt text-xs tracking-wider break-words text-white">{stage}</h4>
+                  <h4 className="font-vt text-base tracking-wider break-words text-white sm:text-lg">
+                    {stage}
+                  </h4>
                 </div>
               ))}
             </div>
 
             {/* EVOLUTION 행 */}
-            <div className="mb-4 grid grid-cols-[60px_repeat(6,minmax(80px,1fr))] gap-2">
-              <div className="font-vt flex items-center text-xs text-[#5A2B55]">EVOLUTION</div>
+            <div className="mb-4 grid grid-cols-[80px_repeat(6,minmax(100px,1fr))] gap-3">
+              <div className="font-vt flex items-center text-sm text-[#5A2B55] sm:text-base">
+                EVOLUTION
+              </div>
               {stages.map((stage) => (
                 <div key={stage} className="flex justify-center">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-white/25 shadow-inner transition-transform duration-300">
+                  <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-white/25 shadow-inner transition-transform duration-300 sm:h-24 sm:w-24">
                     {isUnlocked[stage] ? (
                       <FishIcon maturity={stage} />
                     ) : (
                       <img
                         src="/images/fish/fish-locked.png"
                         alt="locked fish"
-                        className="h-16 w-16 opacity-70"
+                        className="h-20 w-20 opacity-70 sm:h-24 sm:w-24"
                       />
                     )}
                   </div>
@@ -74,11 +78,13 @@ export default function GrowthTimeline() {
             </div>
 
             {/* TIME 행 */}
-            <div className="mb-4 grid grid-cols-[60px_repeat(6,minmax(80px,1fr))] gap-2">
-              <div className="font-vt flex items-center text-xs text-[#5A2B55]">TIME</div>
+            <div className="mb-4 grid grid-cols-[80px_repeat(6,minmax(100px,1fr))] gap-3">
+              <div className="font-vt flex items-center text-sm text-[#5A2B55] sm:text-base">
+                TIME
+              </div>
               {stages.map((stage) => (
                 <div key={stage} className="text-center">
-                  <div className="font-vt text-[10px] break-words text-white">
+                  <div className="font-vt text-xs break-words text-white sm:text-sm">
                     {isUnlocked[stage] ? "25/09/14 00:00" : ""}
                   </div>
                 </div>
@@ -86,11 +92,15 @@ export default function GrowthTimeline() {
             </div>
 
             {/* COMMIT GOAL 행 */}
-            <div className="mb-2 grid grid-cols-[60px_repeat(6,minmax(80px,1fr))] gap-2">
-              <div className="font-vt flex items-center text-xs text-[#5A2B55]">COMMIT GOAL</div>
+            <div className="mb-2 grid grid-cols-[80px_repeat(6,minmax(100px,1fr))] gap-3">
+              <div className="font-vt flex items-center text-sm text-[#5A2B55] sm:text-base">
+                COMMIT GOAL
+              </div>
               {stages.map((stage) => (
                 <div key={stage} className="text-center">
-                  <div className="font-vt text-xs text-[#5A2B55]">{commitGoals[stage] || ""}</div>
+                  <div className="font-vt text-sm text-[#5A2B55] sm:text-base">
+                    {commitGoals[stage] || ""}
+                  </div>
                 </div>
               ))}
             </div>
