@@ -5,7 +5,8 @@ type Maturity = "Hatchling" | "Juvenile" | "Youngling" | "Adult" | "Advanced" | 
 
 export default function GrowthTimeline() {
   const stages: Maturity[] = ["Hatchling", "Juvenile", "Youngling", "Adult", "Advanced", "Master"];
-  const { isMobile } = useViewport();
+  const { isMobile, width } = useViewport();
+  const useVerticalLayout = isMobile || width < 1400;
 
   // 각 단계별 커밋 목표
   const commitGoals: Record<Maturity, number | null> = {
@@ -28,14 +29,9 @@ export default function GrowthTimeline() {
   };
 
   // 모바일에서는 세로 스크롤 가능한 가로 레이아웃 (가로 스크롤 허용)
-  if (isMobile) {
+  if (useVerticalLayout) {
     return (
       <section className="w-full max-w-full">
-        {/* 상단 라벨 */}
-        <div className="mt-5 mb-5 inline-block rounded-lg bg-[#C7D6FF]/60 px-4 py-1 shadow">
-          <span className="font-vt text-base tracking-wide text-black/80">GROWTH TIMELINE</span>
-        </div>
-
         {/* 유리(서리) 카드 - 가로 스크롤 가능 */}
         <div className="overflow-x-auto">
           <div

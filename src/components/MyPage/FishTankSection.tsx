@@ -173,18 +173,18 @@ export default function FishTankSection() {
         </div>
 
         {/* 서브 탭 + APPLY */}
-        <div className="mt-4 mb-4 flex w-full items-center justify-between gap-3">
-          <div className="flex gap-2 sm:gap-4">
+        <div className="relative z-10 mt-4 mb-4 flex w-full items-center justify-between gap-3">
+          <div className="flex flex-wrap gap-2 sm:gap-4">
             <button
-              className={`font-vt rounded-md px-3 py-1 text-sm sm:px-6 sm:py-1 sm:text-lg ${
+              className={`font-vt rounded-md px-4 py-1 text-sm sm:px-6 sm:py-1 sm:text-lg ${
                 tab === "timeline" ? "bg-[#D7B9B9] text-black" : "bg-[#C7D6FF]/80 text-black/80"
               }`}
               onClick={() => setTab("timeline")}
             >
-              TIMELINE
+              GROWTH TIMELINE
             </button>
             <button
-              className={`font-vt rounded-md px-3 py-1 text-sm sm:px-6 sm:py-1 sm:text-lg ${
+              className={`font-vt rounded-md px-4 py-1 text-sm sm:px-6 sm:py-1 sm:text-lg ${
                 tab === "background" ? "bg-[#D7B9B9] text-black" : "bg-[#C7D6FF]/80 text-black/80"
               }`}
               onClick={() => setTab("background")}
@@ -192,7 +192,7 @@ export default function FishTankSection() {
               BACKGROUND
             </button>
             <button
-              className={`font-vt rounded-md px-3 py-1 text-sm sm:px-6 sm:py-1 sm:text-lg ${
+              className={`font-vt rounded-md px-4 py-1 text-sm sm:px-6 sm:py-1 sm:text-lg ${
                 tab === "items" ? "bg-[#D7B9B9] text-black" : "bg-[#C7D6FF]/80 text-black/80"
               }`}
               onClick={() => setTab("items")}
@@ -204,7 +204,7 @@ export default function FishTankSection() {
           {tab !== "timeline" && (
             <button
               onClick={handleApply}
-              className="font-vt rounded-full bg-[#3F3F3F]/80 px-4 py-1.5 text-xs whitespace-nowrap text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none sm:px-6 sm:text-base"
+              className="font-vt flex-shrink-0 rounded-full bg-[#3F3F3F]/80 px-4 py-1.5 text-xs whitespace-nowrap text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none sm:px-6 sm:text-base"
             >
               APPLY
             </button>
