@@ -1,12 +1,28 @@
 import { Footer, Header } from "@/components";
 import LogoText from "@/components/LogoText";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 export default function MainPage() {
   const navigate = useNavigate();
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <div className="relative flex min-h-screen flex-col justify-between bg-sky-300 bg-[url('/images/main/background.png')] bg-cover bg-center">
+    <div className="relative flex min-h-screen flex-col justify-between overflow-x-hidden">
+      <div
+        className="fixed inset-0 -z-10"
+        style={{
+          backgroundImage: "url('/images/main/background.png')",
+          backgroundSize: "cover",
+          animation: "waterMove 2s ease-in-out infinite",
+        }}
+      />
       <div className="fixed top-0 left-0 z-50 w-full">
         <Header />
       </div>
@@ -43,8 +59,20 @@ export default function MainPage() {
         <img
           src="/images/main/seaweed-green.png"
           alt="seaweed"
-          className="absolute top-1/2 right-0 w-[21rem] -translate-y-1/2 md:w-[35rem]"
-          style={{ pointerEvents: "none" }}
+          className={`pointer-events-none absolute top-[50%] right-0 w-[21rem] -translate-y-[50%] transition-all duration-[1000ms] ease-[cubic-bezier(0.22,1,0.36,1)] md:w-[35rem]`}
+          style={{
+            transform: scrollY > 900 ? "translateX(0)" : "translateX(400px)",
+            opacity: scrollY > 900 ? 1 : 0,
+          }}
+        />
+        <img
+          src="/images/main/seaweed-red.png"
+          alt="seaweed2"
+          className={`pointer-events-none absolute top-[620%] left-0 w-[21rem] transition-all duration-[1000ms] ease-[cubic-bezier(0.22,1,0.36,1)] md:w-[32rem]`}
+          style={{
+            transform: scrollY > 1700 ? "translateX(0)" : "translateX(-400px)",
+            opacity: scrollY > 1700 ? 1 : 0,
+          }}
         />
       </div>
       <section className="mt-10 mb-20 flex w-full justify-center px-4 md:mt-20 md:mb-40">
@@ -69,7 +97,7 @@ export default function MainPage() {
         </div>
       </section>
 
-      <section className="mx-auto mt-20 w-full max-w-3xl px-6 text-center text-[#561B51] md:mt-32">
+      <section className="mx-auto mt-34 w-full max-w-3xl px-6 text-center text-[#561B51] md:mt-68">
         <div className="font-vt323 space-y-2 text-3xl leading-7">
           <p>🐟 Ready to raise your own fish?</p>
           <p>Start your project, adopt a fish,</p>
@@ -78,7 +106,7 @@ export default function MainPage() {
           <p>Show off your contributions at a glance</p>
         </div>
         <button
-          className="font-vt323 mt-6 inline-flex items-center justify-center rounded-full bg-[#3F3F3F] px-6 py-3 text-2xl text-[#D7B9B9] shadow-lg transition-colors hover:bg-[#7A7A7A]"
+          className="font-vt323 mt-18 inline-flex items-center justify-center rounded-full bg-[#3F3F3F] px-6 py-3 text-2xl text-[#D7B9B9] shadow-lg transition-all duration-300 hover:scale-x-105 hover:scale-y-105 hover:bg-[#7A7A7A]"
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         >
           raise your own fish now!
