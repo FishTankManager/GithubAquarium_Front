@@ -1,9 +1,12 @@
 import FishIcon from "./FishIcon";
+import { useViewport } from "@/contexts/useViewport";
 
 type Maturity = "Hatchling" | "Juvenile" | "Youngling" | "Adult" | "Advanced" | "Master";
 
 export default function GrowthTimeline() {
   const stages: Maturity[] = ["Hatchling", "Juvenile", "Youngling", "Adult", "Advanced", "Master"];
+  const { isMobile, width } = useViewport();
+  const useVerticalLayout = isMobile || width < 1400;
 
   // 각 단계별 커밋 목표
   const commitGoals: Record<Maturity, number | null> = {
@@ -25,8 +28,91 @@ export default function GrowthTimeline() {
     Master: false,
   };
 
+  // 모바일에서는 세로 스크롤 가능한 가로 레이아웃 (가로 스크롤 허용)
+  if (useVerticalLayout) {
+    return (
+      <section className="w-full max-w-full">
+        {/* 유리(서리) 카드 - 가로 스크롤 가능 */}
+        <div className="overflow-x-auto">
+          <div
+            className="rounded-2xl p-5 shadow-lg ring-1 ring-white/40 sm:p-6"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.25) 100%)",
+              backdropFilter: "blur(6px)",
+              minWidth: "700px",
+            }}
+          >
+            {/* 단계별 헤더 */}
+            <div className="mb-4 grid grid-cols-[80px_repeat(6,minmax(100px,1fr))] gap-3">
+              <div></div> {/* 빈 공간 */}
+              {stages.map((stage) => (
+                <div key={stage} className="text-center">
+                  <h4 className="font-vt text-base tracking-wider break-words text-white sm:text-lg">
+                    {stage}
+                  </h4>
+                </div>
+              ))}
+            </div>
+
+            {/* EVOLUTION 행 */}
+            <div className="mb-4 grid grid-cols-[80px_repeat(6,minmax(100px,1fr))] gap-3">
+              <div className="font-vt flex items-center text-sm text-[#5A2B55] sm:text-base">
+                EVOLUTION
+              </div>
+              {stages.map((stage) => (
+                <div key={stage} className="flex justify-center">
+                  <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-white/25 shadow-inner transition-transform duration-300 sm:h-24 sm:w-24">
+                    {isUnlocked[stage] ? (
+                      <FishIcon maturity={stage} />
+                    ) : (
+                      <img
+                        src="/images/fish/fish-locked.png"
+                        alt="locked fish"
+                        className="h-20 w-20 opacity-70 sm:h-24 sm:w-24"
+                      />
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* TIME 행 */}
+            <div className="mb-4 grid grid-cols-[80px_repeat(6,minmax(100px,1fr))] gap-3">
+              <div className="font-vt flex items-center text-sm text-[#5A2B55] sm:text-base">
+                TIME
+              </div>
+              {stages.map((stage) => (
+                <div key={stage} className="text-center">
+                  <div className="font-vt text-xs break-words text-white sm:text-sm">
+                    {isUnlocked[stage] ? "25/09/14 00:00" : ""}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* COMMIT GOAL 행 */}
+            <div className="mb-2 grid grid-cols-[80px_repeat(6,minmax(100px,1fr))] gap-3">
+              <div className="font-vt flex items-center text-sm text-[#5A2B55] sm:text-base">
+                COMMIT GOAL
+              </div>
+              {stages.map((stage) => (
+                <div key={stage} className="text-center">
+                  <div className="font-vt text-sm text-[#5A2B55] sm:text-base">
+                    {commitGoals[stage] || ""}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // 데스크톱 버전
   return (
-    <section className="w-[1500px]">
+    <section className="w-full max-w-[1500px]">
       {/* 상단 라벨 */}
       <div className="mt-5 mb-5 inline-block rounded-lg bg-[#C7D6FF]/60 px-5 py-1 shadow">
         <span className="font-vt text-xl tracking-wide text-black/80">GROWTH TIMELINE</span>

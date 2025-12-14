@@ -9,11 +9,11 @@ export default function MyPage() {
   const [active, setActive] = useState<"fishtank" | "aquarium">("fishtank");
 
   return (
-    <div className="mb-12 flex min-h-screen flex-col justify-between bg-[#4A68AF]">
+    <div className="mb-12 flex min-h-screen flex-col justify-between overflow-x-hidden bg-[#4A68AF]">
       <Header />
 
-      <main className="mx-auto w-full max-w-[1500px] flex-1 px-4 py-8 text-black">
-        <div className="mb-6 flex items-center justify-center">
+      <main className="mx-auto w-full flex-1 px-2 py-4 text-black sm:px-4 sm:py-8">
+        <div className="mb-4 flex items-center justify-center sm:mb-6">
           <Titles active={active} onChange={setActive} />
         </div>
 

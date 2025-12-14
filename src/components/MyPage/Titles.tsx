@@ -1,3 +1,5 @@
+import { useViewport } from "@/contexts/useViewport";
+
 export default function Titles({
   active,
   onChange,
@@ -5,12 +7,18 @@ export default function Titles({
   active: "fishtank" | "aquarium";
   onChange: (v: "fishtank" | "aquarium") => void;
 }) {
-  // 고정 사이즈
-  const BTN_H = "h-13"; // 버튼 높이
-  const BTN_FISHTANK_W = "w-[260px]"; // FISHTANK 폭
-  const BTN_AQUARIUM_W = "w-[260px]"; // AQUARIUM 폭
+  const { isMobile } = useViewport();
 
-  const base = `rounded-full border-3 ${BTN_H} flex items-center justify-center px-6 transition-colors duration-150`;
+  // 반응형 사이즈 - 모바일 크기 증가
+  const BTN_H = isMobile ? "h-12" : "h-13"; // 버튼 높이
+  const BTN_FISHTANK_W = isMobile ? "w-[180px]" : "w-[260px]"; // FISHTANK 폭
+  const BTN_AQUARIUM_W = isMobile ? "w-[180px]" : "w-[260px]"; // AQUARIUM 폭
+  const MY_TEXT_SIZE = isMobile ? "text-5xl" : "text-5xl";
+  const BTN_TEXT_SIZE = isMobile ? "text-2xl" : "text-3xl";
+  const GAP = isMobile ? "gap-3" : "gap-4";
+  const PADDING = isMobile ? "px-4" : "px-6";
+
+  const base = `rounded-full border-3 ${BTN_H} flex items-center justify-center ${PADDING} transition-colors duration-150`;
   const onBtn = "bg-[#EDF1F8]/80 border-[#CA9B9B]";
   const offBtn = "bg-transparent border-[#CA9B9B]";
 
@@ -34,9 +42,9 @@ export default function Titles({
   );
 
   return (
-    <div className="flex items-center gap-4">
+    <div className={`flex items-center ${GAP} flex-wrap justify-center`}>
       {/* MY */}
-      <StrokeText className="text-5xl">MY</StrokeText>
+      <StrokeText className={MY_TEXT_SIZE}>MY</StrokeText>
 
       {/* FISHTANK */}
       <button
@@ -44,9 +52,9 @@ export default function Titles({
         onClick={() => onChange("fishtank")}
       >
         {active === "fishtank" ? (
-          <StrokeText className="text-3xl">FISHTANK</StrokeText>
+          <StrokeText className={BTN_TEXT_SIZE}>FISHTANK</StrokeText>
         ) : (
-          <span className="font-abeezee text-3xl text-[#CA9B9B]">FISHTANK</span>
+          <span className={`font-abeezee ${BTN_TEXT_SIZE} text-[#CA9B9B]`}>FISHTANK</span>
         )}
       </button>
 
@@ -56,9 +64,9 @@ export default function Titles({
         onClick={() => onChange("aquarium")}
       >
         {active === "aquarium" ? (
-          <StrokeText className="text-3xl">AQUARIUM</StrokeText>
+          <StrokeText className={BTN_TEXT_SIZE}>AQUARIUM</StrokeText>
         ) : (
-          <span className="font-abeezee text-3xl text-[#CA9B9B]">AQUARIUM</span>
+          <span className={`font-abeezee ${BTN_TEXT_SIZE} text-[#CA9B9B]`}>AQUARIUM</span>
         )}
       </button>
     </div>
