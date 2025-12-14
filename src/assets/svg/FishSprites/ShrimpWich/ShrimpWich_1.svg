@@ -1,0 +1,135 @@
+<svg id="stage" xmlns="http://www.w3.org/2000/svg" viewBox="0 -3 50 53" shape-rendering="crispEdges">
+  <g id="shrimpwich-1-*{id}">
+    <g id="shrimpwich-1-*{id}-anchors" visibility="hidden">
+      <circle id="shrimpwich-1-*{id}-anchor-center" cx="25" cy="25" r="0.01"/>
+      <circle id="shrimpwich-1-*{id}-anchor-label-top" cx="25" cy="1" r="0.01"/>
+    </g>
+
+        <style>
+@keyframes shrimpwich-1-*{id}-bob {
+  0%   { transform: translateY(0); }
+  12%  { transform: translateY(0); }
+  40%  { transform: translateY(-3.0px); }
+  80%  { transform: translateY(-0.5px); }
+  100% { transform: translateY(0); }
+}
+@keyframes shrimpwich-1-*{id}-tilt-must {
+  0%,12% { transform: rotate(0deg); }
+  40%    { transform: rotate(-10deg); }
+  80%    { transform: rotate(-2deg); }
+  100%   { transform: rotate(0deg); }
+}
+@keyframes shrimpwich-1-*{id}-tilt-head {
+  0%,12% { transform: rotate(0deg); }
+  40%    { transform: rotate(-5deg); }
+  80%    { transform: rotate(-1deg); }
+  100%   { transform: rotate(0deg); }
+}
+@keyframes shrimpwich-1-*{id}-tilt-tail {
+  0%,12% { transform: rotate(0deg); }
+  40%    { transform: rotate(5deg); }
+  80%    { transform: rotate(1deg); }
+  100%   { transform: rotate(0deg); }
+}
+
+#shrimpwich-1-*{id}-sprite,
+#shrimpwich-1-*{id}-must,
+#shrimpwich-1-*{id}-head,
+#shrimpwich-1-*{id}-body,
+#shrimpwich-1-*{id}-tail {
+  transform-box: fill-box;
+  animation-duration: 1.4s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+
+#shrimpwich-1-*{id}-sprite { animation-name: shrimpwich-1-*{id}-bob; transform-origin: center; }
+
+#shrimpwich-1-*{id}-must { transform-origin: 100% 100%; }
+#shrimpwich-1-*{id}-head { transform-origin: 100% 100%; }
+#shrimpwich-1-*{id}-tail { transform-origin: 0% 0%; }
+
+#shrimpwich-1-*{id}-must { animation-name: shrimpwich-1-*{id}-tilt-must; }
+#shrimpwich-1-*{id}-head { animation-name: shrimpwich-1-*{id}-tilt-head; }
+#shrimpwich-1-*{id}-tail { animation-name: shrimpwich-1-*{id}-tilt-tail; }
+    </style>
+    <g id="shrimpwich-1-*{id}-wrapper" transform="translate(15, 0)">
+      <g id="shrimpwich-1-*{id}-sprite">
+        <g id="shrimpwich-1-*{id}-sprite" data-kind="sprite">
+          <g id="shrimpwich-1-*{id}-must">
+            <rect x="5" y="6" width="1" height="1" fill="rgb(241,111,69)"/>
+            <rect x="4" y="7" width="1" height="1" fill="rgb(203,90,54)"/>
+            <rect x="4" y="8" width="1" height="1" fill="rgb(183,80,47)"/>
+            <rect x="5" y="9" width="1" height="1" fill="rgb(150,55,38)"/>
+          </g>
+          <g id="shrimpwich-1-*{id}-body">
+            <rect x="13" y="8" width="1" height="1" fill="rgb(162,53,39)"/>
+            <rect x="14" y="8" width="1" height="1" fill="rgb(154,44,32)"/>
+            <rect x="12" y="9" width="1" height="1" fill="rgb(225,86,51)"/>
+            <rect x="13" y="9" width="1" height="1" fill="rgb(237,106,60)"/>
+            <rect x="14" y="9" width="1" height="1" fill="rgb(206,90,55)"/>
+            <rect x="15" y="9" width="1" height="1" fill="rgb(154,44,32)"/>
+            <rect x="12" y="10" width="1" height="1" fill="rgb(224,86,51)"/>
+            <rect x="13" y="10" width="1" height="1" fill="rgb(235,101,57)"/>
+            <rect x="14" y="10" width="1" height="1" fill="rgb(227,92,52)"/>
+            <rect x="15" y="10" width="1" height="1" fill="rgb(162,53,39)"/>
+            <rect x="11" y="11" width="1" height="1" fill="rgb(163,45,34)"/>
+            <rect x="12" y="11" width="1" height="1" fill="rgb(233,96,55)"/>
+            <rect x="13" y="11" width="1" height="1" fill="rgb(230,94,54)"/>
+            <rect x="14" y="11" width="1" height="1" fill="rgb(221,84,50)"/>
+            <rect x="15" y="11" width="1" height="1" fill="rgb(189,77,49)"/>
+            <rect x="16" y="11" width="1" height="1" fill="rgb(154,44,32)"/>
+            <rect x="12" y="12" width="1" height="1" fill="rgb(162,53,39)"/>
+            <rect x="13" y="12" width="1" height="1" fill="rgb(213,76,47)"/>
+          </g>
+          <g id="shrimpwich-1-*{id}-head">
+            <rect x="7" y="7" width="1" height="1" fill="rgb(154,44,32)"/>
+            <rect x="8" y="7" width="1" height="1" fill="rgb(162,53,39)"/>
+            <rect x="9" y="7" width="1" height="1" fill="rgb(188,80,53)"/>
+            <rect x="10" y="7" width="1" height="1" fill="rgb(188,80,53)"/>
+            <rect x="11" y="7" width="1" height="1" fill="rgb(162,53,39)"/>
+            <rect x="12" y="7" width="1" height="1" fill="rgb(154,44,32)"/>
+            <rect x="6" y="8" width="1" height="1" fill="rgb(154,44,32)"/>
+            <rect x="7" y="8" width="1" height="1" fill="rgb(188,80,53)"/>
+            <rect x="8" y="8" width="1" height="1" fill="rgb(110,49,27)"/>
+            <rect x="9" y="8" width="1" height="1" fill="rgb(239,110,62)"/>
+            <rect x="10" y="8" width="1" height="1" fill="rgb(239,111,62)"/>
+            <rect x="11" y="8" width="1" height="1" fill="rgb(220,76,47)"/>
+            <rect x="12" y="8" width="1" height="1" fill="rgb(162,53,39)"/>
+            <rect x="6" y="9" width="1" height="1" fill="rgb(233,99,56)"/>
+            <rect x="7" y="9" width="1" height="1" fill="rgb(237,104,58)"/>
+            <rect x="8" y="9" width="1" height="1" fill="rgb(41,26,26)"/>
+            <rect x="9" y="9" width="1" height="1" fill="rgb(237,105,60)"/>
+            <rect x="10" y="9" width="1" height="1" fill="rgb(238,107,61)"/>
+            <rect x="11" y="9" width="1" height="1" fill="rgb(238,108,61)"/>
+            <rect x="6" y="10" width="1" height="1" fill="rgb(154,44,32)"/>
+            <rect x="7" y="10" width="1" height="1" fill="rgb(220,76,47)"/>
+            <rect x="8" y="10" width="1" height="1" fill="rgb(234,99,56)"/>
+            <rect x="9" y="10" width="1" height="1" fill="rgb(235,100,57)"/>
+            <rect x="10" y="10" width="1" height="1" fill="rgb(235,101,57)"/>
+            <rect x="11" y="10" width="1" height="1" fill="rgb(223,90,53)"/>
+            <rect x="7" y="11" width="1" height="1" fill="rgb(154,44,32)"/>
+            <rect x="8" y="11" width="1" height="1" fill="rgb(188,80,53)"/>
+            <rect x="9" y="11" width="1" height="1" fill="rgb(188,80,53)"/>
+            <rect x="10" y="11" width="1" height="1" fill="rgb(181,55,38)"/>
+          </g>
+          <g id="shrimpwich-1-*{id}-tail">
+            <rect x="14" y="12" width="1" height="1" fill="rgb(230,94,54)"/>
+            <rect x="15" y="12" width="1" height="1" fill="rgb(186,74,46)"/>
+            <rect x="16" y="12" width="1" height="1" fill="rgb(154,44,32)"/>
+            <rect x="12" y="13" width="1" height="1" fill="rgb(154,44,32)"/>
+            <rect x="13" y="13" width="1" height="1" fill="rgb(196,59,38)"/>
+            <rect x="14" y="13" width="1" height="1" fill="rgb(195,58,38)"/>
+            <rect x="15" y="13" width="1" height="1" fill="rgb(154,44,32)"/>
+            <rect x="11" y="14" width="1" height="1" fill="rgb(154,44,32)"/>
+            <rect x="12" y="14" width="1" height="1" fill="rgb(187,64,39)"/>
+            <rect x="13" y="14" width="1" height="1" fill="rgb(223,87,49)"/>
+            <rect x="14" y="14" width="1" height="1" fill="rgb(153,58,39)"/>
+            <rect x="12" y="15" width="1" height="1" fill="rgb(154,44,32)"/>
+            <rect x="13" y="15" width="1" height="1" fill="rgb(154,44,32)"/>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

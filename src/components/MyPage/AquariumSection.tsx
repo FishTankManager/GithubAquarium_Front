@@ -4,12 +4,15 @@ import { SubTab } from "./AquariumTabs";
 import AquariumBackgroundGrid from "./AquariumBackgroundGrid";
 import AquariumItemGrid from "./AquariumItemGrid";
 import AquariumFishTable from "./AquariumFishTable";
+import { useViewport } from "@/contexts/useViewport";
 
 type Item = { id: string; name: string; src: string };
 type BgItem = { id: string; name: string; src: string };
 
 export default function AquariumSection() {
-  const [tab, setTab] = useState<SubTab>("background"); // 기본 background
+  const { isMobile, width } = useViewport();
+  const useVerticalLayout = isMobile || width < 1400;
+  const [tab, setTab] = useState<SubTab>(useVerticalLayout ? "fish" : "background"); // 모바일: fish, 와이드: background
   const totalContrib = 12987; // dummy
 
   const bgCandidates: BgItem[] = useMemo(
@@ -68,6 +71,114 @@ export default function AquariumSection() {
     }
   };
 
+  // 모바일 뷰일 때 feat/MyPage 브랜치의 레이아웃 사용
+  if (useVerticalLayout) {
+    return (
+      <div className="flex w-full flex-col px-2 sm:px-4">
+        {/* 상단 Export 버튼 */}
+        <div className="flex items-center justify-between">
+          <div />
+          <button
+            onClick={() => console.log("EXPORT clicked")}
+            className="font-vt mb-4 ml-auto rounded-full bg-[#3F3F3F]/80 px-8 py-1.5 text-xl text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none sm:text-2xl"
+          >
+            EXPORT
+          </button>
+        </div>
+
+        {/* 상단 수족관 미리보기 (배경 + 아이템 오버레이) */}
+        <div className="flex justify-center">
+          <div className="w-full" style={{ aspectRatio: "750/440", maxWidth: "750px" }}>
+            <AquariumCanvas
+              width="100%"
+              height="100%"
+              bgSrc={appliedBgSrc}
+              itemSrc={appliedItemSrc}
+              className="h-full w-full"
+            />
+          </div>
+        </div>
+        <div className="space-y-3">
+          <p className="font-vt mt-3 text-lg text-white sm:text-2xl">
+            Repo contributions: {totalContrib}
+          </p>
+        </div>
+
+        {/* 서브 탭 + APPLY */}
+        <div className="mt-4 mb-4 flex items-center justify-between gap-3">
+          <div className="flex gap-4">
+            <button
+              className={`font-vt rounded-md px-6 py-1 text-lg ${
+                tab === "fish" ? "bg-[#D7B9B9] text-black" : "bg-[#C7D6FF]/80 text-black/80"
+              }`}
+              onClick={() => setTab("fish")}
+            >
+              FISH
+            </button>
+            <button
+              className={`font-vt rounded-md px-6 py-1 text-lg ${
+                tab === "background" ? "bg-[#D7B9B9] text-black" : "bg-[#C7D6FF]/80 text-black/80"
+              }`}
+              onClick={() => setTab("background")}
+            >
+              BACKGROUND
+            </button>
+            <button
+              className={`font-vt rounded-md px-6 py-1 text-lg ${
+                tab === "items" ? "bg-[#D7B9B9] text-black" : "bg-[#C7D6FF]/80 text-black/80"
+              }`}
+              onClick={() => setTab("items")}
+            >
+              ITEMS
+            </button>
+          </div>
+
+          {tab !== "fish" && (
+            <button
+              onClick={handleApply}
+              className="font-vt rounded-full bg-[#3F3F3F]/80 px-6 py-1.5 text-base whitespace-nowrap text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none sm:text-xl"
+            >
+              APPLY
+            </button>
+          )}
+        </div>
+
+        {/* 잠겨있는 아이템/배경 선택 시 메시지 표시 영역 */}
+        {message && (
+          <div className="mb-3 flex justify-center">
+            <div className="font-vt rounded-md bg-[#00355B] px-6 py-1 text-base text-white shadow-lg sm:text-lg">
+              {message}
+            </div>
+          </div>
+        )}
+
+        {/* 탭 컨텐츠 */}
+        <section className="mt-3 rounded-xl">
+          {tab === "fish" && (
+            <div className="w-full overflow-x-auto">
+              <AquariumFishTable />
+            </div>
+          )}
+          {tab === "background" && (
+            <AquariumBackgroundGrid
+              items={bgCandidates}
+              selectedId={selectedBgId}
+              onSelect={setSelectedBgId}
+            />
+          )}
+          {tab === "items" && (
+            <AquariumItemGrid
+              items={itemCandidates}
+              selectedId={selectedItemId}
+              onSelect={setSelectedItemId}
+            />
+          )}
+        </section>
+      </div>
+    );
+  }
+
+  // 와이드 뷰
   return (
     <div className="flex w-full flex-col px-20">
       {/* 상단 공용 툴바: 버튼들 y좌표 통일하기 위해 만들었음 === */}
@@ -82,8 +193,11 @@ export default function AquariumSection() {
           </button>
         </div>
 
-        {/* 우: 탭(Background & Items) + APPLY - 고정 위치 */}
-        <div className="absolute top-0 right-0 flex items-center gap-4" style={{ width: "500px" }}>
+        {/* 우: 탭(Background & Items) + APPLY */}
+        <div
+          className="absolute top-0 right-0 flex items-center justify-between gap-4"
+          style={{ width: "500px" }}
+        >
           <div className="flex gap-3">
             <button
               className={`font-vt rounded-md px-6 py-1 text-xl ${
@@ -103,7 +217,7 @@ export default function AquariumSection() {
             </button>
           </div>
 
-          {/* 잠겨있는 아이템/배경 선택 시 메시지 표시 영역 - 우측 정렬 */}
+          {/* 잠겨있는 아이템/배경 선택 시 메시지 표시 영역 */}
           {message && (
             <div className="flex justify-end">
               <div className="font-vt rounded-md bg-[#00355B] px-6 py-1 text-xl text-white shadow-lg">
@@ -114,7 +228,7 @@ export default function AquariumSection() {
 
           <button
             onClick={handleApply}
-            className="font-vt ml-auto rounded-full bg-[#3F3F3F]/80 px-8 py-1 text-2xl text-[#D7B9B9] hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
+            className="font-vt rounded-full bg-[#3F3F3F]/80 px-8 py-1 text-2xl text-[#D7B9B9] hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
           >
             APPLY
           </button>
@@ -129,7 +243,7 @@ export default function AquariumSection() {
           <p className="font-vt mt-3 text-2xl text-white">Repo contributions: {totalContrib}</p>
         </div>
 
-        {/* 우측: 스크롤 영역만 - 고정 위치 */}
+        {/* 우측: 스크롤 영역 */}
         <aside className="absolute top-0 right-0 w-[500px]">
           <div
             className="rounded-2xl bg-[linear-gradient(180deg,rgba(255,255,255,0.45)_0%,rgba(255,255,255,0.25)_100%)] p-4 shadow-lg ring-1 ring-white/40 backdrop-blur-md"
@@ -154,6 +268,7 @@ export default function AquariumSection() {
           </div>
         </aside>
       </div>
+      {/* 하단: Fish Table */}
       <div className="mt-10 flex justify-center">
         <div className="relative pb-16" style={{ maxWidth: "1000px", width: "100%" }}>
           <AquariumFishTable />
