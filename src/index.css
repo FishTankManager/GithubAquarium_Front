@@ -15,6 +15,11 @@
   --font-kor: "116Angdeokjeongjik", system-ui, Avenir, Helvetica, Arial, sans-serif;
   --font-bungee: "Bungee", system-ui, sans-serif;
   --font-abeezee: "ABeeZee", system-ui, sans-serif;
+  --breakpoint-xs: 319px;
+  --breakpoint-sm: 424px;
+  --breakpoint-md: 767px;
+  --breakpoint-lg: 1023px;
+  --breakpoint-xl: 1439px;
 }
 
 @layer base {
