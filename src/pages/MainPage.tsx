@@ -67,7 +67,7 @@ export default function MainPage() {
         </div>
       </section>
       <section className="mt-6 flex w-full justify-center px-12 md:mt-10">
-        <div className="relative w-full max-w-4xl rounded-[4.5rem] border border-white/60 bg-white/70 p-12 shadow-2xl backdrop-blur md:p-12">
+        <div className="relative w-full max-w-4xl rounded-[1.5rem] border border-white/60 bg-white/70 p-6 shadow-2xl backdrop-blur md:rounded-[3.5rem] md:p-12">
           <img src="/images/main/example.png" className="h-full w-full object-cover" />
           <div className="absolute -right-4 -bottom-4 -left-4 h-8 rounded-3xl bg-black/10 blur" />
         </div>
