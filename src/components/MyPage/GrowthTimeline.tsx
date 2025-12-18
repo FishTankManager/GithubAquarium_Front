@@ -442,23 +442,6 @@ export default function GrowthTimeline({ repoId, contributionFishes = [] }: Grow
               })}
             </div>
 
-            {/* TIME 행 */}
-            <div className="mb-4 grid grid-cols-[80px_repeat(6,minmax(100px,1fr))] gap-3">
-              <div className="font-vt flex items-center text-sm text-[#5A2B55] sm:text-base">
-                TIME
-              </div>
-              {stages.map((stage) => {
-                const fish = getFishForStage(stage);
-                return (
-                  <div key={stage} className="text-center">
-                    <div className="font-vt text-xs break-words text-white sm:text-sm">
-                      {fish ? `${fish.username}` : ""}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
             {/* COMMIT GOAL 행 */}
             <div className="mb-2 grid grid-cols-[80px_repeat(6,minmax(100px,1fr))] gap-3">
               <div className="font-vt flex items-center text-sm text-[#5A2B55] sm:text-base">
@@ -531,20 +514,6 @@ export default function GrowthTimeline({ repoId, contributionFishes = [] }: Grow
                     />
                   )}
                 </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* TIME 행 */}
-        <div className="mb-10 grid grid-cols-[120px_repeat(6,1fr)] gap-4">
-          <div className="font-vt flex items-center text-2xl text-[#5A2B55]">TIME</div>
-          {stages.map((stage) => {
-            const fish = getFishForStage(stage);
-            // TODO: 실제 시간 정보가 API에 추가되면 여기에 표시
-            return (
-              <div key={stage} className="text-center">
-                <div className="font-vt text-xl text-white">{fish ? `${fish.username}` : ""}</div>
               </div>
             );
           })}
