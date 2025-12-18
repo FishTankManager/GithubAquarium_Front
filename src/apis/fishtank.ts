@@ -2,10 +2,14 @@ import { api } from "./axios";
 import type { AxiosError } from "axios";
 
 export interface FishtankBackground {
-  id: number;
-  name: string;
-  code: string;
-  svg_template?: string;
+  id: number; // OwnBackground의 id
+  background: {
+    id: number;
+    name: string;
+    code: string;
+    svg_template?: string;
+  };
+  unlocked_at: string;
   // background_image는 프론트엔드에서 로컬 assets를 사용하므로 제외
 }
 
@@ -46,7 +50,7 @@ export interface SelectableFish {
   species: string;
   commit_count: number;
   selected: boolean;
-  maturity?: number; // 0: Hatchling, 1: Juvenile, 2: Youngling, 3: Adult, 4: Advanced, 5: Master
+  maturity?: number; // 1: Hatchling, 2: Juvenile, 3: Youngling, 4: Adult, 5: Advanced, 6: Master
   required_commits?: number;
   group_code?: string; // 물고기 그룹 코드 (예: "C-KRAKEN")
   is_assigned?: boolean; // 실제로 할당된 물고기인지 여부

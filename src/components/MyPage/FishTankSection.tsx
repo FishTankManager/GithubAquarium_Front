@@ -60,6 +60,7 @@ export default function FishTankSection() {
   const [message, setMessage] = useState<string | null>(null);
   const [bgCandidates, setBgCandidates] = useState<BgItem[]>([]);
   const [loadingBg, setLoadingBg] = useState(true);
+  const [backgroundsData, setBackgroundsData] = useState<FishtankBackground[]>([]);
 
   // 로컬 assets 배경 파일 매핑 (id, code, name 기반)
   const localBackgroundMap: Record<string, string> = {
@@ -89,44 +90,49 @@ export default function FishTankSection() {
         const convertedBackgrounds: BgItem[] = backgrounds.map((bg: FishtankBackground) => {
           let imageSrc: string;
 
+          // AquariumBackgroundSerializer는 OwnBackground를 직렬화하므로 background 필드 사용
+          const background = bg.background;
+
           // 로컬 assets에서 배경 찾기 (id, code, name 기반)
           // code에서 숫자 추출 시도 (예: "bg-1" -> "1")
-          const codeNumber = bg.code.match(/\d+/)?.[0];
+          const codeNumber = background.code.match(/\d+/)?.[0];
           // name에서도 숫자 추출 시도 (예: "bg-1.png" -> "1")
-          const nameNumber = bg.name.match(/\d+/)?.[0];
+          const nameNumber = background.name.match(/\d+/)?.[0];
           const localBg =
-            localBackgroundMap[bg.id.toString()] ||
-            localBackgroundMap[bg.code] ||
-            localBackgroundMap[bg.name] ||
+            localBackgroundMap[background.id.toString()] ||
+            localBackgroundMap[background.code] ||
+            localBackgroundMap[background.name] ||
             (codeNumber ? localBackgroundMap[codeNumber] : null) ||
             (nameNumber ? localBackgroundMap[nameNumber] : null);
 
           if (localBg) {
             // 로컬 assets의 배경 파일 사용 (우선순위 1)
             imageSrc = localBg;
-          } else if (bg.svg_template) {
+          } else if (background.svg_template) {
             // SVG 템플릿을 data URL로 변환 (우선순위 2)
-            imageSrc = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(bg.svg_template)}`;
+            imageSrc = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(background.svg_template)}`;
           } else {
             // 기본 이미지 (background_image는 사용하지 않음 - 404 방지)
             imageSrc = "/images/fishtank_example.png";
           }
 
           console.log(
-            `Background ${bg.id} (code: ${bg.code}, name: ${bg.name}): using ${imageSrc}`,
+            `Background ${bg.id} (code: ${background.code}, name: ${background.name}): using ${imageSrc}`,
           );
 
           return {
-            id: bg.id.toString(),
-            name: bg.name,
+            id: background.id.toString(), // Background의 id 사용
+            name: background.name,
             src: imageSrc,
           };
         });
 
         setBgCandidates(convertedBackgrounds);
+        setBackgroundsData(backgrounds); // 원본 데이터 저장 (applyFishtankBackground에서 사용)
       } catch (e) {
         console.error("Failed to fetch fishtank backgrounds:", e);
         setBgCandidates([]); // 에러 시 빈 배열
+        setBackgroundsData([]);
       } finally {
         setLoadingBg(false);
       }
@@ -259,7 +265,16 @@ export default function FishTankSection() {
           return;
         }
 
-        await applyFishtankBackground(repo.id, backgroundId);
+        // Background의 id를 찾기 위해 backgroundsData에서 매칭
+        const background = backgroundsData.find((bg) => bg.id.toString() === selectedBgId);
+        if (!background) {
+          setMessage("Background not found.");
+          setTimeout(() => setMessage(null), 3000);
+          return;
+        }
+
+        // API는 Background의 id를 요구함
+        await applyFishtankBackground(repo.id, background.background.id);
         setAppliedBgId(selectedBgId);
         // 선택한 배경의 src를 직접 사용
         const selectedBg = bgCandidates.find((b) => b.id === selectedBgId);
