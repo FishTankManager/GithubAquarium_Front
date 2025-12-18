@@ -3,6 +3,7 @@ import FishIcon from "./FishIcon";
 import { getSelectableFish, type SelectableFish } from "@/apis/fishtank";
 import type { Maturity } from "@/types/aquarium";
 import { useViewport } from "@/contexts/useViewport";
+import * as FishSprites from "@/assets/svg/FishSprites";
 
 interface ContributionFishData {
   id: number;
@@ -23,15 +24,15 @@ interface GrowthTimelineProps {
   contributionFishes?: ContributionFishData[];
 }
 
-// maturity 숫자를 Maturity 타입으로 변환
+// maturity 숫자를 Maturity 타입으로 변환 (1부터 시작)
 function getMaturityFromNumber(maturity: number): Maturity {
   const maturityMap: Record<number, Maturity> = {
-    0: "Hatchling",
-    1: "Juvenile",
-    2: "Youngling",
-    3: "Adult",
-    4: "Advanced",
-    5: "Master",
+    1: "Hatchling",
+    2: "Juvenile",
+    3: "Youngling",
+    4: "Adult",
+    5: "Advanced",
+    6: "Master",
   };
   return maturityMap[maturity] || "Hatchling";
 }
@@ -86,7 +87,8 @@ export default function GrowthTimeline({ repoId, contributionFishes = [] }: Grow
         return fish.maturity <= maxMaturity;
       }
       const fishMaturity = getMaturityFromCommitCount(fish.commit_count);
-      const maturityNumber = stages.indexOf(fishMaturity);
+      // stages는 0부터 시작하지만 maturity는 1부터 시작하므로 +1
+      const maturityNumber = stages.indexOf(fishMaturity) + 1;
       return maturityNumber <= maxMaturity;
     });
 
@@ -167,6 +169,22 @@ export default function GrowthTimeline({ repoId, contributionFishes = [] }: Grow
     return highestFish.group_code || null;
   };
 
+  // group_code와 maturity를 기반으로 로컬 SVG 파일 경로 찾기
+  const getLocalSvgPath = (groupCode: string, maturity: number): string | null => {
+    // group_code를 폴더명으로 변환 (예: "SpaceOcto" -> "SpaceOcto")
+    const folderName = groupCode;
+    // 파일명 생성 (예: "SpaceOcto_1")
+    const fileName = `${folderName}_${maturity}`;
+
+    // FishSprites에서 해당 파일 찾기
+    const spriteKey = fileName as keyof typeof FishSprites;
+    if (spriteKey in FishSprites && FishSprites[spriteKey]) {
+      return FishSprites[spriteKey] as string;
+    }
+
+    return null;
+  };
+
   // 각 단계별로 해당하는 물고기 찾기
   // 같은 group_code를 가진 물고기들 중에서 해당 maturity 단계의 물고기를 찾음
   // contributionFishes가 있으면 할당된 물고기만, 없으면 모든 물고기
@@ -174,10 +192,11 @@ export default function GrowthTimeline({ repoId, contributionFishes = [] }: Grow
     const targetGroupCode = getHighestMaturityGroupCode();
     if (!targetGroupCode) return null;
 
+    // stages는 0부터 시작하지만 maturity는 1부터 시작하므로 +1
+    const stageMaturityNumber = stages.indexOf(stage) + 1;
+
     // contributionFishes가 있으면 그것을 우선 사용
     if (contributionFishes.length > 0) {
-      const stageMaturityNumber = stages.indexOf(stage);
-
       // contributionFishes에서 해당 maturity 단계의 물고기 찾기
       const matchingContributionFish = contributionFishes.find((cf) => {
         return (
@@ -186,6 +205,9 @@ export default function GrowthTimeline({ repoId, contributionFishes = [] }: Grow
       });
 
       if (matchingContributionFish) {
+        // 로컬 SVG 파일 찾기 (우선 사용)
+        const localSvg = getLocalSvgPath(targetGroupCode, stageMaturityNumber);
+
         // contributionFishes에서 찾은 물고기를 SelectableFish 형태로 변환
         const selectableFish: SelectableFish = {
           id: matchingContributionFish.id,
@@ -197,13 +219,43 @@ export default function GrowthTimeline({ repoId, contributionFishes = [] }: Grow
           required_commits: matchingContributionFish.species.required_commits,
           group_code: matchingContributionFish.species.group_code,
           is_assigned: true,
-          svg_template: matchingContributionFish.species.svg_template, // SVG 템플릿 추가
+          svg_template: localSvg || matchingContributionFish.species.svg_template, // 로컬 SVG 우선 사용
         };
         console.log(
           `GrowthTimeline: Stage ${stage} - Found from contributionFishes:`,
           selectableFish,
         );
         return selectableFish;
+      }
+
+      // contributionFishes에 없으면 로컬 SVG 파일 사용 (현재 maturity보다 작거나 같은 경우)
+      const highestFish = contributionFishes.reduce((prev, current) =>
+        current.species.maturity > prev.species.maturity ? current : prev,
+      );
+      const maxMaturity = highestFish.species.maturity;
+
+      // 현재 maturity보다 작거나 같으면 로컬 SVG 파일 사용
+      if (stageMaturityNumber <= maxMaturity) {
+        const localSvg = getLocalSvgPath(targetGroupCode, stageMaturityNumber);
+        if (localSvg) {
+          const selectableFish: SelectableFish = {
+            id: null,
+            username: null,
+            species: `${targetGroupCode} ${stage}`,
+            commit_count: 0,
+            selected: false,
+            maturity: stageMaturityNumber,
+            required_commits: 0,
+            group_code: targetGroupCode,
+            is_assigned: false,
+            svg_template: localSvg,
+          };
+          console.log(
+            `GrowthTimeline: Stage ${stage} - Using local SVG for unassigned maturity:`,
+            selectableFish,
+          );
+          return selectableFish;
+        }
       }
 
       // contributionFishes에 없으면 filteredFishes에서 찾기
@@ -221,10 +273,23 @@ export default function GrowthTimeline({ repoId, contributionFishes = [] }: Grow
         // 할당된 물고기가 있으면 그것을 우선 반환, 없으면 할당되지 않은 물고기 반환
         const assignedFish = stageFishes.find((f) => f.is_assigned === true && f.id !== null);
         if (assignedFish) {
+          // 로컬 SVG 파일도 추가
+          const localSvg = getLocalSvgPath(
+            targetGroupCode,
+            assignedFish.maturity || stageMaturityNumber,
+          );
+          if (localSvg) {
+            assignedFish.svg_template = localSvg;
+          }
           return assignedFish;
         }
         // 할당된 물고기가 없으면 첫 번째 물고기 반환 (할당되지 않은 maturity 단계)
-        return stageFishes[0];
+        const fish = stageFishes[0];
+        const localSvg = getLocalSvgPath(targetGroupCode, fish.maturity || stageMaturityNumber);
+        if (localSvg) {
+          fish.svg_template = localSvg;
+        }
+        return fish;
       }
 
       return null;
@@ -277,7 +342,8 @@ export default function GrowthTimeline({ repoId, contributionFishes = [] }: Grow
         current.species.maturity > prev.species.maturity ? current : prev,
       );
       const maxMaturity = highestFish.species.maturity;
-      const stageMaturityNumber = stages.indexOf(stage);
+      // stages는 0부터 시작하지만 maturity는 1부터 시작하므로 +1
+      const stageMaturityNumber = stages.indexOf(stage) + 1;
 
       // 현재 maturity보다 높은 단계는 잠금 상태
       if (stageMaturityNumber > maxMaturity) {
