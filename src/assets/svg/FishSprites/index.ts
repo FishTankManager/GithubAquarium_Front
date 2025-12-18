@@ -1,4 +1,4 @@
-import LaptopSunfish from "@/assets/svg/FishSprites/LaptopSunfish.svg?raw";
+import LaptopSunfish from "@/assets/svg/FishSprites/LaptopSunfish/LaptopSunfish.svg";
 import SpaceOcto_1 from "@/assets/svg/FishSprites/SpaceOcto/SpaceOcto_1.svg?raw";
 import SpaceOcto_2 from "@/assets/svg/FishSprites/SpaceOcto/SpaceOcto_2.svg?raw";
 import SpaceOcto_3 from "@/assets/svg/FishSprites/SpaceOcto/SpaceOcto_3.svg?raw";

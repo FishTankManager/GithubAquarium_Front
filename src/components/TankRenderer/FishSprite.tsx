@@ -5,6 +5,8 @@ type Props = {
   id: string;
   svgSource: string; // *{id} 포함
   label?: string;
+  topLabel?: string;
+  bottomLabel?: string;
   personaWidthPercent?: number; // 탱크 대비 %
   speed?: number; // px/s
   padding?: number;
@@ -15,12 +17,14 @@ type Props = {
 
 const EPS = 0.02;
 const MIN_FLIP_INTERVAL = 500; // ms
-const TRANSITION_FALLBACK_MS = 50; // transitionend 누락 대비
+const TRANSITION_FALLBACK_MS = 50; // transitionend 누락 대비;
 
 export default function FishSpriteTest({
   id,
   svgSource,
-  label = "label",
+  label,
+  topLabel,
+  bottomLabel,
   personaWidthPercent = 4,
   speed = 40,
   padding = 8,
@@ -28,11 +32,17 @@ export default function FishSpriteTest({
   randomStart = true,
   className = "",
 }: Props) {
+  const resolvedTopLabel = topLabel ?? label;
+  const resolvedBottomLabel = bottomLabel;
+
   const tankRef = useContext(TankContext); // 공용 탱크
   const spriteRef = useRef<HTMLDivElement>(null); // translate 적용
   const flipRef = useRef<HTMLDivElement>(null); // scaleX 적용
   const svgHostRef = useRef<HTMLDivElement>(null);
-  const labelBoxRef = useRef<HTMLSpanElement>(null);
+
+  // 위/아래 라벨 박스 각각 따로
+  const topLabelBoxRef = useRef<HTMLSpanElement>(null);
+  const bottomLabelBoxRef = useRef<HTMLSpanElement>(null);
 
   // id 치환 & viewBox 파싱
   const svgHtml = useMemo(() => svgSource.replaceAll(/\*\{id\}/g, id), [svgSource, id]);
@@ -60,44 +70,92 @@ export default function FishSpriteTest({
     if (svgHostRef.current) svgHostRef.current.innerHTML = svgHtml;
   }, [svgHtml]);
 
-  // 라벨 위치 업데이트
+  // 라벨 위치/스타일 업데이트
   const updateLabel = useCallback(() => {
     const host = svgHostRef.current;
-    const box = labelBoxRef.current;
-    if (!host || !box) return;
+    const topBox = topLabelBoxRef.current;
+    const bottomBox = bottomLabelBoxRef.current;
 
-    // ★ prefix 무시하고, *{id}-anchor-label-top / *{id}-anchor-center 만 본다
-    // 예: spaceocto-1-*{id}-anchor-label-top, test-*{id}-anchor-label-top 모두 인식
-    let anchor = host.querySelector(`[id$="${id}-anchor-label-top"]`) as SVGGraphicsElement | null;
+    if (!host || (!topBox && !bottomBox)) return;
 
-    if (!anchor) {
-      anchor = host.querySelector(`[id$="${id}-anchor-center"]`) as SVGGraphicsElement | null;
+    // 공통 anchor: *{id}-anchor-label-top / *{id}-anchor-center
+    let anchorTop = host.querySelector(
+      `[id$="${id}-anchor-label-top"]`,
+    ) as SVGGraphicsElement | null;
+
+    if (!anchorTop) {
+      anchorTop = host.querySelector(`[id$="${id}-anchor-center"]`) as SVGGraphicsElement | null;
     }
 
-    // 기본값: 정중앙 위쪽
-    let ax = viewBox.w / 2;
-    let ay = -2;
+    // ---- 위 라벨 위치: 기존 anchor 기준, 물고기 위쪽 ----
+    if (topBox) {
+      // 기본값: 정중앙 위쪽
+      let ax = viewBox.w / 2;
+      let ay = -2;
 
-    if (anchor) {
-      // 어떤 도형이든 bbox 기반으로 중앙/상단을 사용
-      const bb = anchor.getBBox();
-      ax = bb.x + bb.width / 2;
-      ay = bb.y;
+      if (anchorTop) {
+        const bb = anchorTop.getBBox();
+        ax = bb.x + bb.width / 2;
+        ay = bb.y;
+      }
+
+      const px = (ax - viewBox.minX) * (spriteWRef.current / viewBox.w);
+      const py = (ay - viewBox.minY) * (spriteHRef.current / viewBox.h);
+
+      topBox.style.left = `${px}px`;
+      topBox.style.top = `${py}px`;
     }
 
-    const px = (ax - viewBox.minX) * (spriteWRef.current / viewBox.w);
-    const py = (ay - viewBox.minY) * (spriteHRef.current / viewBox.h);
+    // ---- 아래 라벨 위치: 물고기 전체 아래쪽 ----
+    if (bottomBox) {
+      // anchor-bottom 이 있으면 우선 사용, 없으면 viewBox 전체의 아래 중앙 사용
+      const anchorBottom = host.querySelector(
+        `[id$="${id}-anchor-label-bottom"]`,
+      ) as SVGGraphicsElement | null;
 
-    box.style.left = `${px}px`;
-    box.style.top = `${py}px`;
+      let bx = viewBox.w / 2;
+      let by = viewBox.minY + viewBox.w; // 기본은 세로로는 전체 아래쪽
 
-    // 라벨 폰트 크기: 물고기 2배 확대한 뒤에도, 기존 느낌 유지
-    const labelInner = box.firstElementChild as HTMLElement | null;
-    if (labelInner) {
-      const basisW = labelBaseWRef.current || spriteWRef.current / 2; // fallback
-      labelInner.style.fontSize = `${Math.max(10, basisW * 0.22)}px`;
-      labelInner.style.lineHeight = "1";
-      labelInner.style.whiteSpace = "nowrap";
+      if (anchorBottom) {
+        const bb = anchorBottom.getBBox();
+        bx = bb.x + bb.width / 2;
+        by = bb.y + bb.height;
+      } else {
+        // viewBox 높이 기준 실제 아래쪽 Y로 보정
+        by = viewBox.minY + viewBox.h + 2; // 살짝 여백
+      }
+
+      const pxB = (bx - viewBox.minX) * (spriteWRef.current / viewBox.w);
+      const pyB = (by - viewBox.minY) * (spriteHRef.current / viewBox.h);
+
+      bottomBox.style.left = `${pxB}px`;
+      bottomBox.style.top = `${pyB}px`;
+    }
+
+    // ---- 폰트 크기/두께: top < bottom (스타일 서로 교환) ----
+    const basisW = labelBaseWRef.current || spriteWRef.current / 2;
+    const baseSize = Math.max(10, basisW * 0.22);
+
+    if (topBox) {
+      const topInner = topBox.querySelector(".fish-label-top") as HTMLElement | null;
+      if (topInner) {
+        // 상단 라벨: 조금 더 작고, 얇게
+        topInner.style.fontSize = `${baseSize * 1.1}px`;
+        topInner.style.lineHeight = "1";
+        topInner.style.fontWeight = "700";
+        topInner.style.whiteSpace = "nowrap";
+      }
+    }
+
+    if (bottomBox) {
+      const bottomInner = bottomBox.querySelector(".fish-label-bottom") as HTMLElement | null;
+      if (bottomInner) {
+        // 하단 라벨: 더 크고 두껍게
+        bottomInner.style.fontSize = `${baseSize * 0.85}px`;
+        bottomInner.style.lineHeight = "1";
+        bottomInner.style.fontWeight = "400";
+        bottomInner.style.whiteSpace = "nowrap";
+      }
     }
   }, [id, viewBox]);
 
@@ -191,9 +249,12 @@ export default function FishSpriteTest({
         flipRef.current.style.transition = "none";
         flipRef.current.style.transform = `scaleX(${dir})`;
       }
-      // 라벨은 뒤집힘 보정
-      if (labelBoxRef.current) {
-        labelBoxRef.current.style.transform = `translate(-50%, -100%) scaleX(${1 / dir})`;
+      // 라벨은 뒤집힘 보정 (위/아래 각각)
+      if (topLabelBoxRef.current) {
+        topLabelBoxRef.current.style.transform = `translate(-50%, -100%) scaleX(${1 / dir})`;
+      }
+      if (bottomLabelBoxRef.current) {
+        bottomLabelBoxRef.current.style.transform = `translate(-50%, 0) scaleX(${1 / dir})`;
       }
     };
 
@@ -208,7 +269,7 @@ export default function FishSpriteTest({
           }
         };
         el.addEventListener("transitionend", h);
-        // duration이 매우 짧거나 브라우저가 이벤트를 안줄 때 대비
+        // duration이 매우 짧거나 브라우저가 이벤트를 안 줄 때 대비
         setTimeout(
           () => {
             if (done) return;
@@ -259,16 +320,40 @@ export default function FishSpriteTest({
           style={{ width: "100%", height: "100%" }}
           dangerouslySetInnerHTML={{ __html: svgHtml }}
         />
-        {/* 라벨 컨테이너: 스프라이트 내부 절대좌표, 가운데 정렬 + 위쪽으로 */}
-        <span
-          ref={labelBoxRef}
-          className="pointer-events-none absolute select-none"
-          style={{ left: 0, top: 0, transform: "translate(-50%, -100%) scaleX(1)" }}
-        >
-          <span className="font-vt" style={{ whiteSpace: "nowrap" }}>
-            {label}
+
+        {/* 위 라벨 (물고기 위) */}
+        {resolvedTopLabel && (
+          <span
+            ref={topLabelBoxRef}
+            className="pointer-events-none absolute select-none"
+            style={{
+              left: 0,
+              top: 0,
+              transform: "translate(-50%, -100%) scaleX(1)",
+            }}
+          >
+            <span className="fish-label-top font-vt" style={{ whiteSpace: "nowrap" }}>
+              {resolvedTopLabel}
+            </span>
           </span>
-        </span>
+        )}
+
+        {/* 아래 라벨 (물고기 아래) */}
+        {resolvedBottomLabel && (
+          <span
+            ref={bottomLabelBoxRef}
+            className="pointer-events-none absolute select-none"
+            style={{
+              left: 0,
+              top: 0,
+              transform: "translate(-50%, 0) scaleX(1)",
+            }}
+          >
+            <span className="fish-label-bottom font-vt" style={{ whiteSpace: "nowrap" }}>
+              {resolvedBottomLabel}
+            </span>
+          </span>
+        )}
       </div>
     </div>
   );
