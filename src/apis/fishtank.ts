@@ -25,10 +25,19 @@ export interface Repository {
   owner: number | null;
 }
 
+export interface ContributionFishSpecies {
+  id: number;
+  name: string;
+  maturity: number;
+  required_commits: number;
+  svg_template: string;
+  group_code: string;
+}
+
 export interface ContributionFish {
   id: number;
-  is_visible: boolean;
-  species: string;
+  is_visible_in_fishtank: boolean;
+  species: ContributionFishSpecies;
 }
 
 export interface SelectableFish {
@@ -41,6 +50,7 @@ export interface SelectableFish {
   required_commits?: number;
   group_code?: string; // 물고기 그룹 코드 (예: "C-KRAKEN")
   is_assigned?: boolean; // 실제로 할당된 물고기인지 여부
+  svg_template?: string; // SVG 템플릿 코드
 }
 
 export interface Contributor {

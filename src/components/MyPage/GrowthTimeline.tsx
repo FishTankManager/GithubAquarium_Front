@@ -1,11 +1,26 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import FishIcon from "./FishIcon";
 import { getSelectableFish, type SelectableFish } from "@/apis/fishtank";
 import type { Maturity } from "@/types/aquarium";
 import { useViewport } from "@/contexts/useViewport";
 
+interface ContributionFishData {
+  id: number;
+  username: string;
+  commit_count: number;
+  species: {
+    id: number;
+    name: string;
+    maturity: number;
+    required_commits: number;
+    svg_template: string;
+    group_code: string;
+  };
+}
+
 interface GrowthTimelineProps {
   repoId: string | null;
+  contributionFishes?: ContributionFishData[];
 }
 
 // maturity 숫자를 Maturity 타입으로 변환
@@ -32,11 +47,63 @@ function getMaturityFromCommitCount(commitCount: number): Maturity {
   return "Hatchling"; // 기본값
 }
 
-export default function GrowthTimeline({ repoId }: GrowthTimelineProps) {
+export default function GrowthTimeline({ repoId, contributionFishes = [] }: GrowthTimelineProps) {
   const stages: Maturity[] = ["Hatchling", "Juvenile", "Youngling", "Adult", "Advanced", "Master"];
   const [fishes, setFishes] = useState<SelectableFish[]>([]);
   const { isMobile, width } = useViewport();
   const useVerticalLayout = isMobile || width < 1400;
+
+  // ContributionFish 데이터를 기반으로 같은 group_code를 가진 물고기들 중 maturity가 현재 이하인 것들 필터링
+  const filteredFishes = useMemo(() => {
+    console.log("GrowthTimeline: filteredFishes calculation", {
+      contributionFishesCount: contributionFishes.length,
+      fishesCount: fishes.length,
+    });
+
+    if (contributionFishes.length === 0) {
+      console.log("GrowthTimeline: No contributionFishes, using all fishes");
+      return fishes; // ContributionFish가 없으면 기존 로직 사용
+    }
+
+    // 가장 높은 maturity를 가진 ContributionFish의 group_code 찾기
+    const highestFish = contributionFishes.reduce((prev, current) =>
+      current.species.maturity > prev.species.maturity ? current : prev,
+    );
+    const targetGroupCode = highestFish.species.group_code;
+    const maxMaturity = highestFish.species.maturity;
+
+    console.log("GrowthTimeline: Filtering fishes", {
+      targetGroupCode,
+      maxMaturity,
+      highestFishSpecies: highestFish.species.name,
+    });
+
+    // 같은 group_code를 가진 물고기들 중 maturity가 maxMaturity 이하인 것들만 필터링
+    const filtered = fishes.filter((fish) => {
+      if (fish.group_code !== targetGroupCode) return false;
+      // fish.maturity가 있으면 숫자로 직접 비교, 없으면 commit_count로 maturity 계산 후 비교
+      if (fish.maturity !== undefined) {
+        return fish.maturity <= maxMaturity;
+      }
+      const fishMaturity = getMaturityFromCommitCount(fish.commit_count);
+      const maturityNumber = stages.indexOf(fishMaturity);
+      return maturityNumber <= maxMaturity;
+    });
+
+    console.log("GrowthTimeline: Filtered fishes", {
+      filteredCount: filtered.length,
+      filtered: filtered.map((f) => ({
+        id: f.id,
+        username: f.username,
+        maturity: f.maturity,
+        group_code: f.group_code,
+        is_assigned: f.is_assigned,
+      })),
+    });
+
+    return filtered;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fishes, contributionFishes]);
 
   // 각 단계별 커밋 목표
   const commitGoals: Record<Maturity, number | null> = {
@@ -59,6 +126,16 @@ export default function GrowthTimeline({ repoId }: GrowthTimelineProps) {
       try {
         const data = await getSelectableFish(repoId);
         console.log("GrowthTimeline: Fetched fishes:", data);
+        console.log("GrowthTimeline: Fetched fishes details:", {
+          count: data.length,
+          fishes: data.map((f) => ({
+            id: f.id,
+            username: f.username,
+            maturity: f.maturity,
+            group_code: f.group_code,
+            is_assigned: f.is_assigned,
+          })),
+        });
         setFishes(data);
       } catch (error) {
         console.error("Failed to fetch selectable fish:", error);
@@ -71,9 +148,18 @@ export default function GrowthTimeline({ repoId }: GrowthTimelineProps) {
 
   // 같은 group_code를 가진 물고기들 중에서 가장 높은 maturity 찾기
   const getHighestMaturityGroupCode = (): string | null => {
-    if (fishes.length === 0) return null;
+    // ContributionFish가 있으면 그것을 우선 사용
+    if (contributionFishes.length > 0) {
+      const highestFish = contributionFishes.reduce((prev, current) =>
+        current.species.maturity > prev.species.maturity ? current : prev,
+      );
+      return highestFish.species.group_code;
+    }
+
+    // ContributionFish가 없으면 기존 로직 사용
+    if (filteredFishes.length === 0) return null;
     // 가장 높은 maturity를 가진 물고기의 group_code 반환
-    const highestFish = fishes.reduce((prev, current) => {
+    const highestFish = filteredFishes.reduce((prev, current) => {
       const prevMaturity = prev.maturity ?? getMaturityFromCommitCount(prev.commit_count);
       const currentMaturity = current.maturity ?? getMaturityFromCommitCount(current.commit_count);
       return currentMaturity > prevMaturity ? current : prev;
@@ -83,23 +169,70 @@ export default function GrowthTimeline({ repoId }: GrowthTimelineProps) {
 
   // 각 단계별로 해당하는 물고기 찾기
   // 같은 group_code를 가진 물고기들 중에서 해당 maturity 단계의 물고기를 찾음
-  // 실제로 할당된 물고기만 반환 (is_assigned === true)
+  // contributionFishes가 있으면 할당된 물고기만, 없으면 모든 물고기
   const getFishForStage = (stage: Maturity): SelectableFish | null => {
     const targetGroupCode = getHighestMaturityGroupCode();
     if (!targetGroupCode) return null;
 
-    // 같은 group_code를 가진 물고기들 중에서 해당 maturity 단계 찾기
-    // 실제로 할당된 물고기만 필터링
-    const stageFishes = fishes.filter((fish) => {
-      // group_code가 일치하는지 확인
-      if (fish.group_code !== targetGroupCode) return false;
+    // contributionFishes가 있으면 그것을 우선 사용
+    if (contributionFishes.length > 0) {
+      const stageMaturityNumber = stages.indexOf(stage);
 
-      // 실제로 할당된 물고기만 (is_assigned가 true이거나 id가 null이 아닌 경우)
-      if (fish.is_assigned === false || (fish.id === null && fish.is_assigned !== true)) {
-        return false;
+      // contributionFishes에서 해당 maturity 단계의 물고기 찾기
+      const matchingContributionFish = contributionFishes.find((cf) => {
+        return (
+          cf.species.group_code === targetGroupCode && cf.species.maturity === stageMaturityNumber
+        );
+      });
+
+      if (matchingContributionFish) {
+        // contributionFishes에서 찾은 물고기를 SelectableFish 형태로 변환
+        const selectableFish: SelectableFish = {
+          id: matchingContributionFish.id,
+          username: matchingContributionFish.username,
+          species: matchingContributionFish.species.name,
+          commit_count: matchingContributionFish.commit_count,
+          selected: false, // 기본값
+          maturity: matchingContributionFish.species.maturity,
+          required_commits: matchingContributionFish.species.required_commits,
+          group_code: matchingContributionFish.species.group_code,
+          is_assigned: true,
+          svg_template: matchingContributionFish.species.svg_template, // SVG 템플릿 추가
+        };
+        console.log(
+          `GrowthTimeline: Stage ${stage} - Found from contributionFishes:`,
+          selectableFish,
+        );
+        return selectableFish;
       }
 
-      // FishSpecies의 maturity 필드를 우선 사용, 없으면 commit_count로 계산
+      // contributionFishes에 없으면 filteredFishes에서 찾기
+      // 같은 group_code를 가진 물고기들 중에서 해당 maturity 단계 찾기
+      // is_assigned가 false여도 표시 (할당되지 않았어도 같은 group_code이고 maxMaturity 이하면 표시)
+      const stageFishes = filteredFishes.filter((fish) => {
+        if (fish.group_code !== targetGroupCode) return false;
+        if (fish.maturity !== undefined) {
+          return getMaturityFromNumber(fish.maturity) === stage;
+        }
+        return getMaturityFromCommitCount(fish.commit_count) === stage;
+      });
+
+      if (stageFishes.length > 0) {
+        // 할당된 물고기가 있으면 그것을 우선 반환, 없으면 할당되지 않은 물고기 반환
+        const assignedFish = stageFishes.find((f) => f.is_assigned === true && f.id !== null);
+        if (assignedFish) {
+          return assignedFish;
+        }
+        // 할당된 물고기가 없으면 첫 번째 물고기 반환 (할당되지 않은 maturity 단계)
+        return stageFishes[0];
+      }
+
+      return null;
+    }
+
+    // contributionFishes가 없으면 기존 로직 사용
+    const stageFishes = filteredFishes.filter((fish) => {
+      if (fish.group_code !== targetGroupCode) return false;
       if (fish.maturity !== undefined) {
         return getMaturityFromNumber(fish.maturity) === stage;
       }
@@ -107,15 +240,19 @@ export default function GrowthTimeline({ repoId }: GrowthTimelineProps) {
     });
 
     console.log(
-      `GrowthTimeline: Stage ${stage} (group_code: ${targetGroupCode}) - Found ${stageFishes.length} assigned fishes:`,
-      stageFishes,
+      `GrowthTimeline: Stage ${stage} (group_code: ${targetGroupCode}, contributionFishes: ${contributionFishes.length}) - Found ${stageFishes.length} fishes:`,
+      stageFishes.map((f) => ({
+        id: f.id,
+        username: f.username,
+        maturity: f.maturity,
+        is_assigned: f.is_assigned,
+      })),
     );
 
     if (stageFishes.length === 0) {
-      return null; // 할당된 물고기가 없으면 null 반환
+      return null;
     }
 
-    // 가장 높은 commit_count를 가진 물고기 반환
     return stageFishes.reduce((prev, current) =>
       current.commit_count > prev.commit_count ? current : prev,
     );
@@ -126,12 +263,56 @@ export default function GrowthTimeline({ repoId }: GrowthTimelineProps) {
 
   // 각 단계별 표시 상태 결정
   // - 할당된 물고기가 있으면: 실제 물고기 표시
-  // - 할당된 물고기가 없지만 같은 그룹이 있으면: "?" 표시 (미달성)
-  // - 같은 그룹이 없으면: 잠금 상태
+  // - 할당된 물고기가 없지만 같은 그룹이 있고 maxMaturity 이하면: "?" 표시 (미달성)
+  // - 같은 그룹이 없거나 maxMaturity 초과면: 잠금 상태
   const getStageDisplayState = (stage: Maturity): "assigned" | "unlocked" | "locked" => {
-    if (!targetGroupCode) return "locked";
+    if (!targetGroupCode) {
+      console.log(`GrowthTimeline: Stage ${stage} - No targetGroupCode, returning locked`);
+      return "locked";
+    }
+
+    // contributionFishes가 있으면 가장 높은 maturity 확인
+    if (contributionFishes.length > 0) {
+      const highestFish = contributionFishes.reduce((prev, current) =>
+        current.species.maturity > prev.species.maturity ? current : prev,
+      );
+      const maxMaturity = highestFish.species.maturity;
+      const stageMaturityNumber = stages.indexOf(stage);
+
+      // 현재 maturity보다 높은 단계는 잠금 상태
+      if (stageMaturityNumber > maxMaturity) {
+        console.log(
+          `GrowthTimeline: Stage ${stage} (maturity ${stageMaturityNumber}) - Exceeds maxMaturity ${maxMaturity}, returning locked`,
+        );
+        return "locked";
+      }
+    }
+
     const fish = getFishForStage(stage);
-    if (fish !== null) return "assigned";
+    if (fish !== null) {
+      // 할당된 물고기가 있으면 표시
+      if (fish.is_assigned === true && fish.id !== null) {
+        console.log(`GrowthTimeline: Stage ${stage} - Found assigned fish, returning assigned`, {
+          id: fish.id,
+          username: fish.username,
+          maturity: fish.maturity,
+        });
+        return "assigned";
+      }
+      // 할당되지 않은 물고기지만 svg_template이 있으면 표시 (같은 그룹이고 maxMaturity 이하)
+      if (fish.svg_template) {
+        console.log(
+          `GrowthTimeline: Stage ${stage} - Found unassigned fish with svg_template, returning assigned`,
+        );
+        return "assigned";
+      }
+      // 할당되지 않은 물고기이고 svg_template도 없으면 "?" 표시
+      console.log(
+        `GrowthTimeline: Stage ${stage} - Found unassigned fish without svg_template, returning unlocked`,
+      );
+      return "unlocked";
+    }
+    console.log(`GrowthTimeline: Stage ${stage} - No fish found, returning unlocked`);
     return "unlocked"; // 같은 그룹이 있지만 아직 달성하지 않은 단계
   };
 
@@ -169,10 +350,16 @@ export default function GrowthTimeline({ repoId }: GrowthTimelineProps) {
               </div>
               {stages.map((stage) => {
                 const displayState = getStageDisplayState(stage);
+                const fish = getFishForStage(stage);
                 return (
                   <div key={stage} className="flex justify-center">
                     <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-white/25 shadow-inner transition-transform duration-300 sm:h-24 sm:w-24">
-                      {displayState === "assigned" ? (
+                      {displayState === "assigned" && fish?.svg_template ? (
+                        <div
+                          className="h-full w-full"
+                          dangerouslySetInnerHTML={{ __html: fish.svg_template }}
+                        />
+                      ) : displayState === "assigned" ? (
                         <FishIcon maturity={stage} />
                       ) : displayState === "unlocked" ? (
                         <div className="font-vt text-3xl text-white/70 sm:text-4xl">?</div>
@@ -257,10 +444,16 @@ export default function GrowthTimeline({ repoId }: GrowthTimelineProps) {
           <div className="font-vt flex items-center text-2xl text-[#5A2B55]">EVOLUTION</div>
           {stages.map((stage) => {
             const displayState = getStageDisplayState(stage);
+            const fish = getFishForStage(stage);
             return (
               <div key={stage} className="flex justify-center">
                 <div className="flex h-30 w-30 items-center justify-center rounded-2xl bg-white/25 shadow-inner transition-transform duration-300 hover:scale-110">
-                  {displayState === "assigned" ? (
+                  {displayState === "assigned" && fish?.svg_template ? (
+                    <div
+                      className="h-full w-full"
+                      dangerouslySetInnerHTML={{ __html: fish.svg_template }}
+                    />
+                  ) : displayState === "assigned" ? (
                     <FishIcon maturity={stage} />
                   ) : displayState === "unlocked" ? (
                     <div className="font-vt text-5xl text-white/70">?</div>

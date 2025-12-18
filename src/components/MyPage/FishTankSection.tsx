@@ -27,6 +27,21 @@ export default function FishTankSection() {
   const [repo, setRepo] = useState<RepoInfo | null>(null);
   const size: CanvasSize = { width: 700, height: 400 };
   const [contrib, setContrib] = useState<number>(0);
+  const [contributionFishes, setContributionFishes] = useState<
+    Array<{
+      id: number;
+      username: string;
+      commit_count: number;
+      species: {
+        id: number;
+        name: string;
+        maturity: number;
+        required_commits: number;
+        svg_template: string;
+        group_code: string;
+      };
+    }>
+  >([]);
 
   // 중간 크기 화면에서도 세로 레이아웃 사용 (캔버스 700px + 우측 500px + 패딩 = 약 1400px 필요)
   const useVerticalLayout = isMobile || width < 1400;
@@ -143,6 +158,18 @@ export default function FishTankSection() {
         console.log("Total contributions:", totalContributions);
         setContrib(totalContributions);
 
+        // ContributionFish 데이터 추출
+        const fishes = fishtankDetail.contributors
+          .filter((c) => c.fish !== null)
+          .map((c) => ({
+            id: c.fish!.id,
+            username: c.user,
+            commit_count: c.commit_count,
+            species: c.fish!.species,
+          }));
+        setContributionFishes(fishes);
+        console.log("ContributionFishes:", fishes);
+
         // 현재 적용된 배경 가져오기
         // background_id를 사용하여 로컬 assets 매칭
         try {
@@ -186,6 +213,7 @@ export default function FishTankSection() {
         setContrib(repo.contributions || 0);
         setAppliedBgId(null);
         setAppliedBgUrl(null);
+        setContributionFishes([]);
       }
     };
 
@@ -375,7 +403,7 @@ export default function FishTankSection() {
         <section className="mt-3 rounded-xl">
           {tab === "timeline" && (
             <div className="w-full">
-              <GrowthTimeline />
+              <GrowthTimeline repoId={repo?.id || null} contributionFishes={contributionFishes} />
             </div>
           )}
           {tab === "background" &&
@@ -510,7 +538,7 @@ export default function FishTankSection() {
 
       {/* GrowthTimeline */}
       <div className="mt-10 flex justify-center">
-        <GrowthTimeline repoId={repo?.id || null} />
+        <GrowthTimeline repoId={repo?.id || null} contributionFishes={contributionFishes} />
       </div>
     </div>
   );
