@@ -1,4 +1,4 @@
-import LaptopSunfish from "@/assets/svg/FishSprites/LaptopSunfish/LaptopSunfish.svg";
+import LaptopSunfish from "@/assets/svg/FishSprites/LaptopSunfish.svg?raw";
 import SpaceOcto_1 from "@/assets/svg/FishSprites/SpaceOcto/SpaceOcto_1.svg?raw";
 import SpaceOcto_2 from "@/assets/svg/FishSprites/SpaceOcto/SpaceOcto_2.svg?raw";
 import SpaceOcto_3 from "@/assets/svg/FishSprites/SpaceOcto/SpaceOcto_3.svg?raw";
@@ -18,7 +18,9 @@ import CPFishbun_1 from "@/assets/svg/FishSprites/Fishbun/CPFishbun_1.svg?raw";
 import CPFishbun_3 from "@/assets/svg/FishSprites/Fishbun/CPFishbun_3.svg?raw";
 import SPFishbun_1 from "@/assets/svg/FishSprites/Fishbun/SPFishbun_1.svg?raw";
 import SPFishbun_3 from "@/assets/svg/FishSprites/Fishbun/SPFishbun_3.svg?raw";
-import Fishbun_2 from "@/assets/svg/FishSprites/Fishbun/Fishbun_2.svg?raw";
+import RBFishbun_2 from "@/assets/svg/FishSprites/Fishbun/RBFishbun_2.svg?raw";
+import CPFishbun_2 from "@/assets/svg/FishSprites/Fishbun/CPFishbun_2.svg?raw";
+import SPFishbun_2 from "@/assets/svg/FishSprites/Fishbun/SPFishbun_2.svg?raw";
 
 export {
   LaptopSunfish,
@@ -40,5 +42,7 @@ export {
   CPFishbun_3,
   SPFishbun_1,
   SPFishbun_3,
-  Fishbun_2,
+  RBFishbun_2,
+  CPFishbun_2,
+  SPFishbun_2,
 };

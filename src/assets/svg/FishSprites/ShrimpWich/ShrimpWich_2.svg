@@ -3,6 +3,12 @@
     <g id="shrimpwich-2-*{id}-anchors" visibility="hidden">
       <circle id="shrimpwich-2-*{id}-anchor-center" cx="25" cy="25" r="0.01"/>
       <circle id="shrimpwich-2-*{id}-anchor-label-top" cx="25" cy="-1" r="0.01"/>
+      <circle
+        id="shrimpwich-2-*{id}-anchor-label-bottom"
+        cx="25"
+        cy="20"
+        r="0.01"
+      />
     </g>
     <style>
 @keyframes shrimpwich-2-*{id}-bob {
@@ -191,7 +197,7 @@
             <rect x="13" y="15" width="1" height="1" fill="rgb(173,55,49)"/>
             <rect x="14" y="15" width="1" height="1" fill="rgb(148,44,46)"/>
           </g>
-          <g id="shrimpwich-2-*{id}-tail" transform="rotate(-60deg)">
+          <g id="shrimpwich-2-*{id}-tail">
             <rect x="11" y="17" width="1" height="1" fill="rgb(158,71,72)"/>
             <rect x="12" y="17" width="1" height="1" fill="rgb(158,71,72)"/>
             <rect x="10" y="18" width="1" height="1" fill="rgb(158,71,72)"/>

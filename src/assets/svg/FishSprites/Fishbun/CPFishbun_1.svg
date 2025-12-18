@@ -2,7 +2,8 @@
   <g id="CPFishbun-1-*{id}">
     <g id="CPFishbun-1-*{id}-anchors" visibility="hidden">
       <circle id="CPFishbun-1-*{id}-anchor-center" cx="25" cy="25" r="0.01"/>
-      <circle id="CPFishbun-1-*{id}-anchor-label-top" cx="25" cy="0" r="0.01"/>
+      <circle id="CPFishbun-1-*{id}-anchor-label-top" cx="25" cy="3" r="0.01"/>
+      <circle id="CPFishbun-1-*{id}-anchor-label-bottom" cx="25" cy="20" r="0.01"/>
     </g>
 
     <style>

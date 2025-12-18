@@ -2,7 +2,8 @@
   <g id="SPFishbun-3-*{id}">
     <g id="SPFishbun-3-*{id}-anchors" visibility="hidden">
       <circle id="SPFishbun-3-*{id}-anchor-center" cx="25" cy="25" r="0.01"/>
-      <circle id="SPFishbun-3-*{id}-anchor-label-top" cx="25" cy="0" r="0.01"/>
+      <circle id="SPFishbun-3-*{id}-anchor-label-top" cx="25" cy="13" r="0.01"/>
+      <circle id="SPFishbun-3-*{id}-anchor-label-bottom" cx="25" cy="32" r="0.01"/>
     </g>
 
     <style>

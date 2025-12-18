@@ -2,7 +2,8 @@
   <g id="spaceocto-4-*{id}">
     <g id="spaceocto-4-*{id}-anchors" visibility="hidden">
       <circle id="spaceocto-4-*{id}-anchor-center" cx="25" cy="25" r="0.01"/>
-      <circle id="spaceocto-4-*{id}-anchor-label-top" cx="25" cy="-3" r="0.01"/>
+      <circle id="spaceocto-4-*{id}-anchor-label-top" cx="25" cy="-2" r="0.01"/>
+      <circle id="spaceocto-4-*{id}-anchor-label-bottom" cx="25" cy="31" r="0.01"/>
     </g>
     <style>
 

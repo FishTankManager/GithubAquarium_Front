@@ -17,7 +17,7 @@ const mockContributors: Contributor[] = [
     commitCount: 42,
     fish: {
       id: 101,
-      species: "SpaceOcto_4",
+      species: "SpaceOcto_6",
     },
   },
   {
@@ -26,7 +26,7 @@ const mockContributors: Contributor[] = [
     commitCount: 17,
     fish: {
       id: 102,
-      species: "ShrimpWich_2",
+      species: "ShrimpWich_6",
     },
   },
   {
@@ -35,7 +35,7 @@ const mockContributors: Contributor[] = [
     commitCount: 5,
     fish: {
       id: 103,
-      species: "RBFishbun_1",
+      species: "SPFishbun_3",
     },
   },
 ];
