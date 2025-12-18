@@ -27,7 +27,7 @@ export default function Header() {
       </div>
 
       <nav
-        className={`font-turret flex h-full items-center justify-center pb-6 text-black ${
+        className={`font-turret flex h-full items-center justify-center text-black ${
           isMobile ? "gap-2 text-base sm:gap-4 sm:text-lg" : "gap-24 text-lg"
         }`}
       >
