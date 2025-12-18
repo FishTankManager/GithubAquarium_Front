@@ -27,7 +27,7 @@ const ShopItem: React.FC = () => {
         />
 
         {/* 어항: 윗줄 */}
-        <div className="absolute top-[6%] left-[9%] flex h-57 w-[34%] flex-col items-center justify-between">
+        <div className="absolute top-[6%] left-[9%] flex h-50 w-[34%] flex-col items-center justify-between">
           <img
             src="/images/shop/group76.svg"
             alt="tank-top-left"
@@ -35,7 +35,7 @@ const ShopItem: React.FC = () => {
           />
           <PriceBar price={200} />
         </div>
-        <div className="absolute top-[6%] right-[9%] flex h-57 w-[34%] flex-col items-center justify-between">
+        <div className="absolute top-[6%] right-[9%] flex h-50 w-[34%] flex-col items-center justify-between">
           <img
             src="/images/shop/group77.svg"
             alt="tank-top-right"
@@ -44,7 +44,7 @@ const ShopItem: React.FC = () => {
           <PriceBar price={300} />
         </div>
         {/* 어항: 아랫줄 */}
-        <div className="absolute top-[50%] left-[9%] flex h-57 w-[34%] flex-col items-center justify-between">
+        <div className="absolute top-[50%] left-[9%] flex h-50 w-[34%] flex-col items-center justify-between">
           <img
             src="/images/shop/group78.svg"
             alt="tank-bottom-left"
@@ -52,7 +52,7 @@ const ShopItem: React.FC = () => {
           />
           <PriceBar price={400} />
         </div>
-        <div className="absolute top-[50%] right-[9%] flex h-57 w-[34%] flex-col items-center justify-between">
+        <div className="absolute top-[50%] right-[9%] flex h-50 w-[34%] flex-col items-center justify-between">
           <img
             src="/images/shop/emptytank.png"
             alt="tank-bottom-right"
