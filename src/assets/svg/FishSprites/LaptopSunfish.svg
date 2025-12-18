@@ -1,46 +1,41 @@
 <svg xmlns="http://www.w3.org/2000/svg"
      viewBox="0 0 50 50"
      shape-rendering="crispEdges">
-  <!-- 루트: 인스턴스 id 접두사 -->
-  <g id="test-*{id}">
-
-    <!-- 라벨/정렬용 앵커 (컨테이너에서 좌표 읽어 사용) -->
-    <g id="test-*{id}-anchors" visibility="hidden">
-      <!-- 중심점 (viewBox 기준) -->
-      <circle id="test-*{id}-anchor-center" cx="13" cy="22" r="0.01"/>
-      <!-- 라벨 기준점: 윗변 중앙 살짝 위 -->
-      <circle id="test-*{id}-anchor-label-top" cx="13" cy="-2" r="0.01"/>
+  <g id="laptopsunfish-*{id}">
+    <g id="laptopsunfish-*{id}-anchors" visibility="hidden">
+      <circle id="laptopsunfish-*{id}-anchor-center" cx="13" cy="22" r="0.01"/>
+      <circle id="laptopsunfish-*{id}-anchor-label-top" cx="13" cy="-2" r="0.01"/>
+      <circle id="laptopsunfish-*{id}-anchor-label-bottom" cx="13" cy="40" r="0.01"/>
     </g>
 
-    <!-- 파트 idle 애니메이션 (이동/flip은 컨테이너에서) -->
     <style>
-      @keyframes test-*{id}-fin-move    { 0%{transform:rotate(0)} 50%{transform:rotate(-4deg)} 100%{transform:rotate(0)} }
-      @keyframes test-*{id}-head-move   { 0%{transform:rotate(0)} 50%{transform:rotate(-4deg)} 100%{transform:rotate(0)} }
-      @keyframes test-*{id}-body-move   { 0%{transform:translateY(0)} 50%{transform:translateY(-0.5px)} 100%{transform:translateY(0)} }
-      @keyframes test-*{id}-arms-move   { 0%{transform:rotate(0)} 50%{transform:rotate(-4deg)} 100%{transform:rotate(0)} }
-      @keyframes test-*{id}-legs-move   { 0%{transform:translate(0,0)} 50%{transform:translate(0.3px,0)} 100%{transform:translate(0,0)} }
-      @keyframes test-*{id}-laptop-move { 0%{transform:translate(0,0)} 50%{transform:translate(0.3px,0)} 100%{transform:translate(0,0)} }
+      @keyframes laptopsunfish-*{id}-fin-move    { 0%{transform:rotate(0)} 50%{transform:rotate(-4deg)} 100%{transform:rotate(0)} }
+      @keyframes laptopsunfish-*{id}-head-move   { 0%{transform:rotate(0)} 50%{transform:rotate(-4deg)} 100%{transform:rotate(0)} }
+      @keyframes laptopsunfish-*{id}-body-move   { 0%{transform:translateY(0)} 50%{transform:translateY(-0.5px)} 100%{transform:translateY(0)} }
+      @keyframes laptopsunfish-*{id}-arms-move   { 0%{transform:rotate(0)} 50%{transform:rotate(-4deg)} 100%{transform:rotate(0)} }
+      @keyframes laptopsunfish-*{id}-legs-move   { 0%{transform:translate(0,0)} 50%{transform:translate(0.3px,0)} 100%{transform:translate(0,0)} }
+      @keyframes laptopsunfish-*{id}-laptop-move { 0%{transform:translate(0,0)} 50%{transform:translate(0.3px,0)} 100%{transform:translate(0,0)} }
 
-      #test-*{id}-head, #test-*{id}-body,
-      #test-*{id}-arms, #test-*{id}-legs,
-      #test-*{id}-fin,  #test-*{id}-laptop {
+      #laptopsunfish-*{id}-head, #laptopsunfish-*{id}-body,
+      #laptopsunfish-*{id}-arms, #laptopsunfish-*{id}-legs,
+      #laptopsunfish-*{id}-fin,  #laptopsunfish-*{id}-laptop {
         transform-box: fill-box;
         transform-origin: center;
         animation-duration: 1.2s;
         animation-iteration-count: infinite;
         animation-timing-function: ease-in-out;
       }
-      #test-*{id}-head   { animation-name: test-*{id}-head-move; }
-      #test-*{id}-body   { animation-name: test-*{id}-body-move; }
-      #test-*{id}-arms   { animation-name: test-*{id}-arms-move; }
-      #test-*{id}-legs   { animation-name: test-*{id}-legs-move; animation-delay: 0.4s; }
-      #test-*{id}-fin    { animation-name: test-*{id}-fin-move; }
-      #test-*{id}-laptop { animation-name: test-*{id}-laptop-move; }
+      #laptopsunfish-*{id}-head   { animation-name: laptopsunfish-*{id}-head-move; }
+      #laptopsunfish-*{id}-body   { animation-name: laptopsunfish-*{id}-body-move; }
+      #laptopsunfish-*{id}-arms   { animation-name: laptopsunfish-*{id}-arms-move; }
+      #laptopsunfish-*{id}-legs   { animation-name: laptopsunfish-*{id}-legs-move; animation-delay: 0.4s; }
+      #laptopsunfish-*{id}-fin    { animation-name: laptopsunfish-*{id}-fin-move; }
+      #laptopsunfish-*{id}-laptop { animation-name: laptopsunfish-*{id}-laptop-move; }
     </style>
 
     <!-- 좌표 보정: 원본이 y=1부터 시작 → -1px 올려 tight viewBox(0..44)에 맞춤 -->
-    <g id="test-*{id}-sprite" transform="translate(0,-1)">
-      <g id="test-*{id}-fin">
+    <g id="laptopsunfish-*{id}-sprite" transform="translate(0,-1)">
+      <g id="laptopsunfish-*{id}-fin">
       <g fill="#06243a" fill-opacity="1.000000">
           <rect x="3" y="1" width="3" height="1"/>
           <rect x="3" y="2" width="1" height="1"/>
@@ -164,7 +159,7 @@
           <rect x="3" y="12" width="1" height="1"/>
         </g>
       </g>
-      <g id="test-*{id}-head">
+      <g id="laptopsunfish-*{id}-head">
       <g fill="#395862" fill-opacity="1.000000">
           <rect x="9" y="9" width="7" height="1"/>
           <rect x="15" y="10" width="2" height="1"/>
@@ -871,7 +866,7 @@
           <rect x="15" y="26" width="1" height="1"/>
         </g>
       </g>
-      <g id="test-*{id}-body">
+      <g id="laptopsunfish-*{id}-body">
       <g fill="#cbcec8" fill-opacity="1.000000">
           <rect x="8" y="27" width="1" height="1"/>
         </g>
@@ -1008,7 +1003,7 @@
           <rect x="15" y="37" width="1" height="1"/>
         </g>
       </g>
-      <g id="test-*{id}-arms">
+      <g id="laptopsunfish-*{id}-arms">
       <g fill="#626e73" fill-opacity="1.000000">
           <rect x="5" y="26" width="1" height="1"/>
         </g>
@@ -1190,7 +1185,7 @@
           <rect x="9" y="36" width="1" height="1"/>
         </g>
       </g>
-      <g id="test-*{id}-legs">
+      <g id="laptopsunfish-*{id}-legs">
       <g fill="#112d3d" fill-opacity="1.000000">
           <rect x="5" y="38" width="1" height="1"/>
           <rect x="5" y="40" width="1" height="1"/>
@@ -1298,7 +1293,7 @@
           <rect x="7" y="43" width="1" height="1"/>
         </g>
       </g>
-      <g id="test-*{id}-laptop">
+      <g id="laptopsunfish-*{id}-laptop">
       <g fill="#021224" fill-opacity="1.000000">
           <rect x="16" y="26" width="1" height="1"/>
         </g>

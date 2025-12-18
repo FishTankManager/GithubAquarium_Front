@@ -3,6 +3,7 @@
     <g id="shrimpwich-5-*{id}-anchors" visibility="hidden">
       <circle id="shrimpwich-5-*{id}-anchor-center" cx="25" cy="25" r="0.01"/>
       <circle id="shrimpwich-5-*{id}-anchor-label-top" cx="25" cy="0" r="0.01"/>
+      <circle id="shrimpwich-5-*{id}-anchor-label-bottom" cx="25" cy="27" r="0.01"/>
     </g>
 
     <style>
@@ -372,7 +373,7 @@
           <rect x="16" y="21" width="1" height="1" fill="#b34a3f" fill-opacity="1.000"/>
           <rect x="17" y="21" width="1" height="1" fill="#b34a3f" fill-opacity="1.000"/>
         </g>
-        <g id="shrimpwich-5-*{id}-tail" transform="rotate(-60deg)">
+        <g id="shrimpwich-5-*{id}-tail">
           <rect x="11" y="17" width="1" height="1" fill="#9e4748" fill-opacity="1.000"/>
           <rect x="12" y="17" width="1" height="1" fill="#9e4748" fill-opacity="1.000"/>
           <rect x="10" y="18" width="1" height="1" fill="#9e4748" fill-opacity="1.000"/>
