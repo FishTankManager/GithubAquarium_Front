@@ -30,7 +30,7 @@ export default function FishTankSection() {
   // ]);
 
   // 배경/아이템 관련 상태
-  const [tab, setTab] = useState<SubTab>("timeline");
+  const [tab, setTab] = useState<SubTab>("background");
   // const [appliedBgId, setAppliedBgId] = useState<string | null>(null);
   const [selectedBgId, setSelectedBgId] = useState<string | null>(null);
   // const [appliedItemId, setAppliedItemId] = useState<string | null>(null);
@@ -149,6 +149,17 @@ export default function FishTankSection() {
   if (useVerticalLayout) {
     return (
       <div className="flex w-full flex-col px-2 sm:px-4">
+        {/* RepoSelect - 모바일 레이아웃에도 항상 표시 */}
+        <div className="font-abeezee mb-5 flex justify-center text-[#B2B2B2]">
+          <RepoSelect
+            value={repo}
+            onChange={(r) => {
+              console.log("Repo selected:", r);
+              setRepo(r);
+            }}
+          />
+        </div>
+
         {/* 상단 Export 버튼 */}
         <div className="flex items-center justify-between">
           <div />

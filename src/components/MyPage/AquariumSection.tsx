@@ -1,10 +1,15 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import AquariumCanvas from "./AquariumCanvas";
 import { SubTab } from "./AquariumTabs";
 import AquariumBackgroundGrid from "./AquariumBackgroundGrid";
 import AquariumItemGrid from "./AquariumItemGrid";
 import AquariumFishTable from "./AquariumFishTable";
 import { useViewport } from "@/contexts/useViewport";
+import {
+  getAquariumBackgrounds,
+  applyAquariumBackground,
+  type AquariumBackground,
+} from "@/apis/aquarium";
 
 type Item = { id: string; name: string; src: string };
 type BgItem = { id: string; name: string; src: string };
@@ -15,16 +20,50 @@ export default function AquariumSection() {
   const [tab, setTab] = useState<SubTab>(useVerticalLayout ? "fish" : "background"); // 모바일: fish, 와이드: background
   const totalContrib = 12987; // dummy
 
-  const bgCandidates: BgItem[] = useMemo(
-    () => [
-      { id: "blank", name: "Blank", src: "/images/background/bg-blank.png" },
-      { id: "ocean", name: "Pixel Ocean", src: "/images/background/bg-ocean.png" },
-      { id: "deep1", name: "Deep Sea 1", src: "/images/background/bg-deep-1.png" },
-      { id: "deep2", name: "Deep Sea 2", src: "/images/background/bg-deep-2.png" },
-      { id: "locked", name: "Locked", src: "/images/background/bg-locked.png" },
-    ],
-    [],
-  );
+  const [bgCandidates, setBgCandidates] = useState<BgItem[]>([]);
+  const [loadingBg, setLoadingBg] = useState(true);
+
+  // API에서 배경 목록 가져오기
+  useEffect(() => {
+    const fetchBackgrounds = async () => {
+      try {
+        setLoadingBg(true);
+        const backgrounds = await getAquariumBackgrounds();
+
+        // AquariumBackground를 BgItem으로 변환
+        const convertedBackgrounds: BgItem[] = backgrounds.map((bg: AquariumBackground) => {
+          // background_image URL 사용 (없으면 기본 이미지)
+          let imageUrl = "/images/background/bg-blank.png";
+          if (bg.background.background_image) {
+            if (bg.background.background_image.startsWith("http")) {
+              imageUrl = bg.background.background_image;
+            } else if (bg.background.background_image.startsWith("/")) {
+              // 상대 URL인 경우 base URL 추가
+              const baseURL = import.meta.env.VITE_API_BASE_URL || "";
+              imageUrl = `${baseURL}${bg.background.background_image}`;
+            } else {
+              imageUrl = bg.background.background_image;
+            }
+          }
+
+          return {
+            id: bg.id.toString(),
+            name: bg.background.name,
+            src: imageUrl,
+          };
+        });
+
+        setBgCandidates(convertedBackgrounds);
+      } catch (e) {
+        console.error("Failed to fetch aquarium backgrounds:", e);
+        setBgCandidates([]); // 에러 시 빈 배열
+      } finally {
+        setLoadingBg(false);
+      }
+    };
+
+    fetchBackgrounds();
+  }, []);
 
   const itemCandidates: Item[] = useMemo(
     () => [
@@ -51,15 +90,25 @@ export default function AquariumSection() {
     ? itemCandidates.find((i) => i.id === appliedItemId)?.src
     : undefined;
 
-  const handleApply = () => {
+  const handleApply = async () => {
     if (tab === "background" && selectedBgId) {
-      if (selectedBgId === "locked") {
-        setMessage("This background is locked.");
-        setTimeout(() => setMessage(null), 3000); // 3초 후 메시지 자동 제거
-        return;
+      try {
+        const ownBackgroundId = parseInt(selectedBgId);
+        if (isNaN(ownBackgroundId)) {
+          setMessage("Invalid background selected.");
+          setTimeout(() => setMessage(null), 3000);
+          return;
+        }
+
+        await applyAquariumBackground(ownBackgroundId);
+        setAppliedBgId(selectedBgId);
+        setMessage("Background applied successfully!");
+        setTimeout(() => setMessage(null), 3000);
+      } catch (e) {
+        const errorMessage = e instanceof Error ? e.message : "Failed to apply background.";
+        setMessage(errorMessage);
+        setTimeout(() => setMessage(null), 3000);
       }
-      setAppliedBgId(selectedBgId);
-      setMessage(null); // 성공적으로 적용되면 메시지 제거
     } else if (tab === "items" && selectedItemId) {
       if (selectedItemId === "locked") {
         setMessage("This item is locked.");
@@ -159,13 +208,18 @@ export default function AquariumSection() {
               <AquariumFishTable />
             </div>
           )}
-          {tab === "background" && (
-            <AquariumBackgroundGrid
-              items={bgCandidates}
-              selectedId={selectedBgId}
-              onSelect={setSelectedBgId}
-            />
-          )}
+          {tab === "background" &&
+            (loadingBg ? (
+              <div className="flex items-center justify-center py-10 text-white">
+                배경 목록을 불러오는 중...
+              </div>
+            ) : (
+              <AquariumBackgroundGrid
+                items={bgCandidates}
+                selectedId={selectedBgId}
+                onSelect={setSelectedBgId}
+              />
+            ))}
           {tab === "items" && (
             <AquariumItemGrid
               items={itemCandidates}
@@ -250,13 +304,18 @@ export default function AquariumSection() {
             style={{ WebkitBackdropFilter: "blur(6px)" }}
           >
             <div className="max-h-[440px] overflow-y-auto pr-2">
-              {tab === "background" && (
-                <AquariumBackgroundGrid
-                  items={bgCandidates}
-                  selectedId={selectedBgId}
-                  onSelect={setSelectedBgId}
-                />
-              )}
+              {tab === "background" &&
+                (loadingBg ? (
+                  <div className="flex items-center justify-center py-10 text-white">
+                    배경 목록을 불러오는 중...
+                  </div>
+                ) : (
+                  <AquariumBackgroundGrid
+                    items={bgCandidates}
+                    selectedId={selectedBgId}
+                    onSelect={setSelectedBgId}
+                  />
+                ))}
               {tab === "items" && (
                 <AquariumItemGrid
                   items={itemCandidates}
