@@ -8,9 +8,15 @@ import { CanvasSize, RepoInfo } from "@/types/aquarium";
 import {
   getFishtankBackgrounds,
   getFishtankDetail,
+  applyFishtankBackground,
+  getFishtankSprites,
   type FishtankBackground,
 } from "@/apis/fishtank";
 import { useViewport } from "@/contexts/useViewport";
+// 배경 이미지 import
+import bg1 from "@/assets/png/Backgrounds/bg-1.png";
+import bg2 from "@/assets/png/Backgrounds/bg-2.png";
+import bg3 from "@/assets/png/Backgrounds/bg-3.png";
 
 type Item = { id: string; name: string; src: string };
 type BgItem = { id: string; name: string; src: string };
@@ -31,13 +37,30 @@ export default function FishTankSection() {
 
   // 배경/아이템 관련 상태
   const [tab, setTab] = useState<SubTab>("background");
-  // const [appliedBgId, setAppliedBgId] = useState<string | null>(null);
+  const [appliedBgId, setAppliedBgId] = useState<string | null>(null);
+  const [appliedBgUrl, setAppliedBgUrl] = useState<string | null>(null);
   const [selectedBgId, setSelectedBgId] = useState<string | null>(null);
   // const [appliedItemId, setAppliedItemId] = useState<string | null>(null);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [bgCandidates, setBgCandidates] = useState<BgItem[]>([]);
   const [loadingBg, setLoadingBg] = useState(true);
+
+  // 로컬 assets 배경 파일 매핑 (id, code, name 기반)
+  const localBackgroundMap: Record<string, string> = {
+    // id 기반
+    "1": bg1,
+    "2": bg2,
+    "3": bg3,
+    // code 기반
+    "bg-1": bg1,
+    "bg-2": bg2,
+    "bg-3": bg3,
+    // name 기반 (혹시 모를 경우 대비)
+    "bg-1.png": bg1,
+    "bg-2.png": bg2,
+    "bg-3.png": bg3,
+  };
 
   // API에서 배경 목록 가져오기
   useEffect(() => {
@@ -47,14 +70,41 @@ export default function FishTankSection() {
         const backgrounds = await getFishtankBackgrounds();
 
         // FishtankBackground를 BgItem으로 변환
-        // svg_template을 data URL로 변환하여 src에 사용
+        // 로컬 assets의 배경 파일을 우선 사용 (404 에러 방지)
         const convertedBackgrounds: BgItem[] = backgrounds.map((bg: FishtankBackground) => {
-          // SVG 템플릿을 data URL로 변환 (encodeURIComponent 사용)
-          const svgDataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(bg.svg_template)}`;
+          let imageSrc: string;
+
+          // 로컬 assets에서 배경 찾기 (id, code, name 기반)
+          // code에서 숫자 추출 시도 (예: "bg-1" -> "1")
+          const codeNumber = bg.code.match(/\d+/)?.[0];
+          // name에서도 숫자 추출 시도 (예: "bg-1.png" -> "1")
+          const nameNumber = bg.name.match(/\d+/)?.[0];
+          const localBg =
+            localBackgroundMap[bg.id.toString()] ||
+            localBackgroundMap[bg.code] ||
+            localBackgroundMap[bg.name] ||
+            (codeNumber ? localBackgroundMap[codeNumber] : null) ||
+            (nameNumber ? localBackgroundMap[nameNumber] : null);
+
+          if (localBg) {
+            // 로컬 assets의 배경 파일 사용 (우선순위 1)
+            imageSrc = localBg;
+          } else if (bg.svg_template) {
+            // SVG 템플릿을 data URL로 변환 (우선순위 2)
+            imageSrc = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(bg.svg_template)}`;
+          } else {
+            // 기본 이미지 (background_image는 사용하지 않음 - 404 방지)
+            imageSrc = "/images/fishtank_example.png";
+          }
+
+          console.log(
+            `Background ${bg.id} (code: ${bg.code}, name: ${bg.name}): using ${imageSrc}`,
+          );
+
           return {
             id: bg.id.toString(),
             name: bg.name,
-            src: svgDataUrl,
+            src: imageSrc,
           };
         });
 
@@ -70,11 +120,12 @@ export default function FishTankSection() {
     fetchBackgrounds();
   }, []);
 
-  // 레포지토리 선택 시 피쉬탱크 상세 정보 가져오기 및 contributions 합산
+  // 레포지토리 선택 시 피쉬탱크 상세 정보 가져오기 및 contributions 합산, 배경 로드
   useEffect(() => {
-    const fetchFishtankDetail = async () => {
+    const fetchFishtankData = async () => {
       if (!repo) {
         setContrib(0);
+        setAppliedBgId(null);
         return;
       }
 
@@ -91,17 +142,55 @@ export default function FishTankSection() {
 
         console.log("Total contributions:", totalContributions);
         setContrib(totalContributions);
+
+        // 현재 적용된 배경 가져오기
+        // background_id를 사용하여 로컬 assets 매칭
+        try {
+          const spriteData = await getFishtankSprites(repo.id);
+          if (spriteData.background_id) {
+            // background_id를 사용하여 로컬 assets 매칭
+            const bgIdStr = spriteData.background_id.toString();
+            const localBg = localBackgroundMap[bgIdStr];
+
+            if (localBg) {
+              // 로컬 assets 사용
+              setAppliedBgUrl(null);
+              setAppliedBgId(bgIdStr);
+            } else {
+              // 로컬 assets가 없으면 bgCandidates에서 찾기
+              const matchedBg = bgCandidates.find((bg) => bg.id === bgIdStr);
+              if (matchedBg) {
+                setAppliedBgUrl(null);
+                setAppliedBgId(bgIdStr);
+              } else {
+                // 매칭되는 배경이 없으면 기본 이미지 사용 (background_url 사용 안 함 - 404 방지)
+                setAppliedBgUrl(null);
+                setAppliedBgId(null);
+              }
+            }
+          } else {
+            setAppliedBgUrl(null);
+            setAppliedBgId(null);
+          }
+        } catch (e) {
+          console.warn("Failed to fetch fishtank sprites:", e);
+          // 배경 로드 실패는 무시 (기본 배경 사용)
+          setAppliedBgUrl(null);
+          setAppliedBgId(null);
+        }
       } catch {
         // 피쉬탱크가 없는 경우 레포지토리 정보의 contributions 사용
         console.warn("Fishtank not found for repo:", repo.id, repo.fullName);
         console.warn("Using repository contributions as fallback:", repo.contributions);
         // 레포지토리 정보의 contributions를 사용 (피쉬탱크가 없어도 해당 레포의 commit 수는 알 수 있음)
         setContrib(repo.contributions || 0);
+        setAppliedBgId(null);
+        setAppliedBgUrl(null);
       }
     };
 
-    fetchFishtankDetail();
-  }, [repo]);
+    fetchFishtankData();
+  }, [repo, bgCandidates]);
 
   const itemCandidates: Item[] = useMemo(
     () => [
@@ -114,24 +203,76 @@ export default function FishTankSection() {
     [],
   );
 
-  // 배경과 아이템은 현재 FishTankCanvas에서 사용하지 않으므로 주석 처리
-  // const appliedBgSrc =
-  //   (appliedBgId && bgCandidates.find((b) => b.id === appliedBgId)?.src) ||
-  //   "/images/aquarium_example.png";
+  // 적용된 배경 이미지 URL 계산
+  const appliedBgSrc =
+    appliedBgUrl ||
+    (appliedBgId && bgCandidates.find((b) => b.id === appliedBgId)?.src) ||
+    "/images/fishtank_example.png";
 
-  // const appliedItemSrc = appliedItemId
-  //   ? itemCandidates.find((i) => i.id === appliedItemId)?.src
-  //   : undefined;
-
-  const handleApply = () => {
+  const handleApply = async () => {
     if (tab === "background" && selectedBgId) {
       if (selectedBgId === "locked") {
         setMessage("This background is locked.");
         setTimeout(() => setMessage(null), 3000);
         return;
       }
-      // setAppliedBgId(selectedBgId); // 현재 사용하지 않음
-      setMessage(null);
+
+      if (!repo) {
+        setMessage("레포지토리를 먼저 선택해주세요.");
+        setTimeout(() => setMessage(null), 3000);
+        return;
+      }
+
+      try {
+        const backgroundId = parseInt(selectedBgId);
+        if (isNaN(backgroundId)) {
+          setMessage("Invalid background selected.");
+          setTimeout(() => setMessage(null), 3000);
+          return;
+        }
+
+        await applyFishtankBackground(repo.id, backgroundId);
+        setAppliedBgId(selectedBgId);
+        // 선택한 배경의 src를 직접 사용
+        const selectedBg = bgCandidates.find((b) => b.id === selectedBgId);
+        if (selectedBg) {
+          setAppliedBgUrl(null); // bgCandidates의 src 사용
+        }
+        // 배경 적용 후 현재 적용된 배경 다시 가져오기
+        try {
+          const spriteData = await getFishtankSprites(repo.id);
+          if (spriteData.background_id) {
+            // background_id를 사용하여 로컬 assets 매칭
+            const bgIdStr = spriteData.background_id.toString();
+            const localBg = localBackgroundMap[bgIdStr];
+
+            if (localBg) {
+              // 로컬 assets 사용
+              setAppliedBgUrl(null);
+              setAppliedBgId(bgIdStr);
+            } else {
+              // 로컬 assets가 없으면 bgCandidates에서 찾기
+              const matchedBg = bgCandidates.find((bg) => bg.id === bgIdStr);
+              if (matchedBg) {
+                setAppliedBgUrl(null);
+                setAppliedBgId(bgIdStr);
+              } else {
+                // 매칭되는 배경이 없으면 기본 이미지 사용 (background_url 사용 안 함 - 404 방지)
+                setAppliedBgUrl(null);
+                setAppliedBgId(null);
+              }
+            }
+          }
+        } catch (e) {
+          console.warn("Failed to refresh background after apply:", e);
+        }
+        setMessage("배경이 성공적으로 적용되었습니다!");
+        setTimeout(() => setMessage(null), 3000);
+      } catch (e) {
+        const errorMessage = e instanceof Error ? e.message : "배경 적용에 실패했습니다.";
+        setMessage(errorMessage);
+        setTimeout(() => setMessage(null), 3000);
+      }
     } else if (tab === "items" && selectedItemId) {
       if (selectedItemId === "locked") {
         setMessage("This item is locked.");
@@ -174,7 +315,7 @@ export default function FishTankSection() {
         {/* 상단 캔버스 미리보기 */}
         <div className="flex justify-center">
           <div className="w-full" style={{ aspectRatio: "700/400", maxWidth: "700px" }}>
-            <FishTankCanvas ref={canvasRef} size={size} />
+            <FishTankCanvas ref={canvasRef} size={size} bowlSrc={appliedBgSrc} />
           </div>
         </div>
         <div className="space-y-3">
@@ -213,23 +354,22 @@ export default function FishTankSection() {
           </div>
 
           {tab !== "timeline" && (
-            <button
-              onClick={handleApply}
-              className="font-vt flex-shrink-0 rounded-full bg-[#3F3F3F]/80 px-4 py-1.5 text-xs whitespace-nowrap text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none sm:px-6 sm:text-base"
-            >
-              APPLY
-            </button>
+            <div className="relative">
+              {/* 메시지 표시 영역 - APPLY 버튼 위에 absolute로 고정 */}
+              {message && (
+                <div className="font-vt absolute right-0 bottom-full z-10 mb-2 rounded-md bg-[#00355B] px-3 py-1 text-xs whitespace-nowrap text-white shadow-lg sm:text-sm">
+                  {message}
+                </div>
+              )}
+              <button
+                onClick={handleApply}
+                className="font-vt flex-shrink-0 rounded-full bg-[#3F3F3F]/80 px-4 py-1.5 text-xs whitespace-nowrap text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none sm:px-6 sm:text-base"
+              >
+                APPLY
+              </button>
+            </div>
           )}
         </div>
-
-        {/* 잠겨있는 아이템/배경 선택 시 메시지 표시 영역 */}
-        {message && (
-          <div className="mb-3 flex justify-center">
-            <div className="font-vt rounded-md bg-[#00355B] px-6 py-1 text-base text-white shadow-lg sm:text-lg">
-              {message}
-            </div>
-          </div>
-        )}
 
         {/* 탭 컨텐츠 */}
         <section className="mt-3 rounded-xl">
@@ -312,21 +452,20 @@ export default function FishTankSection() {
             </button>
           </div>
 
-          {/* 잠겨있는 아이템/배경 선택 시 메시지 표시 영역 */}
-          {message && (
-            <div className="flex justify-end">
-              <div className="font-vt rounded-md bg-[#00355B] px-6 py-1 text-xl text-white shadow-lg">
+          <div className="relative">
+            {/* 메시지 표시 영역 - APPLY 버튼 위에 absolute로 고정 */}
+            {message && (
+              <div className="font-vt absolute right-0 bottom-full z-10 mb-2 rounded-md bg-[#00355B] px-3 py-1 text-sm whitespace-nowrap text-white shadow-lg">
                 {message}
               </div>
-            </div>
-          )}
-
-          <button
-            onClick={handleApply}
-            className="font-vt rounded-full bg-[#3F3F3F]/80 px-8 py-1 text-2xl text-[#D7B9B9] hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
-          >
-            APPLY
-          </button>
+            )}
+            <button
+              onClick={handleApply}
+              className="font-vt rounded-full bg-[#3F3F3F]/80 px-8 py-1 text-2xl text-[#D7B9B9] hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
+            >
+              APPLY
+            </button>
+          </div>
         </div>
       </div>
 
@@ -334,7 +473,7 @@ export default function FishTankSection() {
       <div className="relative">
         {/* 좌측: FishTankCanvas */}
         <div style={{ width: "700px" }}>
-          <FishTankCanvas ref={canvasRef} size={size} />
+          <FishTankCanvas ref={canvasRef} size={size} bowlSrc={appliedBgSrc} />
           <p className="font-vt mt-3 text-2xl text-white">Repo contributions: {contrib}</p>
         </div>
 

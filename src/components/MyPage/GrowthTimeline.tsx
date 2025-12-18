@@ -83,14 +83,21 @@ export default function GrowthTimeline({ repoId }: GrowthTimelineProps) {
 
   // 각 단계별로 해당하는 물고기 찾기
   // 같은 group_code를 가진 물고기들 중에서 해당 maturity 단계의 물고기를 찾음
+  // 실제로 할당된 물고기만 반환 (is_assigned === true)
   const getFishForStage = (stage: Maturity): SelectableFish | null => {
     const targetGroupCode = getHighestMaturityGroupCode();
     if (!targetGroupCode) return null;
 
     // 같은 group_code를 가진 물고기들 중에서 해당 maturity 단계 찾기
+    // 실제로 할당된 물고기만 필터링
     const stageFishes = fishes.filter((fish) => {
       // group_code가 일치하는지 확인
       if (fish.group_code !== targetGroupCode) return false;
+
+      // 실제로 할당된 물고기만 (is_assigned가 true이거나 id가 null이 아닌 경우)
+      if (fish.is_assigned === false || (fish.id === null && fish.is_assigned !== true)) {
+        return false;
+      }
 
       // FishSpecies의 maturity 필드를 우선 사용, 없으면 commit_count로 계산
       if (fish.maturity !== undefined) {
@@ -100,24 +107,12 @@ export default function GrowthTimeline({ repoId }: GrowthTimelineProps) {
     });
 
     console.log(
-      `GrowthTimeline: Stage ${stage} (group_code: ${targetGroupCode}) - Found ${stageFishes.length} fishes:`,
+      `GrowthTimeline: Stage ${stage} (group_code: ${targetGroupCode}) - Found ${stageFishes.length} assigned fishes:`,
       stageFishes,
     );
 
     if (stageFishes.length === 0) {
-      // 같은 group_code를 가진 물고기가 있지만 해당 단계는 할당되지 않은 경우
-      // 할당되지 않은 물고기 중에서 해당 maturity 단계 찾기
-      const unassignedFish = fishes.find(
-        (f) =>
-          f.group_code === targetGroupCode &&
-          f.maturity !== undefined &&
-          getMaturityFromNumber(f.maturity) === stage &&
-          f.is_assigned === false,
-      );
-      if (unassignedFish) {
-        return unassignedFish; // 할당되지 않았지만 같은 그룹이므로 반환
-      }
-      return null;
+      return null; // 할당된 물고기가 없으면 null 반환
     }
 
     // 가장 높은 commit_count를 가진 물고기 반환
@@ -129,16 +124,15 @@ export default function GrowthTimeline({ repoId }: GrowthTimelineProps) {
   // 같은 group_code를 가진 물고기가 있는지 확인
   const targetGroupCode = getHighestMaturityGroupCode();
 
-  // 각 단계별 잠금 상태
-  // 같은 group_code를 가진 물고기가 있으면, 해당 그룹의 모든 단계를 해금 상태로 표시
-  // 실제로 할당된 물고기가 있는 단계는 물고기 표시, 없는 단계는 잠금 해제된 상태로 표시
-  const isUnlocked: Record<Maturity, boolean> = {
-    Hatchling: targetGroupCode !== null, // 같은 그룹이 있으면 해금
-    Juvenile: targetGroupCode !== null,
-    Youngling: targetGroupCode !== null,
-    Adult: targetGroupCode !== null,
-    Advanced: targetGroupCode !== null,
-    Master: targetGroupCode !== null,
+  // 각 단계별 표시 상태 결정
+  // - 할당된 물고기가 있으면: 실제 물고기 표시
+  // - 할당된 물고기가 없지만 같은 그룹이 있으면: "?" 표시 (미달성)
+  // - 같은 그룹이 없으면: 잠금 상태
+  const getStageDisplayState = (stage: Maturity): "assigned" | "unlocked" | "locked" => {
+    if (!targetGroupCode) return "locked";
+    const fish = getFishForStage(stage);
+    if (fish !== null) return "assigned";
+    return "unlocked"; // 같은 그룹이 있지만 아직 달성하지 않은 단계
   };
 
   // 모바일에서는 세로 스크롤 가능한 가로 레이아웃 (가로 스크롤 허용)
@@ -173,21 +167,26 @@ export default function GrowthTimeline({ repoId }: GrowthTimelineProps) {
               <div className="font-vt flex items-center text-sm text-[#5A2B55] sm:text-base">
                 EVOLUTION
               </div>
-              {stages.map((stage) => (
-                <div key={stage} className="flex justify-center">
-                  <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-white/25 shadow-inner transition-transform duration-300 sm:h-24 sm:w-24">
-                    {isUnlocked[stage] ? (
-                      <FishIcon maturity={stage} />
-                    ) : (
-                      <img
-                        src="/images/fish/fish-locked.png"
-                        alt="locked fish"
-                        className="h-20 w-20 opacity-70 sm:h-24 sm:w-24"
-                      />
-                    )}
+              {stages.map((stage) => {
+                const displayState = getStageDisplayState(stage);
+                return (
+                  <div key={stage} className="flex justify-center">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-white/25 shadow-inner transition-transform duration-300 sm:h-24 sm:w-24">
+                      {displayState === "assigned" ? (
+                        <FishIcon maturity={stage} />
+                      ) : displayState === "unlocked" ? (
+                        <div className="font-vt text-3xl text-white/70 sm:text-4xl">?</div>
+                      ) : (
+                        <img
+                          src="/images/fish/fish-locked.png"
+                          alt="locked fish"
+                          className="h-20 w-20 opacity-70 sm:h-24 sm:w-24"
+                        />
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* TIME 행 */}
@@ -195,13 +194,16 @@ export default function GrowthTimeline({ repoId }: GrowthTimelineProps) {
               <div className="font-vt flex items-center text-sm text-[#5A2B55] sm:text-base">
                 TIME
               </div>
-              {stages.map((stage) => (
-                <div key={stage} className="text-center">
-                  <div className="font-vt text-xs break-words text-white sm:text-sm">
-                    {isUnlocked[stage] ? "25/09/14 00:00" : ""}
+              {stages.map((stage) => {
+                const fish = getFishForStage(stage);
+                return (
+                  <div key={stage} className="text-center">
+                    <div className="font-vt text-xs break-words text-white sm:text-sm">
+                      {fish ? `${fish.username}` : ""}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* COMMIT GOAL 행 */}
@@ -253,21 +255,26 @@ export default function GrowthTimeline({ repoId }: GrowthTimelineProps) {
         {/* EVOLUTION 행 */}
         <div className="mb-10 grid grid-cols-[120px_repeat(6,1fr)] gap-4">
           <div className="font-vt flex items-center text-2xl text-[#5A2B55]">EVOLUTION</div>
-          {stages.map((stage) => (
-            <div key={stage} className="flex justify-center">
-              <div className="flex h-30 w-30 items-center justify-center rounded-2xl bg-white/25 shadow-inner transition-transform duration-300 hover:scale-110">
-                {isUnlocked[stage] ? (
-                  <FishIcon maturity={stage} />
-                ) : (
-                  <img
-                    src="/images/fish/fish-locked.png"
-                    alt="locked fish"
-                    className="h-30 w-30 opacity-70"
-                  />
-                )}
+          {stages.map((stage) => {
+            const displayState = getStageDisplayState(stage);
+            return (
+              <div key={stage} className="flex justify-center">
+                <div className="flex h-30 w-30 items-center justify-center rounded-2xl bg-white/25 shadow-inner transition-transform duration-300 hover:scale-110">
+                  {displayState === "assigned" ? (
+                    <FishIcon maturity={stage} />
+                  ) : displayState === "unlocked" ? (
+                    <div className="font-vt text-5xl text-white/70">?</div>
+                  ) : (
+                    <img
+                      src="/images/fish/fish-locked.png"
+                      alt="locked fish"
+                      className="h-30 w-30 opacity-70"
+                    />
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* TIME 행 */}
