@@ -5,7 +5,8 @@ export interface FishtankBackground {
   id: number;
   name: string;
   code: string;
-  svg_template: string;
+  svg_template?: string;
+  // background_image는 프론트엔드에서 로컬 assets를 사용하므로 제외
 }
 
 export interface Repository {
@@ -24,10 +25,19 @@ export interface Repository {
   owner: number | null;
 }
 
+export interface ContributionFishSpecies {
+  id: number;
+  name: string;
+  maturity: number;
+  required_commits: number;
+  svg_template: string;
+  group_code: string;
+}
+
 export interface ContributionFish {
   id: number;
-  is_visible: boolean;
-  species: string;
+  is_visible_in_fishtank: boolean;
+  species: ContributionFishSpecies;
 }
 
 export interface SelectableFish {
@@ -40,6 +50,7 @@ export interface SelectableFish {
   required_commits?: number;
   group_code?: string; // 물고기 그룹 코드 (예: "C-KRAKEN")
   is_assigned?: boolean; // 실제로 할당된 물고기인지 여부
+  svg_template?: string; // SVG 템플릿 코드
 }
 
 export interface Contributor {
@@ -174,6 +185,34 @@ export async function getSelectableFish(repoId: string): Promise<SelectableFish[
       401: "로그인이 필요합니다.",
       404: "피쉬탱크를 찾을 수 없습니다.",
       500: "서버 오류로 물고기 목록을 불러오지 못했습니다.",
+    });
+  }
+}
+
+export interface FishtankSpriteData {
+  background_url: string;
+  background_id: number | null;
+  fishes: Array<{
+    id: number;
+    label: string;
+    svg_source: string;
+  }>;
+}
+
+/**
+ * 특정 Repository의 Fishtank 스프라이트 데이터를 조회합니다.
+ * @param repoId 레포지토리 ID
+ * @returns 배경 URL과 물고기 스프라이트 데이터
+ */
+export async function getFishtankSprites(repoId: string): Promise<FishtankSpriteData> {
+  try {
+    const res = await api.get<FishtankSpriteData>(`/aquatics/fishtank/${repoId}/sprites/`);
+    return res.data;
+  } catch (e) {
+    throwMapped(e, {
+      401: "로그인이 필요합니다.",
+      404: "피쉬탱크를 찾을 수 없습니다.",
+      500: "서버 오류로 스프라이트 데이터를 불러오지 못했습니다.",
     });
   }
 }
