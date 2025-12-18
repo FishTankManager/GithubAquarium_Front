@@ -10,6 +10,10 @@ import {
   applyAquariumBackground,
   type AquariumBackground,
 } from "@/apis/aquarium";
+// 배경 이미지 import
+import bg1 from "@/assets/png/Backgrounds/bg-1.png";
+import bg2 from "@/assets/png/Backgrounds/bg-2.png";
+import bg3 from "@/assets/png/Backgrounds/bg-3.png";
 
 type Item = { id: string; name: string; src: string };
 type BgItem = { id: string; name: string; src: string };
@@ -22,6 +26,23 @@ export default function AquariumSection() {
 
   const [bgCandidates, setBgCandidates] = useState<BgItem[]>([]);
   const [loadingBg, setLoadingBg] = useState(true);
+  const [backgroundsData, setBackgroundsData] = useState<AquariumBackground[]>([]);
+
+  // 로컬 assets 배경 파일 매핑 (id, code, name 기반)
+  const localBackgroundMap: Record<string, string> = {
+    // id 기반
+    "1": bg1,
+    "2": bg2,
+    "3": bg3,
+    // code 기반
+    "bg-1": bg1,
+    "bg-2": bg2,
+    "bg-3": bg3,
+    // name 기반 (혹시 모를 경우 대비)
+    "bg-1.png": bg1,
+    "bg-2.png": bg2,
+    "bg-3.png": bg3,
+  };
 
   // API에서 배경 목록 가져오기
   useEffect(() => {
@@ -31,32 +52,50 @@ export default function AquariumSection() {
         const backgrounds = await getAquariumBackgrounds();
 
         // AquariumBackground를 BgItem으로 변환
+        // 로컬 assets의 배경 파일을 우선 사용 (404 에러 방지)
         const convertedBackgrounds: BgItem[] = backgrounds.map((bg: AquariumBackground) => {
-          // background_image URL 사용 (없으면 기본 이미지)
-          let imageUrl = "/images/background/bg-blank.png";
-          if (bg.background.background_image) {
-            if (bg.background.background_image.startsWith("http")) {
-              imageUrl = bg.background.background_image;
-            } else if (bg.background.background_image.startsWith("/")) {
-              // 상대 URL인 경우 base URL 추가
-              const baseURL = import.meta.env.VITE_API_BASE_URL || "";
-              imageUrl = `${baseURL}${bg.background.background_image}`;
-            } else {
-              imageUrl = bg.background.background_image;
-            }
+          let imageSrc: string;
+
+          // AquariumBackgroundSerializer는 OwnBackground를 직렬화하므로 background 필드 사용
+          const background = bg.background;
+
+          // 로컬 assets에서 배경 찾기 (id, code, name 기반)
+          // code에서 숫자 추출 시도 (예: "bg-1" -> "1")
+          const codeNumber = background.code.match(/\d+/)?.[0];
+          // name에서도 숫자 추출 시도 (예: "bg-1.png" -> "1")
+          const nameNumber = background.name.match(/\d+/)?.[0];
+          const localBg =
+            localBackgroundMap[background.id.toString()] ||
+            localBackgroundMap[background.code] ||
+            localBackgroundMap[background.name] ||
+            (codeNumber ? localBackgroundMap[codeNumber] : null) ||
+            (nameNumber ? localBackgroundMap[nameNumber] : null);
+
+          if (localBg) {
+            // 로컬 assets의 배경 파일 사용 (우선순위 1)
+            imageSrc = localBg;
+          } else {
+            // 기본 이미지 (background_image는 사용하지 않음 - 404 방지)
+            imageSrc = "/images/aquarium_example.png";
           }
 
+          console.log(
+            `Background ${bg.id} (code: ${background.code}, name: ${background.name}): using ${imageSrc}`,
+          );
+
           return {
-            id: bg.id.toString(),
-            name: bg.background.name,
-            src: imageUrl,
+            id: bg.id.toString(), // OwnBackground의 id 사용 (fishtank와 동일)
+            name: background.name,
+            src: imageSrc,
           };
         });
 
         setBgCandidates(convertedBackgrounds);
+        setBackgroundsData(backgrounds); // 원본 데이터 저장 (applyAquariumBackground에서 사용)
       } catch (e) {
         console.error("Failed to fetch aquarium backgrounds:", e);
         setBgCandidates([]); // 에러 시 빈 배열
+        setBackgroundsData([]);
       } finally {
         setLoadingBg(false);
       }
@@ -92,20 +131,35 @@ export default function AquariumSection() {
 
   const handleApply = async () => {
     if (tab === "background" && selectedBgId) {
+      if (selectedBgId === "locked") {
+        setMessage("This background is locked.");
+        setTimeout(() => setMessage(null), 3000);
+        return;
+      }
+
       try {
-        const ownBackgroundId = parseInt(selectedBgId);
-        if (isNaN(ownBackgroundId)) {
-          setMessage("Invalid background selected.");
+        // selectedBgId는 OwnBackground.id이므로, backgroundsData에서 bg.id로 매칭
+        const background = backgroundsData.find((bg) => bg.id.toString() === selectedBgId);
+        if (!background) {
+          console.error("Background not found:", {
+            selectedBgId,
+            availableIds: backgroundsData.map((bg) => ({
+              ownBgId: bg.id,
+              backgroundId: bg.background.id,
+            })),
+          });
+          setMessage("Background not found.");
           setTimeout(() => setMessage(null), 3000);
           return;
         }
 
-        await applyAquariumBackground(ownBackgroundId);
+        // API는 OwnBackground의 id를 요구함
+        await applyAquariumBackground(background.id);
         setAppliedBgId(selectedBgId);
-        setMessage("Background applied successfully!");
+        setMessage("배경이 성공적으로 적용되었습니다!");
         setTimeout(() => setMessage(null), 3000);
       } catch (e) {
-        const errorMessage = e instanceof Error ? e.message : "Failed to apply background.";
+        const errorMessage = e instanceof Error ? e.message : "배경 적용에 실패했습니다.";
         setMessage(errorMessage);
         setTimeout(() => setMessage(null), 3000);
       }
