@@ -1,14 +1,9 @@
-<svg id="stage" xmlns="http://www.w3.org/2000/svg" viewBox="0 -4 50 54" shape-rendering="crispEdges">
+<svg xmlns="http://www.w3.org/2000/svg" id="stage" viewBox="0 -4 50 54" shape-rendering="crispEdges">
   <g id="shrimpwich-2-*{id}">
     <g id="shrimpwich-2-*{id}-anchors" visibility="hidden">
       <circle id="shrimpwich-2-*{id}-anchor-center" cx="25" cy="25" r="0.01"/>
-      <circle id="shrimpwich-2-*{id}-anchor-label-top" cx="25" cy="-1" r="0.01"/>
-      <circle
-        id="shrimpwich-2-*{id}-anchor-label-bottom"
-        cx="25"
-        cy="20"
-        r="0.01"
-      />
+      <circle id="shrimpwich-2-*{id}-anchor-label-top" cx="25" cy="10.5" r="0.01"/>
+      <circle id="shrimpwich-2-*{id}-anchor-label-bottom" cx="25" cy="31.5" r="0.01"/>
     </g>
     <style>
 @keyframes shrimpwich-2-*{id}-bob {
@@ -67,7 +62,7 @@
 #shrimpwich-2-*{id}-body2 { animation-name: shrimpwich-2-*{id}-tilt-body2; }
 #shrimpwich-2-*{id}-tail { animation-name: shrimpwich-2-*{id}-tilt-tail; }
     </style>
-    <g id="shrimpwich-2-*{id}-wrapper" transform="translate(12, 0)">
+    <g id="shrimpwich-2-*{id}-wrapper" transform="translate(12, 11.5)">
       <g id="shrimpwich-2-*{id}-sprite">
         <g id="shrimpwich-2-*{id}-sprite" data-kind="sprite">
           <g id="shrimpwich-2-*{id}-must">

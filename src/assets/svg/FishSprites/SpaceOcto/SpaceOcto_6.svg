@@ -2,8 +2,8 @@
   <g id="spaceocto-6-*{id}">
     <g id="spaceocto-6-*{id}-anchors" visibility="hidden">
       <circle id="spaceocto-6-*{id}-anchor-center" cx="25" cy="25" r="0.01"/>
-      <circle id="spaceocto-6-*{id}-anchor-label-top" cx="25" cy="-3" r="0.01"/>
-      <circle id="spaceocto-6-*{id}-anchor-label-bottom" cx="25" cy="36" r="0.01"/>
+      <circle id="spaceocto-6-*{id}-anchor-label-top" cx="25" cy="0.5" r="0.01"/>
+      <circle id="spaceocto-6-*{id}-anchor-label-bottom" cx="25" cy="39.5" r="0.01"/>
     </g>
 
 
@@ -74,7 +74,7 @@ animation-timing-function: steps(1, end);}
     </style>
 
 
-    <g id="spaceocto-6-*{id}-wrapper" transform="translate(8.00, 0)">
+    <g id="spaceocto-6-*{id}-wrapper" transform="translate(8, 3.5)">
       <g id="spaceocto-6-*{id}-sprite">
         <g id="spaceocto-6-*{id}-gas" opacity="0">
           <rect x="4" y="33" width="1" height="1" fill="#fbe9c6" fill-opacity="1.000"/>

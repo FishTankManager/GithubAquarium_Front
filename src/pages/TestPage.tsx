@@ -5,7 +5,7 @@ import { getAquariumDetail } from "@/apis/aquarium";
 const mockFishList: Fish[] = [
   {
     id: 101,
-    name: "SpaceOcto_4", // species
+    name: "SpaceOcto_6", // species
     github_username: "alice", // 소유자
     group_code: "SpaceOcto",
     maturity: 3,
@@ -17,7 +17,7 @@ const mockFishList: Fish[] = [
   },
   {
     id: 102,
-    name: "ShrimpWich_2",
+    name: "ShrimpWich_6",
     github_username: "bob",
     group_code: "ShrimpWich",
     maturity: 2,
@@ -29,7 +29,7 @@ const mockFishList: Fish[] = [
   },
   {
     id: 103,
-    name: "RBFishbun_1",
+    name: "SPFishbun_3",
     github_username: "charlie",
     group_code: "Fishbun",
     maturity: 1,

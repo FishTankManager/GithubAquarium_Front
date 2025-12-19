@@ -1,8 +1,9 @@
-<svg id="stage" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" shape-rendering="crispEdges">
+<svg xmlns="http://www.w3.org/2000/svg" id="stage" viewBox="0 0 50 50" shape-rendering="crispEdges">
   <g id="CPFishbun-3-*{id}">
     <g id="CPFishbun-3-*{id}-anchors" visibility="hidden">
       <circle id="CPFishbun-3-*{id}-anchor-center" cx="25" cy="25" r="0.01"/>
-      <circle id="CPFishbun-3-*{id}-anchor-label-top" cx="25" cy="0" r="0.01"/>
+      <circle id="CPFishbun-3-*{id}-anchor-label-top" cx="25" cy="17.8" r="0.01"/>
+      <circle id="CPFishbun-3-*{id}-anchor-label-bottom" cx="25" cy="39.8" r="0.01"/>
     </g>
 
     <style>
@@ -109,7 +110,7 @@
 }
     </style>
 
-    <g id="CPFishbun-3-*{id}-wrapper" transform="translate(5, 0)">
+    <g id="CPFishbun-3-*{id}-wrapper" transform="translate(5, 4.8)">
       <g id="CPFishbun-3-*{id}-sprite" data-kind="sprite">
         <g id="CPFishbun-3-*{id}-body">
           <rect x="24" y="15" width="1" height="1" fill="#cd7a18" fill-opacity="1.000"/>

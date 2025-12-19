@@ -1,13 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg"
-     viewBox="0 0 50 50"
-     shape-rendering="crispEdges">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" shape-rendering="crispEdges">
   <g id="spaceocto-1-*{id}">
     <g id="spaceocto-1-*{id}-anchors" visibility="hidden">
       <circle id="spaceocto-1-*{id}-anchor-center" cx="25" cy="25" r="0.01"/>
-      <circle id="spaceocto-1-*{id}-anchor-label-top" cx="25" cy="-1" r="0.01"/>
-      <circle id="spaceocto-1-*{id}-anchor-label-bottom" cx="25" cy="15" r="0.01"/>
-    </g
-    >
+      <circle id="spaceocto-1-*{id}-anchor-label-top" cx="25" cy="14" r="0.01"/>
+      <circle id="spaceocto-1-*{id}-anchor-label-bottom" cx="25" cy="30" r="0.01"/>
+    </g>
     <style>
     @keyframes spaceocto-1-*{id}-bob {
       0%   { transform: translateY(0); }
@@ -70,7 +67,7 @@
     #spaceocto-1-*{id}-leg3 { animation-name: spaceocto-1-*{id}-tilt-right-sm; }
     #spaceocto-1-*{id}-leg4 { animation-name: spaceocto-1-*{id}-tilt-right; }
     </style>
-    <g id="spaceocto-1-*{id}-wrapper" transform="translate(17, 0)">
+    <g id="spaceocto-1-*{id}-wrapper" transform="translate(17, 15)">
       <g id="spaceocto-1-*{id}-sprite">
         <g id="spaceocto-1-*{id}-head">
           <rect x="5" y="3" width="1" height="1" fill="#453941" fill-opacity="1.000000"/>
