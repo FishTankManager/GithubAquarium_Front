@@ -42,7 +42,7 @@ export default function FishTank({
       {!bgImage && <div className="pointer-events-none absolute inset-0 z-0 bg-sky-200" />}
 
       {/* 좌상단 Repository 이름 */}
-      <div className="pointer-events-none absolute top-2 left-2 z-20 rounded px-1 py-1 text-xl font-medium text-black">
+      <div className="pointer-events-none absolute top-2 left-2 z-20 rounded px-2 py-1 text-xl font-medium text-black">
         {repositoryName}
       </div>
 
