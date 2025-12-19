@@ -3,9 +3,9 @@
      shape-rendering="crispEdges">
   <g id="laptopsunfish-*{id}">
     <g id="laptopsunfish-*{id}-anchors" visibility="hidden">
-      <circle id="laptopsunfish-*{id}-anchor-center" cx="13" cy="22" r="0.01"/>
-      <circle id="laptopsunfish-*{id}-anchor-label-top" cx="13" cy="-2" r="0.01"/>
-      <circle id="laptopsunfish-*{id}-anchor-label-bottom" cx="13" cy="40" r="0.01"/>
+      <circle id="laptopsunfish-*{id}-anchor-center" cx="25" cy="25" r="0.01"/>
+      <circle id="laptopsunfish-*{id}-anchor-label-top" cx="25" cy="1" r="0.01"/>
+      <circle id="laptopsunfish-*{id}-anchor-label-bottom" cx="25" cy="43" r="0.01"/>
     </g>
 
     <style>
@@ -34,7 +34,7 @@
     </style>
 
     <!-- 좌표 보정: 원본이 y=1부터 시작 → -1px 올려 tight viewBox(0..44)에 맞춤 -->
-    <g id="laptopsunfish-*{id}-sprite" transform="translate(0,-1)">
+    <g id="laptopsunfish-*{id}-sprite" transform="translate(12,2)">
       <g id="laptopsunfish-*{id}-fin">
       <g fill="#06243a" fill-opacity="1.000000">
           <rect x="3" y="1" width="3" height="1"/>

@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>SVG Fish Auto Align + Preview</title>
+    <style>
+      body {
+        font-family:
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          sans-serif;
+        margin: 16px;
+      }
+      .panel {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 12px;
+      }
+      .row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      textarea {
+        width: 100%;
+        height: 420px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 12px;
+      }
+      button {
+        padding: 8px 12px;
+        cursor: pointer;
+      }
+      input[type="number"] {
+        width: 92px;
+        padding: 6px;
+      }
+      .grid2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        align-items: start;
+      }
+      .gridPreview {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        align-items: start;
+      }
+      .muted {
+        color: #666;
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      /* ---- Preview frame ---- */
+      .previewFrame {
+        border: 1px dashed #bbb;
+        border-radius: 8px;
+        padding: 12px;
+        background: #fafafa;
+      }
+      .stageBox {
+        width: 320px; /* 미리보기 크기 */
+        height: 320px;
+        border-radius: 10px;
+        border: 1px solid #e3e3e3;
+        background: linear-gradient(180deg, #f8fbff, #ffffff);
+        display: grid;
+        place-items: center;
+      }
+      .stageSvg {
+        width: 280px; /* 실제 표시 SVG 크기 */
+        height: 280px;
+        image-rendering: pixelated;
+        shape-rendering: crispEdges;
+      }
+      .caption {
+        margin-top: 8px;
+        font-size: 12px;
+        color: #333;
+      }
+      code {
+        background: #f2f2f2;
+        padding: 2px 4px;
+        border-radius: 4px;
+      }
+      .note {
+        margin-top: 8px;
+        font-size: 12px;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>SVG Fish Auto Align (center to viewBox center)</h2>
+
+    <div class="panel row">
+      <button id="btnAlign">정렬(가로+세로) + 앵커 재배치</button>
+
+      <label class="row">
+        목표 중심 X
+        <input id="targetX" type="number" value="25" step="0.1" />
+      </label>
+      <label class="row">
+        목표 중심 Y
+        <input id="targetY" type="number" value="25" step="0.1" />
+      </label>
+
+      <label class="row">
+        label-top margin(위로)
+        <input id="labelTopMargin" type="number" value="2" step="0.1" />
+      </label>
+      <label class="row">
+        label-bottom ratio(0~1)
+        <input id="labelBottomRatio" type="number" value="0.4" step="0.05" min="0" max="1" />
+      </label>
+
+      <label class="row">
+        outline 표시
+        <input id="showOutline" type="checkbox" checked />
+      </label>
+
+      <span class="muted">
+        wrapper의 기존 <code>translate(x,y)</code>를 기준으로 dx/dy를 더해, 스프라이트 bbox 중심이
+        (targetX,targetY)가 되도록 맞춥니다.
+      </span>
+    </div>
+
+    <div class="grid2">
+      <div class="panel">
+        <h3>입력 SVG</h3>
+        <textarea id="input"></textarea>
+        <div class="note muted">
+          SVG를 그대로 붙여넣고 버튼을 누르세요. (애니메이션이 들어있으면 미리보기에서도 동작합니다)
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>출력 SVG (수정본)</h3>
+        <textarea id="output" readonly></textarea>
+        <div class="note muted">
+          wrapper의 translate가 변경되고, anchor들이 새 좌표로 갱신됩니다.
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>미리보기 (50×50 외곽선 + 애니메이션)</h3>
+
+      <div class="gridPreview">
+        <div class="previewFrame">
+          <div class="stageBox">
+            <div id="previewOriginal"></div>
+          </div>
+          <div class="caption">원본</div>
+        </div>
+
+        <div class="previewFrame">
+          <div class="stageBox">
+            <div id="previewAligned"></div>
+          </div>
+          <div class="caption">정렬본</div>
+        </div>
+      </div>
+
+      <p class="muted" style="margin-top: 10px">
+        주의: <code>getBBox()</code>는 요소가 DOM에 붙어 있어야 동작합니다. 이 툴은 내부적으로
+        임시로 붙였다가 계산합니다.
+      </p>
+    </div>
+
+    <script>
+      const $ = (sel, root = document) => root.querySelector(sel);
+
+      function clamp(v, min, max) {
+        return Math.max(min, Math.min(max, v));
+      }
+
+      function parseTranslate(transformStr) {
+        if (!transformStr) return null;
+        const m = transformStr.match(/translate\(\s*([-\d.]+)(?:[\s,]+([-\d.]+))?\s*\)/);
+        if (!m) return null;
+        return { x: Number(m[1]), y: m[2] != null ? Number(m[2]) : 0 };
+      }
+
+      function formatTranslate(x, y) {
+        const fx = Number.isFinite(x) ? Number(x.toFixed(3)) : 0;
+        const fy = Number.isFinite(y) ? Number(y.toFixed(3)) : 0;
+        return `translate(${fx}, ${fy})`;
+      }
+
+      function findByIdSuffix(root, suffix) {
+        return root.querySelector(`[id$="${suffix}"]`);
+      }
+
+      function safeSpriteNode(svgRoot) {
+        const byData = svgRoot.querySelector('[data-kind="sprite"]');
+        if (byData) return byData;
+
+        const wrapper = findByIdSuffix(svgRoot, "-wrapper");
+        if (!wrapper) return null;
+
+        // wrapper 아래 첫 g를 sprite로 간주
+        const firstG = Array.from(wrapper.children).find(
+          (n) => n.tagName && n.tagName.toLowerCase() === "g",
+        );
+        return firstG || null;
+      }
+
+      function ensureSvgElement(inputText) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(inputText, "image/svg+xml");
+        const svg = doc.documentElement;
+        if (!svg || svg.nodeName.toLowerCase() !== "svg") {
+          throw new Error("유효한 SVG가 아닙니다.");
+        }
+        return svg;
+      }
+
+      function serializeSvg(svgEl) {
+        const serializer = new XMLSerializer();
+        return serializer.serializeToString(svgEl);
+      }
+
+      function parseViewBox(svgEl) {
+        const vbRaw = svgEl.getAttribute("viewBox");
+        if (!vbRaw) return { x: 0, y: 0, w: 50, h: 50 };
+        const nums = vbRaw
+          .trim()
+          .split(/\s+|,/)
+          .map((n) => Number(n));
+        if (nums.length !== 4 || nums.some((n) => !Number.isFinite(n))) {
+          return { x: 0, y: 0, w: 50, h: 50 };
+        }
+        return { x: nums[0], y: nums[1], w: nums[2], h: nums[3] };
+      }
+
+      function ensureOutlineRect(svgRoot, vb, enabled) {
+        // outline용 rect를 맨 위(첫 자식)에 삽입/갱신
+        const existing = svgRoot.querySelector('rect[data-kind="stage-outline"]');
+        if (!enabled) {
+          if (existing) existing.remove();
+          return;
+        }
+
+        const rect =
+          existing || svgRoot.ownerDocument.createElementNS("http://www.w3.org/2000/svg", "rect");
+        rect.setAttribute("data-kind", "stage-outline");
+        rect.setAttribute("x", vb.x);
+        rect.setAttribute("y", vb.y);
+        rect.setAttribute("width", vb.w);
+        rect.setAttribute("height", vb.h);
+        rect.setAttribute("fill", "none");
+        rect.setAttribute("stroke", "#111");
+        rect.setAttribute("stroke-width", "0.5");
+        rect.setAttribute("shape-rendering", "crispEdges");
+        rect.setAttribute("vector-effect", "non-scaling-stroke");
+
+        if (!existing) {
+          // 맨 앞에 넣어서 항상 테두리가 보이도록 함
+          svgRoot.insertBefore(rect, svgRoot.firstChild);
+        }
+      }
+
+      function align(svgText, opts) {
+        const svgEl = ensureSvgElement(svgText);
+
+        const wrapper = findByIdSuffix(svgEl, "-wrapper");
+        if (!wrapper) throw new Error('wrapper(g[id$="-wrapper"])를 찾지 못했습니다.');
+
+        const sprite = safeSpriteNode(svgEl);
+        if (!sprite) throw new Error('sprite([data-kind="sprite"])를 찾지 못했습니다.');
+
+        // 임시 DOM에 붙여서 getBBox 수행 (clone 기반)
+        const sandbox = document.createElement("div");
+        sandbox.style.position = "absolute";
+        sandbox.style.left = "-99999px";
+        sandbox.style.top = "-99999px";
+        sandbox.style.width = "0";
+        sandbox.style.height = "0";
+        sandbox.style.overflow = "hidden";
+        document.body.appendChild(sandbox);
+
+        const svgClone = svgEl.cloneNode(true);
+        sandbox.appendChild(svgClone);
+
+        const vb = parseViewBox(svgClone);
+
+        const wrapperC = findByIdSuffix(svgClone, "-wrapper");
+        const spriteC = safeSpriteNode(svgClone);
+
+        const targetX = opts.targetX;
+        const targetY = opts.targetY;
+
+        const t0 = parseTranslate(wrapperC.getAttribute("transform")) || { x: 0, y: 0 };
+
+        // 1) 현재 bbox 중심 계산 (wrapper 변환 포함된 최종 좌표)
+        const bbox0 = spriteC.getBBox();
+        const center0 = { x: bbox0.x + bbox0.width / 2, y: bbox0.y + bbox0.height / 2 };
+
+        // 2) 목표 중심으로 맞추기 위한 delta
+        const dx = targetX - center0.x;
+        const dy = targetY - center0.y;
+
+        const newTx = t0.x + dx;
+        const newTy = t0.y + dy;
+
+        wrapperC.setAttribute("transform", formatTranslate(newTx, newTy));
+
+        // 3) 이동 후 bbox 재측정
+        const bbox1 = spriteC.getBBox();
+
+        // 4) anchors 재배치 (stage 좌표계 기준)
+        const minX = vb.x,
+          minY = vb.y,
+          maxX = vb.x + vb.w,
+          maxY = vb.y + vb.h;
+
+        const labelTopMargin = opts.labelTopMargin;
+        const labelBottomRatio = clamp(opts.labelBottomRatio, 0, 1);
+
+        const cx = clamp(targetX, minX, maxX);
+        const cy = clamp(targetY, minY, maxY);
+
+        const topY = clamp(bbox1.y - labelTopMargin, minY, maxY);
+        const bottomY = clamp(bbox1.y + bbox1.height * labelBottomRatio, minY, maxY);
+
+        const anchorCenterC = findByIdSuffix(svgClone, "-anchor-center");
+        const anchorTopC = findByIdSuffix(svgClone, "-anchor-label-top");
+        const anchorBottomC = findByIdSuffix(svgClone, "-anchor-label-bottom");
+
+        if (anchorCenterC) {
+          anchorCenterC.setAttribute("cx", cx);
+          anchorCenterC.setAttribute("cy", cy);
+        }
+        if (anchorTopC) {
+          anchorTopC.setAttribute("cx", cx);
+          anchorTopC.setAttribute("cy", topY);
+        }
+        if (anchorBottomC) {
+          anchorBottomC.setAttribute("cx", cx);
+          anchorBottomC.setAttribute("cy", bottomY);
+        }
+
+        // 5) outline 적용(옵션)
+        ensureOutlineRect(svgClone, vb, opts.showOutline);
+
+        const out = serializeSvg(svgClone);
+        document.body.removeChild(sandbox);
+        return out;
+      }
+
+      function withOutlineForPreview(svgText, enabled) {
+        // 원본 미리보기에도 outline 넣고 싶을 때 사용
+        try {
+          const svgEl = ensureSvgElement(svgText);
+          const vb = parseViewBox(svgEl);
+          ensureOutlineRect(svgEl, vb, enabled);
+          // 미리보기는 크게 보여주기 위해 class 추가
+          svgEl.setAttribute("class", "stageSvg");
+          return serializeSvg(svgEl);
+        } catch {
+          return "";
+        }
+      }
+
+      function renderPreview(targetEl, svgText) {
+        // inline SVG가 들어가야 animation이 정상 동작
+        targetEl.innerHTML = svgText || "";
+        const svg = targetEl.querySelector("svg");
+        if (svg) svg.setAttribute("class", "stageSvg");
+      }
+
+      // ---- UI wiring
+      const input = $("#input");
+      const output = $("#output");
+
+      const previewOriginal = $("#previewOriginal");
+      const previewAligned = $("#previewAligned");
+
+      function refreshOriginalPreview() {
+        const outlined = withOutlineForPreview(input.value, $("#showOutline").checked);
+        renderPreview(previewOriginal, outlined);
+      }
+
+      $("#btnAlign").addEventListener("click", () => {
+        try {
+          const opts = {
+            targetX: Number($("#targetX").value),
+            targetY: Number($("#targetY").value),
+            labelTopMargin: Number($("#labelTopMargin").value),
+            labelBottomRatio: Number($("#labelBottomRatio").value),
+            showOutline: $("#showOutline").checked,
+          };
+
+          // 원본 미리보기
+          refreshOriginalPreview();
+
+          // 정렬 실행
+          const out = align(input.value, opts);
+          output.value = out;
+
+          // 정렬본 미리보기
+          renderPreview(previewAligned, out);
+        } catch (e) {
+          alert(e?.message || String(e));
+        }
+      });
+
+      $("#showOutline").addEventListener("change", () => {
+        refreshOriginalPreview();
+        if (output.value.trim()) {
+          // output에도 outline 토글 반영(간단히 재정렬 없이 preview만 갱신)
+          try {
+            const outPreview = withOutlineForPreview(output.value, $("#showOutline").checked);
+            renderPreview(previewAligned, outPreview);
+          } catch {}
+        }
+      });
+
+      // 초기 텍스트
+      input.value = `<!-- 여기에 SVG를 그대로 붙여넣으세요 -->`;
+      refreshOriginalPreview();
+    </script>
+  </body>
+</html>

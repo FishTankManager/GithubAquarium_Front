@@ -1,9 +1,9 @@
-<svg id="stage" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" shape-rendering="crispEdges">
+<svg xmlns="http://www.w3.org/2000/svg" id="stage" viewBox="0 0 50 50" shape-rendering="crispEdges">
   <g id="RBFishbun-3-*{id}">
     <g id="RBFishbun-3-*{id}-anchors" visibility="hidden">
       <circle id="RBFishbun-3-*{id}-anchor-center" cx="25" cy="25" r="0.01"/>
-      <circle id="RBFishbun-3-*{id}-anchor-label-top" cx="25" cy="13" r="0.01"/>
-      <circle id="RBFishbun-3-*{id}-anchor-label-bottom" cx="25" cy="35" r="0.01"/>
+      <circle id="RBFishbun-3-*{id}-anchor-label-top" cx="25" cy="15.5" r="0.01"/>
+      <circle id="RBFishbun-3-*{id}-anchor-label-bottom" cx="25" cy="37.5" r="0.01"/>
     </g>
 
     <style>
@@ -110,7 +110,7 @@
 }
     </style>
 
-    <g id="RBFishbun-3-*{id}-wrapper" transform="translate(5, 0)">
+    <g id="RBFishbun-3-*{id}-wrapper" transform="translate(5, 2.5)">
       <g id="RBFishbun-3-*{id}-sprite" data-kind="sprite">
         <g id="RBFishbun-3-*{id}-body">
           <rect x="24" y="15" width="1" height="1" fill="#b8570c" fill-opacity="1.000"/>

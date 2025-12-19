@@ -1,9 +1,9 @@
-<svg id="stage" xmlns="http://www.w3.org/2000/svg" viewBox="0 -4 50 54" shape-rendering="crispEdges">
+<svg xmlns="http://www.w3.org/2000/svg" id="stage" viewBox="0 -4 50 54" shape-rendering="crispEdges">
   <g id="shrimpwich-3-*{id}">
     <g id="shrimpwich-3-*{id}-anchors" visibility="hidden">
       <circle id="shrimpwich-3-*{id}-anchor-center" cx="25" cy="25" r="0.01"/>
-      <circle id="shrimpwich-3-*{id}-anchor-label-top" cx="25" cy="-1" r="0.01"/>
-      <circle id="shrimpwich-3-*{id}-anchor-label-bottom" cx="25" cy="22" r="0.01"/>
+      <circle id="shrimpwich-3-*{id}-anchor-label-top" cx="25" cy="9" r="0.01"/>
+      <circle id="shrimpwich-3-*{id}-anchor-label-bottom" cx="25" cy="32" r="0.01"/>
     </g>
 
     <style>
@@ -70,7 +70,7 @@
 #shrimpwich-3-*{id}-tail { animation-name: shrimpwich-3-*{id}-tilt-tail; }
     </style>
 
-    <g id="shrimpwich-3-*{id}-wrapper" transform="translate(12, 0)">
+    <g id="shrimpwich-3-*{id}-wrapper" transform="translate(12, 10)">
       <g id="shrimpwich-3-*{id}-sprite">
         <g id="shrimpwich-3-*{id}-sprite" data-kind="sprite">
         <g id="shrimpwich-3-*{id}-bread1">

@@ -2,8 +2,8 @@
   <g id="spaceocto-5-*{id}">
     <g id="spaceocto-5-*{id}-anchors" visibility="hidden">
       <circle id="spaceocto-5-*{id}-anchor-center" cx="25" cy="25" r="0.01"/>
-      <circle id="spaceocto-5-*{id}-anchor-label-top" cx="25" cy="-2" r="0.01"/>
-      <circle id="spaceocto-5-*{id}-anchor-label-bottom" cx="25" cy="34" r="0.01"/>
+      <circle id="spaceocto-5-*{id}-anchor-label-top" cx="25" cy="2" r="0.01"/>
+      <circle id="spaceocto-5-*{id}-anchor-label-bottom" cx="25" cy="38" r="0.01"/>
     </g>
     
     
@@ -64,7 +64,7 @@
     </style>
     
 
-    <g id="spaceocto-5-*{id}-wrapper" transform="translate(8.00, 0)">
+    <g id="spaceocto-5-*{id}-wrapper" transform="translate(8, 4)">
       <g id="spaceocto-5-*{id}-sprite">
         <g id="spaceocto-5-*{id}-head">
           <rect x="11" y="4" width="1" height="1" fill="#6b5e64" fill-opacity="1.000"/>
