@@ -8,6 +8,7 @@ import { getFishSpriteSvgByGroupAndMaturity } from "@/assets/svg/FishSprites/map
 interface AquariumFishTableProps {
   fishList?: Fish[]; // aquarium preview에 표시되는 물고기 목록
   onSave?: (fishSettings: Array<{ id: number; visible: boolean }>) => Promise<void>; // SAVE & APPLY 버튼 클릭 시 호출
+  onSelectionChange?: (fishId: number, visible: boolean) => void; // 토글 변경 시 호출 (preview 즉시 반영용)
 }
 
 // maturity 숫자를 Maturity 문자열로 변환
@@ -23,7 +24,11 @@ const getMaturityFromNumber = (maturity: number): Maturity => {
   return maturityMap[maturity] || "Hatchling";
 };
 
-export default function AquariumFishTable({ fishList = [], onSave }: AquariumFishTableProps) {
+export default function AquariumFishTable({
+  fishList = [],
+  onSave,
+  onSelectionChange,
+}: AquariumFishTableProps) {
   const { isMobile, width } = useViewport();
 
   // 모든 물고기를 표시 (is_visible_in_aquarium과 관계없이)
@@ -51,10 +56,18 @@ export default function AquariumFishTable({ fishList = [], onSave }: AquariumFis
   const toggleFishSelection = (fishId: string) => {
     setSelectedFish((prev) => {
       const newSet = new Set(prev);
-      if (newSet.has(fishId)) {
+      const wasSelected = newSet.has(fishId);
+      if (wasSelected) {
         newSet.delete(fishId);
       } else {
         newSet.add(fishId);
+      }
+      // 부모 컴포넌트에 토글 변경 알림 (preview 즉시 반영용)
+      if (onSelectionChange) {
+        const fish = rows.find((r) => r.id === fishId);
+        if (fish) {
+          onSelectionChange(fish.fishId, !wasSelected);
+        }
       }
       return newSet;
     });
@@ -63,13 +76,21 @@ export default function AquariumFishTable({ fishList = [], onSave }: AquariumFis
   const handleSave = async () => {
     if (!onSave) return;
 
-    // 모든 물고기에 대한 visibility 설정 생성
-    const fishSettings = rows.map((r) => ({
-      id: r.fishId,
-      visible: selectedFish.has(r.id),
-    }));
+    try {
+      // 모든 물고기에 대한 visibility 설정 생성
+      const fishSettings = rows.map((r) => ({
+        id: r.fishId,
+        visible: selectedFish.has(r.id),
+      }));
 
-    await onSave(fishSettings);
+      console.log("Saving fish visibility settings:", fishSettings);
+      await onSave(fishSettings);
+      console.log("Fish visibility settings saved successfully");
+    } catch (error) {
+      console.error("Failed to save fish visibility:", error);
+      // 에러는 부모 컴포넌트에서 처리하도록 throw
+      throw error;
+    }
   };
 
   // 중간 크기 화면에서도 가로 스크롤 사용 (약 1000px 이하)

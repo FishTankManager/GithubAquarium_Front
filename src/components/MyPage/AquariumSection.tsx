@@ -48,6 +48,8 @@ export default function AquariumSection() {
   const [aquariumDetail, setAquariumDetail] = useState<AquariumDetail | null>(null);
   const [loadingAquarium, setLoadingAquarium] = useState(true);
   const [allFishes, setAllFishes] = useState<UserFish[]>([]);
+  // 로컬 토글 상태 (preview 즉시 반영용)
+  const [localFishVisibility, setLocalFishVisibility] = useState<Map<number, boolean>>(new Map());
 
   const [bgCandidates, setBgCandidates] = useState<BgItem[]>([]);
   const [loadingBg, setLoadingBg] = useState(true);
@@ -131,6 +133,12 @@ export default function AquariumSection() {
       try {
         const fishes = await getMyFishes();
         setAllFishes(fishes);
+        // 초기 로컬 visibility 상태 설정 (is_visible_in_aquarium 기반)
+        const initialVisibility = new Map<number, boolean>();
+        fishes.forEach((fish) => {
+          initialVisibility.set(fish.id, fish.is_visible_in_aquarium);
+        });
+        setLocalFishVisibility(initialVisibility);
       } catch (e) {
         console.error("Failed to fetch all fishes:", e);
         setAllFishes([]);
@@ -140,16 +148,33 @@ export default function AquariumSection() {
     fetchAllFishes();
   }, []);
 
-  // 물고기 visibility 업데이트 핸들러
+  // 물고기 visibility 업데이트 핸들러 (SAVE & APPLY 버튼 클릭 시)
   const handleFishVisibilityUpdate = async (
     fishSettings: Array<{ id: number; visible: boolean }>,
   ) => {
     try {
+      console.log("Calling updateAquariumFishVisibility with:", fishSettings);
       await updateAquariumFishVisibility(fishSettings);
+      console.log("updateAquariumFishVisibility succeeded");
+
       // 업데이트 후 아쿠아리움 상세 정보와 모든 물고기 목록 다시 불러오기
-      await Promise.all([fetchAquariumDetail(), getMyFishes().then(setAllFishes)]);
+      const [, updatedFishes] = await Promise.all([fetchAquariumDetail(), getMyFishes()]);
+      setAllFishes(updatedFishes);
+      // 로컬 visibility 상태도 서버 상태로 동기화
+      const newVisibility = new Map<number, boolean>();
+      updatedFishes.forEach((fish) => {
+        newVisibility.set(fish.id, fish.is_visible_in_aquarium);
+      });
+      setLocalFishVisibility(newVisibility);
+
+      // 성공 메시지 표시
+      setMessage("물고기 배치가 성공적으로 저장되었습니다!");
+      setTimeout(() => setMessage(null), 3000);
     } catch (e) {
       console.error("Failed to update fish visibility:", e);
+      const errorMessage = e instanceof Error ? e.message : "물고기 배치 저장에 실패했습니다.";
+      setMessage(errorMessage);
+      setTimeout(() => setMessage(null), 3000);
       throw e; // 에러를 다시 throw하여 AquariumFishTable에서 처리 가능하도록
     }
   };
@@ -173,36 +198,46 @@ export default function AquariumSection() {
     return nameMap[name] || name;
   };
 
-  // AquariumFish를 Fish로 변환 (preview용)
-  const convertToFishList = (aquariumFish: AquariumDetail["fish_list"]): Fish[] => {
-    return aquariumFish.map((fish) => ({
-      id: fish.id,
-      name: fish.name,
-      group_code: fish.group_code,
-      maturity: fish.maturity,
-      repository_name: fish.repository_name,
-      commit_count: fish.commit_count,
-      unlocked_at: fish.unlocked_at,
-      is_visible_in_aquarium: fish.is_visible_in_aquarium,
-      is_visible_in_fishtank: fish.is_visible_in_fishtank,
-      // github_username은 optional이므로 없어도 됨
-    }));
-  };
-
   // UserFish를 Fish로 변환 (테이블용 - 모든 물고기)
+  // aquariumDetail.fish_list에서 commit_count를 가져와서 매핑
   const convertUserFishToFishList = (userFishes: UserFish[]): Fish[] => {
+    // aquariumDetail.fish_list에서 id를 키로 하는 commit_count 맵 생성
+    const commitCountMap = new Map<number, number>();
+    if (aquariumDetail?.fish_list) {
+      aquariumDetail.fish_list.forEach((fish) => {
+        commitCountMap.set(fish.id, fish.commit_count);
+      });
+    }
+
     return userFishes.map((fish) => ({
       id: fish.id,
       name: fish.species_name,
       group_code: fish.group_code,
       maturity: fish.maturity,
       repository_name: fish.repository_full_name,
-      commit_count: 0, // UserFish에는 commit_count가 없으므로 0으로 설정 (표시용이므로 문제없음)
+      commit_count: commitCountMap.get(fish.id) ?? fish.commit_count ?? 0, // aquariumDetail에서 가져오거나 UserFish에서 가져오거나 0
       unlocked_at: null, // UserFish에는 unlocked_at이 없으므로 null
-      is_visible_in_aquarium: fish.is_visible_in_aquarium,
+      is_visible_in_aquarium: localFishVisibility.get(fish.id) ?? fish.is_visible_in_aquarium, // 로컬 상태 우선 사용
       is_visible_in_fishtank: fish.is_visible_in_fishtank,
       github_username: fish.github_username,
     }));
+  };
+
+  // Preview용 fishList 생성 (로컬 visibility 상태 기반)
+  const getPreviewFishList = (): Fish[] => {
+    const allFishList = convertUserFishToFishList(allFishes);
+    return allFishList.filter(
+      (fish) => localFishVisibility.get(fish.id) ?? fish.is_visible_in_aquarium,
+    );
+  };
+
+  // 토글 선택 상태 변경 핸들러
+  const handleFishSelectionChange = (fishId: number, visible: boolean) => {
+    setLocalFishVisibility((prev) => {
+      const newMap = new Map(prev);
+      newMap.set(fishId, visible);
+      return newMap;
+    });
   };
 
   const itemCandidates: Item[] = useMemo(
@@ -305,7 +340,7 @@ export default function AquariumSection() {
                 height="100%"
                 className="relative overflow-hidden rounded-2xl shadow-lg"
                 backgroundName={convertBackgroundName(aquariumDetail.background_name)}
-                fishList={convertToFishList(aquariumDetail.fish_list)}
+                fishList={getPreviewFishList()}
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center rounded-2xl bg-sky-200">
@@ -376,6 +411,7 @@ export default function AquariumSection() {
               <AquariumFishTable
                 fishList={convertUserFishToFishList(allFishes)}
                 onSave={handleFishVisibilityUpdate}
+                onSelectionChange={handleFishSelectionChange}
               />
             </div>
           )}
@@ -473,7 +509,7 @@ export default function AquariumSection() {
               height={440}
               className="relative overflow-hidden rounded-2xl shadow-lg"
               backgroundName={convertBackgroundName(aquariumDetail.background_name)}
-              fishList={convertToFishList(aquariumDetail.fish_list)}
+              fishList={getPreviewFishList()}
             />
           ) : (
             <div className="flex h-[440px] w-full items-center justify-center rounded-2xl bg-sky-200">
@@ -519,6 +555,7 @@ export default function AquariumSection() {
           <AquariumFishTable
             fishList={convertUserFishToFishList(allFishes)}
             onSave={handleFishVisibilityUpdate}
+            onSelectionChange={handleFishSelectionChange}
           />
         </div>
       </div>

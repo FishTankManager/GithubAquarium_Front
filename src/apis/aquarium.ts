@@ -179,6 +179,7 @@ export interface UserFish {
   group_code: string;
   maturity: number;
   github_username: string;
+  commit_count: number;
   is_visible_in_fishtank: boolean;
   is_visible_in_aquarium: boolean;
   aquarium: number | null;
