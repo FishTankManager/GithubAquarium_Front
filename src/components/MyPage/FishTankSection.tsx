@@ -255,7 +255,7 @@ export default function FishTankSection() {
     }
 
     try {
-      const embedCode = await getFishtankEmbedCode(repo.id);
+      const embedCode = await getFishtankEmbedCode(Number(repo.id));
       // Markdown 코드를 클립보드에 복사
       await navigator.clipboard.writeText(embedCode.markdown);
       setMessage("Markdown 코드가 클립보드에 복사되었습니다!");

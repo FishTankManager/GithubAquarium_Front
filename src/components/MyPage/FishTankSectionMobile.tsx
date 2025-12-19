@@ -22,8 +22,9 @@ export default function FishTankSectionMobile() {
 
       try {
         const fishtankDetail = await getFishtankDetail(repo.id);
-        const totalContributions = fishtankDetail.contributors.reduce(
-          (sum, contributor) => sum + contributor.commit_count,
+        // fishtankDetail.fish_list에서 commit_count 합산
+        const totalContributions = fishtankDetail.fish_list.reduce(
+          (sum: number, fish) => sum + (fish.commit_count || 0),
           0,
         );
         setContrib(totalContributions);
@@ -55,7 +56,7 @@ export default function FishTankSectionMobile() {
       </div>
 
       <div className="mt-6">
-        <GrowthTimeline />
+        <GrowthTimeline repoId={repo?.id || null} />
       </div>
     </>
   );
