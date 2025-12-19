@@ -9,6 +9,7 @@ import {
   getMyBackgrounds,
   getFishtankDetail,
   applyFishtankBackground,
+  getFishtankEmbedCode,
   type MyBackground,
 } from "@/apis/fishtank";
 import { useViewport } from "@/contexts/useViewport";
@@ -243,6 +244,26 @@ export default function FishTankSection() {
     return nameMap[name] || name;
   };
 
+  const handleExport = async () => {
+    if (!repo) {
+      setMessage("레포지토리를 선택해주세요.");
+      setTimeout(() => setMessage(null), 3000);
+      return;
+    }
+
+    try {
+      const embedCode = await getFishtankEmbedCode(repo.id);
+      // Markdown 코드를 클립보드에 복사
+      await navigator.clipboard.writeText(embedCode.markdown);
+      setMessage("Markdown 코드가 클립보드에 복사되었습니다!");
+      setTimeout(() => setMessage(null), 3000);
+    } catch (error) {
+      console.error("Export failed:", error);
+      setMessage(error instanceof Error ? error.message : "Export에 실패했습니다.");
+      setTimeout(() => setMessage(null), 3000);
+    }
+  };
+
   const handleApply = async () => {
     if (tab === "background" && selectedBgId) {
       if (selectedBgId === "locked") {
@@ -327,7 +348,7 @@ export default function FishTankSection() {
         <div className="flex items-center justify-between">
           <div />
           <button
-            onClick={() => console.log("EXPORT clicked")}
+            onClick={handleExport}
             className="font-vt mb-4 ml-auto rounded-full bg-[#3F3F3F]/80 px-8 py-1.5 text-xl text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none sm:text-2xl"
           >
             EXPORT
@@ -456,7 +477,7 @@ export default function FishTankSection() {
         {/* 좌: EXPORT 버튼 - 왼쪽 캔버스 영역 오른쪽 끝 */}
         <div className="flex justify-end" style={{ width: "700px" }}>
           <button
-            onClick={() => console.log("EXPORT clicked")}
+            onClick={handleExport}
             className="font-vt rounded-full bg-[#3F3F3F]/80 px-8 py-1 text-2xl text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
           >
             EXPORT

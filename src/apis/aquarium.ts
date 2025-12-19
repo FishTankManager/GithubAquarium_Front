@@ -174,3 +174,26 @@ export async function getMyFishes(): Promise<UserFish[]> {
     });
   }
 }
+
+/**
+ * Aquarium Embed Code를 가져옵니다.
+ * @returns Embed code 정보 (html, markdown, img_url)
+ */
+export interface EmbedCode {
+  ok: boolean;
+  img_url: string;
+  html: string;
+  markdown: string;
+}
+
+export async function getAquariumEmbedCode(): Promise<EmbedCode> {
+  try {
+    const res = await api.get<EmbedCode>("/aquatics/embed/aquarium/");
+    return res.data;
+  } catch (e) {
+    throwMapped(e, {
+      401: "로그인이 필요합니다.",
+      500: "서버 오류로 embed 코드를 불러오지 못했습니다.",
+    });
+  }
+}
