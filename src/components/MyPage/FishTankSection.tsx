@@ -14,26 +14,7 @@ import {
 } from "@/apis/fishtank";
 import { useViewport } from "@/contexts/useViewport";
 import type { Fish } from "@/types/fish";
-// 배경 이미지 import
-import bg1 from "@/assets/png/Backgrounds/bg-deep-1.png";
-import bg2 from "@/assets/png/Backgrounds/bg-deep-2.png";
-import bg3 from "@/assets/png/Backgrounds/bg-ocean.png";
-
-// 로컬 assets 배경 파일 매핑 (id, code, name 기반)
-const localBackgroundMap: Record<string, string> = {
-  // id 기반
-  "1": bg1,
-  "2": bg2,
-  "3": bg3,
-  // code 기반
-  "bg-1": bg1,
-  "bg-2": bg2,
-  "bg-3": bg3,
-  // name 기반 (혹시 모를 경우 대비)
-  "bg-1.png": bg1,
-  "bg-2.png": bg2,
-  "bg-3.png": bg3,
-};
+import { getBackgroundImage } from "@/assets/png/Backgrounds";
 
 type Item = { id: string; name: string; src: string };
 type BgItem = { id: string; name: string; src: string };
@@ -87,12 +68,14 @@ export default function FishTankSection() {
         const backgrounds = await getMyBackgrounds();
 
         // MyBackground를 BgItem으로 변환
-        // 로컬 assets의 배경 파일을 우선 사용 (404 에러 방지)
+        // getBackgroundImage를 사용하여 미리보기와 동일한 이미지 소스 사용
         const convertedBackgrounds: BgItem[] = backgrounds.map((bg: MyBackground) => {
           let imageSrc: string;
 
-          // 로컬 assets에서 배경 찾기 (background_id 기반)
-          const localBg = localBackgroundMap[bg.background_id.toString()];
+          // bg.name을 convertBackgroundName으로 변환한 후 getBackgroundImage 사용
+          // 이렇게 하면 미리보기와 동일한 이미지를 사용합니다
+          const convertedName = convertBackgroundName(bg.name);
+          const localBg = convertedName ? getBackgroundImage(convertedName) : null;
 
           if (localBg) {
             // 로컬 assets의 배경 파일 사용 (우선순위 1)
@@ -105,7 +88,9 @@ export default function FishTankSection() {
             imageSrc = "/images/fishtank_example.png";
           }
 
-          console.log(`Background ${bg.background_id} (name: ${bg.name}): using ${imageSrc}`);
+          console.log(
+            `Background ${bg.background_id} (name: ${bg.name}, converted: ${convertedName}): using ${imageSrc}`,
+          );
 
           return {
             id: bg.background_id.toString(), // Background의 id 사용
