@@ -3,9 +3,9 @@ import bg2 from "@/assets/png/Backgrounds/bg-2.png";
 import bg3 from "@/assets/png/Backgrounds/bg-3.png";
 
 const BACKGROUND_IMAGES: Record<string, string> = {
-  "bg-1": bg1,
-  "bg-2": bg2,
-  "bg-3": bg3,
+  "Bg Ocean": bg1,
+  "Bg Deep 1": bg2,
+  "Bg Deep 2": bg3,
 };
 
 export function getBackgroundImage(name?: string): string | undefined {

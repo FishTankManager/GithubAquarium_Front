@@ -1,43 +1,55 @@
-import { Footer, Header, FishTankPreview } from "@/components";
-import type { Contributor } from "@/types/fish";
+import { Footer, Header, FishTankPreview, AquariumPreview } from "@/components";
+import type { Fish } from "@/types/fish";
 import { getAquariumDetail } from "@/apis/aquarium";
-// import {
-//   LaptopSunfish,
-//   SpaceOcto_1,
-//   SpaceOcto_2,
-//   SpaceOcto_3,
-//   SpaceOcto_4,
-//   SpaceOcto_5,
-//   SpaceOcto_6,
-// } from "@/assets/svg/FishSprites";
 
-const mockContributors: Contributor[] = [
+const mockFishList: Fish[] = [
   {
-    id: 1,
-    user: "user123",
-    commitCount: 42,
-    fish: {
-      id: 101,
-      species: "SpaceOcto_6",
-    },
+    id: 101,
+    name: "SpaceOcto_4", // species
+    github_name: "alice", // 소유자
+    group_code: "SpaceOcto",
+    maturity: 3,
+    repository_name: "octo-space/frontend",
+    commit_count: 42,
+    unlocked_at: "2024-11-20T12:00:00Z",
+    is_visible_in_aquarium: true,
+    is_visible_in_fishtank: true,
   },
   {
-    id: 2,
-    user: "alice",
-    commitCount: 17,
-    fish: {
-      id: 102,
-      species: "ShrimpWich_6",
-    },
+    id: 102,
+    name: "ShrimpWich_2",
+    github_name: "bob",
+    group_code: "ShrimpWich",
+    maturity: 2,
+    repository_name: "shrimpwich/engine",
+    commit_count: 17,
+    unlocked_at: "2024-10-03T09:30:00Z",
+    is_visible_in_aquarium: true,
+    is_visible_in_fishtank: true,
   },
   {
-    id: 3,
-    user: "bob",
-    commitCount: 5,
-    fish: {
-      id: 103,
-      species: "SPFishbun_3",
-    },
+    id: 103,
+    name: "RBFishbun_1",
+    github_name: "charlie",
+    group_code: "Fishbun",
+    maturity: 1,
+    repository_name: "bakery/fishbun-core",
+    commit_count: 8,
+    unlocked_at: "2024-08-15T15:00:00Z",
+    is_visible_in_aquarium: true,
+    is_visible_in_fishtank: false, // 피시탱크에서는 안 보임
+  },
+  {
+    id: 104,
+    name: "LaptopSunfish",
+    github_name: "diana",
+    group_code: "LaptopSunfish",
+    maturity: 4,
+    repository_name: "suntech/laptop-ui",
+    commit_count: 105,
+    unlocked_at: "2024-07-12T11:20:00Z",
+    is_visible_in_aquarium: true,
+    is_visible_in_fishtank: true,
   },
 ];
 
@@ -53,21 +65,21 @@ export default function TestPage() {
         <p className="text-h1 font-turret">Test Page</p>
         <p className="text-h1 font-kor">테스트 페이지</p>
 
-        {/* <TankRenderer width={400} height={400} className="bg-sky-200">
-          <FishSprite
-            id="demo-00"
-            svgSource={LaptopSunfish}
-            personaWidthPercent={10}
-            label="user123"
-          />
-        </TankRenderer> */}
         <FishTankPreview
           width={480}
           height={300}
           className="relative overflow-hidden rounded-2xl shadow-lg"
           repositoryName="Jongpippan Repo"
-          contributors={mockContributors}
-          backgroundName="bg-1"
+          fishList={mockFishList}
+          backgroundName="Bg Ocean"
+        />
+
+        <AquariumPreview
+          width={480}
+          height={300}
+          className="relative overflow-hidden rounded-2xl shadow-lg"
+          fishList={mockFishList}
+          backgroundName="Bg Deep 2"
         />
       </main>
       <Footer />
