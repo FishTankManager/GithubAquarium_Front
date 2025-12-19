@@ -65,10 +65,6 @@ export default function FishTankSection() {
 
   // 중간 크기 화면에서도 세로 레이아웃 사용 (캔버스 700px + 우측 500px + 패딩 = 약 1400px 필요)
   const useVerticalLayout = isMobile || width < 1400;
-  // const [timeline] = useState<TimelineItem[]>([
-  //   { id: "t1", at: "25/09/14 00:00", fish: { id: "f1", maturity: "Juvenile" } },
-  //   { id: "t0", at: "25/09/12 00:00", fish: { id: "f0", maturity: "Hatchling" } },
-  // ]);
 
   // 배경/아이템 관련 상태
   const [tab, setTab] = useState<SubTab>("background");
@@ -79,6 +75,8 @@ export default function FishTankSection() {
   const [bgCandidates, setBgCandidates] = useState<BgItem[]>([]);
   const [loadingBg, setLoadingBg] = useState(true);
   const [backgroundsData, setBackgroundsData] = useState<MyBackground[]>([]);
+  // 미리보기용 배경 이름 (FishTankPreview에 전달)
+  const [previewBackgroundName, setPreviewBackgroundName] = useState<string | undefined>(undefined);
 
   // API에서 배경 목록 가져오기
   useEffect(() => {
@@ -135,6 +133,7 @@ export default function FishTankSection() {
       if (!repo) {
         setContrib(0);
         setFishtankDetail(null);
+        setPreviewBackgroundName(undefined);
         return;
       }
 
@@ -165,6 +164,9 @@ export default function FishTankSection() {
           background_name: fishtankDetail.background_name,
           fish_list: fishtankDetail.fish_list,
         });
+
+        // 미리보기 배경도 서버 값으로 동기화
+        setPreviewBackgroundName(convertBackgroundName(fishtankDetail.background_name));
 
         // fish_list의 각 commit_count를 합산
         const totalContributions = fishtankDetail.fish_list.reduce(
@@ -207,6 +209,7 @@ export default function FishTankSection() {
         setContrib(repo.contributions || 0);
         setContributionFishes([]);
         setFishtankDetail(null);
+        setPreviewBackgroundName(undefined);
       }
     };
 
@@ -289,6 +292,8 @@ export default function FishTankSection() {
             background_name: updatedDetail.background_name,
             fish_list: updatedDetail.fish_list,
           });
+          // 미리보기 배경도 서버 값으로 동기화
+          setPreviewBackgroundName(convertBackgroundName(updatedDetail.background_name));
         } catch (e) {
           console.warn("Failed to refresh background after apply:", e);
         }
@@ -343,7 +348,7 @@ export default function FishTankSection() {
                 height="100%"
                 className="relative overflow-hidden rounded-2xl shadow-lg"
                 repositoryName={fishtankDetail.repository_full_name}
-                backgroundName={convertBackgroundName(fishtankDetail.background_name)}
+                backgroundName={previewBackgroundName}
                 fishList={fishtankDetail.fish_list}
               />
             ) : (
@@ -422,7 +427,13 @@ export default function FishTankSection() {
               <AquariumBackgroundGrid
                 items={bgCandidates}
                 selectedId={selectedBgId}
-                onSelect={setSelectedBgId}
+                onSelect={(id) => {
+                  setSelectedBgId(id);
+                  const bg = backgroundsData.find((b) => b.background_id.toString() === id);
+                  if (bg) {
+                    setPreviewBackgroundName(convertBackgroundName(bg.name));
+                  }
+                }}
               />
             ))}
           {tab === "items" && (
@@ -514,7 +525,7 @@ export default function FishTankSection() {
               height={400}
               className="relative overflow-hidden rounded-2xl shadow-lg"
               repositoryName={fishtankDetail.repository_full_name}
-              backgroundName={convertBackgroundName(fishtankDetail.background_name)}
+              backgroundName={previewBackgroundName}
               fishList={fishtankDetail.fish_list}
             />
           ) : (
@@ -541,7 +552,13 @@ export default function FishTankSection() {
                   <AquariumBackgroundGrid
                     items={bgCandidates}
                     selectedId={selectedBgId}
-                    onSelect={setSelectedBgId}
+                    onSelect={(id) => {
+                      setSelectedBgId(id);
+                      const bg = backgroundsData.find((b) => b.background_id.toString() === id);
+                      if (bg) {
+                        setPreviewBackgroundName(convertBackgroundName(bg.name));
+                      }
+                    }}
                   />
                 ))}
               {tab === "items" && (
