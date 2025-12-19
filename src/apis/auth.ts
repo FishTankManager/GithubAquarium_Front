@@ -3,6 +3,7 @@ import type { AxiosError } from "axios";
 
 export interface UserProfile {
   id: number;
+  username: string;
   email: string | null;
   github_id: number | null;
   github_username: string | null;
