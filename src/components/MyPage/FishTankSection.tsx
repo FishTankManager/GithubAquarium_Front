@@ -348,7 +348,7 @@ export default function FishTankSection() {
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center rounded-2xl bg-sky-200">
-                <p className="font-vt text-xl text-gray-600">레포지토리를 선택해주세요</p>
+                <p className="font-vt text-xl text-gray-600">Choose your repository!</p>
               </div>
             )}
           </div>
@@ -519,7 +519,7 @@ export default function FishTankSection() {
             />
           ) : (
             <div className="flex h-[400px] w-full items-center justify-center rounded-2xl bg-sky-200">
-              <p className="font-vt text-2xl text-gray-600">레포지토리를 선택해주세요</p>
+              <p className="font-vt text-2xl text-gray-600">Choose your repository!</p>
             </div>
           )}
           <p className="font-vt mt-3 text-2xl text-white">Repo contributions: {contrib}</p>
