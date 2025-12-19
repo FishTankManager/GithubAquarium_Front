@@ -77,3 +77,49 @@ export async function applyAquariumBackground(ownBackgroundId: number): Promise<
     });
   }
 }
+
+/* =========================
+ *  /aquatics/aquarium/ 타입
+ * ========================= */
+
+export interface AquariumFish {
+  id: number;
+  name: string; // 물고기 종 이름
+  group_code: string; // 종 그룹 코드
+  maturity: number; // 성장 단계 (1~6)
+  repository_name: string; // 출처 레포지토리 이름
+  commit_count: number; // 해당 레포에 기여한 커밋 수
+  unlocked_at: string; // 해금 시각 (ISO 문자열)
+  is_visible_in_aquarium: boolean;
+  is_visible_in_fishtank: boolean;
+}
+
+export interface AquariumDetail {
+  id: number;
+  svg_url: string; // 생성된 아쿠아리움 SVG 파일 절대 경로
+  background_name: string; // Background name (예: "bg-1" / 기본 배경)
+  fish_list: AquariumFish[]; // 아쿠아리움에 배치된 물고기 목록
+}
+
+/* =========================
+ *  /aquatics/aquarium/ API
+ * ========================= */
+
+/**
+ * 로그인한 사용자의 아쿠아리움 상세 정보를 가져온다.
+ *
+ * GET /aquatics/aquarium/
+ * 입력값 없음.
+ */
+export async function getAquariumDetail(): Promise<AquariumDetail> {
+  try {
+    const { data } = await api.get<AquariumDetail>("/aquatics/aquarium/");
+    return data;
+  } catch (error) {
+    throwMapped(error, {
+      404: "아쿠아리움 정보를 찾을 수 없습니다. (404)",
+      403: "아쿠아리움 정보를 조회할 권한이 없습니다. (403)",
+      500: "아쿠아리움 정보를 불러오는 중 오류가 발생했습니다. (500)",
+    });
+  }
+}

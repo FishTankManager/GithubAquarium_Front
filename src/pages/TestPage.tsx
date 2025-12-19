@@ -1,5 +1,6 @@
 import { Footer, Header, FishTankPreview } from "@/components";
 import type { Contributor } from "@/types/fish";
+import { getAquariumDetail } from "@/apis/aquarium";
 // import {
 //   LaptopSunfish,
 //   SpaceOcto_1,
@@ -17,7 +18,7 @@ const mockContributors: Contributor[] = [
     commitCount: 42,
     fish: {
       id: 101,
-      species: "SpaceOcto_4",
+      species: "SpaceOcto_6",
     },
   },
   {
@@ -26,7 +27,7 @@ const mockContributors: Contributor[] = [
     commitCount: 17,
     fish: {
       id: 102,
-      species: "ShrimpWich_2",
+      species: "ShrimpWich_6",
     },
   },
   {
@@ -35,12 +36,14 @@ const mockContributors: Contributor[] = [
     commitCount: 5,
     fish: {
       id: 103,
-      species: "RBFishbun_1",
+      species: "SPFishbun_3",
     },
   },
 ];
 
 export default function TestPage() {
+  const aquarium = getAquariumDetail();
+  console.log(aquarium);
   return (
     <div className="flex min-h-screen flex-col justify-between bg-sky-300">
       <Header />
@@ -60,9 +63,9 @@ export default function TestPage() {
         </TankRenderer> */}
         <FishTankPreview
           width={480}
-          height={360}
+          height={300}
           className="relative overflow-hidden rounded-2xl shadow-lg"
-          repositoryName="github-user/repository-name"
+          repositoryName="Jongpippan Repo"
           contributors={mockContributors}
           backgroundName="bg-1"
         />
