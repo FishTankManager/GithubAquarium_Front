@@ -11,6 +11,7 @@ import {
   getAquariumDetail,
   updateAquariumFishVisibility,
   getMyFishes,
+  getAquariumEmbedCode,
   type MyBackground,
   type UserFish,
 } from "@/apis/aquarium";
@@ -252,6 +253,21 @@ export default function AquariumSection() {
     });
   };
 
+  // Export 핸들러
+  const handleExport = async () => {
+    try {
+      const embedCode = await getAquariumEmbedCode();
+      // Markdown 코드를 클립보드에 복사
+      await navigator.clipboard.writeText(embedCode.markdown);
+      setMessage("Markdown 코드가 클립보드에 복사되었습니다!");
+      setTimeout(() => setMessage(null), 3000);
+    } catch (error) {
+      console.error("Export failed:", error);
+      setMessage(error instanceof Error ? error.message : "Export에 실패했습니다.");
+      setTimeout(() => setMessage(null), 3000);
+    }
+  };
+
   const itemCandidates: Item[] = useMemo(
     () => [
       { id: "it1", name: "Corals 1", src: "/images/items/coral-1.png" },
@@ -325,7 +341,7 @@ export default function AquariumSection() {
         <div className="flex items-center justify-between">
           <div />
           <button
-            onClick={() => console.log("EXPORT clicked")}
+            onClick={handleExport}
             className="font-vt mb-4 ml-auto rounded-full bg-[#3F3F3F]/80 px-8 py-1.5 text-xl text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none sm:text-2xl"
           >
             EXPORT
@@ -458,7 +474,7 @@ export default function AquariumSection() {
         {/* 좌: EXPORT 버튼 - 왼쪽 캔버스 영역 오른쪽 끝 */}
         <div className="flex justify-end" style={{ width: "700px" }}>
           <button
-            onClick={() => console.log("EXPORT clicked")}
+            onClick={handleExport}
             className="font-vt rounded-full bg-[#3F3F3F]/80 px-8 py-1 text-2xl text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
           >
             EXPORT
