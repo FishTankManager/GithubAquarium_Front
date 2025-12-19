@@ -29,13 +29,13 @@ export default function FishTank({
     <TankRenderer width={width} height={height} className={className}>
       {/* 배경 이미지 (탱크 전체 뒤에 깔기) */}
       {bgImage && (
-        <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="pointer-events-none absolute inset-0 z-0">
           <img src={bgImage} alt="" className="h-full w-full object-cover" />
         </div>
       )}
 
       {/* 좌상단 Repository 이름 */}
-      <div className="pointer-events-none absolute top-2 left-2 z-20 rounded bg-black/60 px-3 py-1 text-xs font-medium text-white">
+      <div className="text-md pointer-events-none absolute left-2 z-20 rounded px-1 py-1 text-xl font-medium">
         {repositoryName}
       </div>
 

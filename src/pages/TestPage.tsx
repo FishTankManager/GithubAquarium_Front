@@ -1,5 +1,6 @@
 import { Footer, Header, FishTankPreview } from "@/components";
 import type { Contributor } from "@/types/fish";
+import { getAquariumDetail } from "@/apis/aquarium";
 // import {
 //   LaptopSunfish,
 //   SpaceOcto_1,
@@ -41,6 +42,8 @@ const mockContributors: Contributor[] = [
 ];
 
 export default function TestPage() {
+  const aquarium = getAquariumDetail();
+  console.log(aquarium);
   return (
     <div className="flex min-h-screen flex-col justify-between bg-sky-300">
       <Header />
@@ -60,9 +63,9 @@ export default function TestPage() {
         </TankRenderer> */}
         <FishTankPreview
           width={480}
-          height={360}
+          height={300}
           className="relative overflow-hidden rounded-2xl shadow-lg"
-          repositoryName="github-user/repository-name"
+          repositoryName="Jongpippan Repo"
           contributors={mockContributors}
           backgroundName="bg-1"
         />
