@@ -136,7 +136,7 @@ const ShopPage: React.FC = () => {
       : null;
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-[#E3F6FF]">
+    <div className="relative min-h-screen overflow-x-hidden">
       <div className="fixed top-0 left-0 z-50 w-full">
         <Header />
       </div>
