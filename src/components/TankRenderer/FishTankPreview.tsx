@@ -3,7 +3,7 @@ import React from "react";
 import TankRenderer from "./TankRenderer";
 import FishSprite from "./FishSprite";
 import type { Fish } from "@/types/fish";
-import { getFishSpriteSvg } from "@/assets/svg/FishSprites/map";
+import { getFishSpriteSvg, getFishSpriteSvgByGroupAndMaturity } from "@/assets/svg/FishSprites/map";
 import { getBackgroundImage } from "@/assets/png/Backgrounds";
 
 type FishTankProps = {
@@ -47,14 +47,22 @@ export default function FishTank({
 
       {/* 물고기 렌더링 */}
       {visibleFish.map((fish) => {
-        const svgSource = getFishSpriteSvg(fish.name);
+        // group_code와 maturity를 조합해서 SVG 찾기 (우선순위 1)
+        // 만약 name이 정확히 "GroupCode_Maturity" 형식이면 그것도 시도
+        let svgSource: string;
+        if (fish.group_code && fish.maturity) {
+          svgSource = getFishSpriteSvgByGroupAndMaturity(fish.group_code, fish.maturity);
+        } else {
+          // fallback: name으로 찾기
+          svgSource = getFishSpriteSvg(fish.name);
+        }
 
         return (
           <FishSprite
             key={fish.id}
             id={String(fish.id)}
             svgSource={svgSource}
-            topLabel={fish.github_username}
+            topLabel={fish.github_username || "Unknown"}
             bottomLabel={`${fish.commit_count} commits`}
             personaWidthPercent={10}
           />

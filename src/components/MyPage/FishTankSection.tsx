@@ -1,22 +1,38 @@
-import { useRef, useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import RepoSelect from "./RepoSelect";
-import FishTankCanvas from "./FishTankCanvas";
+import { FishTankPreview } from "@/components";
 import GrowthTimeline from "./GrowthTimeline";
 import AquariumBackgroundGrid from "./AquariumBackgroundGrid";
 import AquariumItemGrid from "./AquariumItemGrid";
-import { CanvasSize, RepoInfo } from "@/types/aquarium";
+import { RepoInfo } from "@/types/aquarium";
 import {
   getMyBackgrounds,
   getFishtankDetail,
   applyFishtankBackground,
-  getFishtankSprites,
   type MyBackground,
 } from "@/apis/fishtank";
 import { useViewport } from "@/contexts/useViewport";
+import type { Fish } from "@/types/fish";
 // 배경 이미지 import
 import bg1 from "@/assets/png/Backgrounds/bg-deep-1.png";
 import bg2 from "@/assets/png/Backgrounds/bg-deep-2.png";
 import bg3 from "@/assets/png/Backgrounds/bg-ocean.png";
+
+// 로컬 assets 배경 파일 매핑 (id, code, name 기반)
+const localBackgroundMap: Record<string, string> = {
+  // id 기반
+  "1": bg1,
+  "2": bg2,
+  "3": bg3,
+  // code 기반
+  "bg-1": bg1,
+  "bg-2": bg2,
+  "bg-3": bg3,
+  // name 기반 (혹시 모를 경우 대비)
+  "bg-1.png": bg1,
+  "bg-2.png": bg2,
+  "bg-3.png": bg3,
+};
 
 type Item = { id: string; name: string; src: string };
 type BgItem = { id: string; name: string; src: string };
@@ -25,7 +41,6 @@ type SubTab = "timeline" | "background" | "items";
 export default function FishTankSection() {
   const { isMobile, width } = useViewport();
   const [repo, setRepo] = useState<RepoInfo | null>(null);
-  const size: CanvasSize = { width: 700, height: 400 };
   const [contrib, setContrib] = useState<number>(0);
   const [contributionFishes, setContributionFishes] = useState<
     Array<{
@@ -42,6 +57,11 @@ export default function FishTankSection() {
       };
     }>
   >([]);
+  const [fishtankDetail, setFishtankDetail] = useState<{
+    repository_full_name: string;
+    background_name: string;
+    fish_list: Fish[];
+  } | null>(null);
 
   // 중간 크기 화면에서도 세로 레이아웃 사용 (캔버스 700px + 우측 500px + 패딩 = 약 1400px 필요)
   const useVerticalLayout = isMobile || width < 1400;
@@ -52,8 +72,6 @@ export default function FishTankSection() {
 
   // 배경/아이템 관련 상태
   const [tab, setTab] = useState<SubTab>("background");
-  const [appliedBgId, setAppliedBgId] = useState<string | null>(null);
-  const [appliedBgUrl, setAppliedBgUrl] = useState<string | null>(null);
   const [selectedBgId, setSelectedBgId] = useState<string | null>(null);
   // const [appliedItemId, setAppliedItemId] = useState<string | null>(null);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
@@ -61,22 +79,6 @@ export default function FishTankSection() {
   const [bgCandidates, setBgCandidates] = useState<BgItem[]>([]);
   const [loadingBg, setLoadingBg] = useState(true);
   const [backgroundsData, setBackgroundsData] = useState<MyBackground[]>([]);
-
-  // 로컬 assets 배경 파일 매핑 (id, code, name 기반)
-  const localBackgroundMap: Record<string, string> = {
-    // id 기반
-    "1": bg1,
-    "2": bg2,
-    "3": bg3,
-    // code 기반
-    "bg-1": bg1,
-    "bg-2": bg2,
-    "bg-3": bg3,
-    // name 기반 (혹시 모를 경우 대비)
-    "bg-1.png": bg1,
-    "bg-2.png": bg2,
-    "bg-3.png": bg3,
-  };
 
   // API에서 배경 목록 가져오기
   useEffect(() => {
@@ -132,80 +134,69 @@ export default function FishTankSection() {
     const fetchFishtankData = async () => {
       if (!repo) {
         setContrib(0);
-        setAppliedBgId(null);
+        setFishtankDetail(null);
         return;
       }
 
       try {
         console.log("Fetching fishtank detail for repo:", repo.id, repo.fullName);
+        // repo.id는 string이므로 숫자로 변환
+        const repoIdNum = parseInt(repo.id, 10);
+        if (isNaN(repoIdNum)) {
+          console.error("Invalid repo ID:", repo.id);
+          throw new Error(`Invalid repository ID: ${repo.id}`);
+        }
         const fishtankDetail = await getFishtankDetail(repo.id);
         console.log("Fishtank detail received:", fishtankDetail);
 
-        // contributors의 각 commit_count를 합산
-        const totalContributions = fishtankDetail.contributors.reduce(
-          (sum, contributor) => sum + contributor.commit_count,
+        // fishtankDetail state에 저장
+        setFishtankDetail({
+          repository_full_name: fishtankDetail.repository_full_name,
+          background_name: fishtankDetail.background_name,
+          fish_list: fishtankDetail.fish_list,
+        });
+
+        // fish_list의 각 commit_count를 합산
+        const totalContributions = fishtankDetail.fish_list.reduce(
+          (sum, fish) => sum + fish.commit_count,
           0,
         );
 
         console.log("Total contributions:", totalContributions);
         setContrib(totalContributions);
 
-        // ContributionFish 데이터 추출
-        const fishes = fishtankDetail.contributors
-          .filter((c) => c.fish !== null)
-          .map((c) => ({
-            id: c.fish!.id,
-            username: c.user,
-            commit_count: c.commit_count,
-            species: c.fish!.species,
-          }));
+        // ContributionFish 데이터 추출 (fish_list를 기반으로)
+        // fish_list는 이미 is_visible_in_fishtank=true인 것만 반환되므로 필터링 불필요
+        const fishes = fishtankDetail.fish_list.map((fish) => ({
+          id: fish.id,
+          username: fish.repository_name, // repository_name을 username으로 사용
+          commit_count: fish.commit_count,
+          species: {
+            id: fish.id,
+            name: fish.name,
+            maturity: fish.maturity,
+            required_commits: 0, // API 응답에 없으므로 기본값
+            svg_template: "", // API 응답에 없으므로 빈 문자열 (나중에 로컬에서 로드)
+            group_code: fish.group_code,
+          },
+        }));
         setContributionFishes(fishes);
         console.log("ContributionFishes:", fishes);
-
-        // 현재 적용된 배경 가져오기
-        // background_id를 사용하여 로컬 assets 매칭
-        try {
-          const spriteData = await getFishtankSprites(repo.id);
-          if (spriteData.background_id) {
-            // background_id를 사용하여 로컬 assets 매칭
-            const bgIdStr = spriteData.background_id.toString();
-            const localBg = localBackgroundMap[bgIdStr];
-
-            if (localBg) {
-              // 로컬 assets 사용
-              setAppliedBgUrl(null);
-              setAppliedBgId(bgIdStr);
-            } else {
-              // 로컬 assets가 없으면 bgCandidates에서 찾기
-              const matchedBg = bgCandidates.find((bg) => bg.id === bgIdStr);
-              if (matchedBg) {
-                setAppliedBgUrl(null);
-                setAppliedBgId(bgIdStr);
-              } else {
-                // 매칭되는 배경이 없으면 기본 이미지 사용 (background_url 사용 안 함 - 404 방지)
-                setAppliedBgUrl(null);
-                setAppliedBgId(null);
-              }
-            }
-          } else {
-            setAppliedBgUrl(null);
-            setAppliedBgId(null);
-          }
-        } catch (e) {
-          console.warn("Failed to fetch fishtank sprites:", e);
-          // 배경 로드 실패는 무시 (기본 배경 사용)
-          setAppliedBgUrl(null);
-          setAppliedBgId(null);
-        }
-      } catch {
+      } catch (e) {
         // 피쉬탱크가 없는 경우 레포지토리 정보의 contributions 사용
-        console.warn("Fishtank not found for repo:", repo.id, repo.fullName);
+        const errorMessage = e instanceof Error ? e.message : "Unknown error";
+        console.warn(
+          "Fishtank not found for repo:",
+          repo.id,
+          repo.fullName,
+          "Error:",
+          errorMessage,
+        );
         console.warn("Using repository contributions as fallback:", repo.contributions);
         // 레포지토리 정보의 contributions를 사용 (피쉬탱크가 없어도 해당 레포의 commit 수는 알 수 있음)
         setContrib(repo.contributions || 0);
-        setAppliedBgId(null);
-        setAppliedBgUrl(null);
         setContributionFishes([]);
+        setFishtankDetail(null);
       }
     };
 
@@ -223,11 +214,24 @@ export default function FishTankSection() {
     [],
   );
 
-  // 적용된 배경 이미지 URL 계산
-  const appliedBgSrc =
-    appliedBgUrl ||
-    (appliedBgId && bgCandidates.find((b) => b.id === appliedBgId)?.src) ||
-    "/images/fishtank_example.png";
+  // background_name을 FishTankPreview가 기대하는 형식으로 변환
+  // 예: "bg-deep-1" → "Bg Deep 1", "bg-ocean" → "Bg Ocean"
+  const convertBackgroundName = (name: string | null | undefined): string | undefined => {
+    if (!name || name === "기본 배경") return undefined;
+
+    // 백엔드에서 오는 형식: "bg-deep-1", "bg-deep-2", "bg-ocean" 등
+    // FishTankPreview가 기대하는 형식: "Bg Deep 1", "Bg Deep 2", "Bg Ocean"
+    const nameMap: Record<string, string> = {
+      "bg-deep-1": "Bg Deep 1",
+      "bg-deep-2": "Bg Deep 2",
+      "bg-ocean": "Bg Ocean",
+      "Bg Deep 1": "Bg Deep 1",
+      "Bg Deep 2": "Bg Deep 2",
+      "Bg Ocean": "Bg Ocean",
+    };
+
+    return nameMap[name] || name;
+  };
 
   const handleApply = async () => {
     if (tab === "background" && selectedBgId) {
@@ -263,42 +267,21 @@ export default function FishTankSection() {
 
         // API는 Background의 id를 요구함
         await applyFishtankBackground(repo.id, background.background_id);
-        setAppliedBgId(selectedBgId);
-        // 선택한 배경의 src를 직접 사용
-        const selectedBg = bgCandidates.find((b) => b.id === selectedBgId);
-        if (selectedBg) {
-          setAppliedBgUrl(null); // bgCandidates의 src 사용
-        }
-        // 배경 적용 후 현재 적용된 배경 다시 가져오기
-        try {
-          const spriteData = await getFishtankSprites(repo.id);
-          if (spriteData.background_id) {
-            // background_id를 사용하여 로컬 assets 매칭
-            const bgIdStr = spriteData.background_id.toString();
-            const localBg = localBackgroundMap[bgIdStr];
+        setMessage("배경이 성공적으로 적용되었습니다!");
+        setTimeout(() => setMessage(null), 3000);
 
-            if (localBg) {
-              // 로컬 assets 사용
-              setAppliedBgUrl(null);
-              setAppliedBgId(bgIdStr);
-            } else {
-              // 로컬 assets가 없으면 bgCandidates에서 찾기
-              const matchedBg = bgCandidates.find((bg) => bg.id === bgIdStr);
-              if (matchedBg) {
-                setAppliedBgUrl(null);
-                setAppliedBgId(bgIdStr);
-              } else {
-                // 매칭되는 배경이 없으면 기본 이미지 사용 (background_url 사용 안 함 - 404 방지)
-                setAppliedBgUrl(null);
-                setAppliedBgId(null);
-              }
-            }
-          }
+        // 배경 적용 후 fishtank detail 다시 가져오기
+        try {
+          const updatedDetail = await getFishtankDetail(repo.id);
+          // fishtankDetail state 업데이트
+          setFishtankDetail({
+            repository_full_name: updatedDetail.repository_full_name,
+            background_name: updatedDetail.background_name,
+            fish_list: updatedDetail.fish_list,
+          });
         } catch (e) {
           console.warn("Failed to refresh background after apply:", e);
         }
-        setMessage("배경이 성공적으로 적용되었습니다!");
-        setTimeout(() => setMessage(null), 3000);
       } catch (e) {
         const errorMessage = e instanceof Error ? e.message : "배경 적용에 실패했습니다.";
         setMessage(errorMessage);
@@ -314,8 +297,6 @@ export default function FishTankSection() {
       setMessage(null);
     }
   };
-
-  const canvasRef = useRef<HTMLDivElement>(null);
 
   // 모바일 뷰일 때 Aquarium 페이지와 동일한 레이아웃 사용
   if (useVerticalLayout) {
@@ -346,7 +327,20 @@ export default function FishTankSection() {
         {/* 상단 캔버스 미리보기 */}
         <div className="flex justify-center">
           <div className="w-full" style={{ aspectRatio: "700/400", maxWidth: "700px" }}>
-            <FishTankCanvas ref={canvasRef} size={size} bowlSrc={appliedBgSrc} />
+            {fishtankDetail ? (
+              <FishTankPreview
+                width="100%"
+                height="100%"
+                className="relative overflow-hidden rounded-2xl shadow-lg"
+                repositoryName={fishtankDetail.repository_full_name}
+                backgroundName={convertBackgroundName(fishtankDetail.background_name)}
+                fishList={fishtankDetail.fish_list}
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center rounded-2xl bg-sky-200">
+                <p className="font-vt text-xl text-gray-600">레포지토리를 선택해주세요</p>
+              </div>
+            )}
           </div>
         </div>
         <div className="space-y-3">
@@ -502,9 +496,22 @@ export default function FishTankSection() {
 
       {/* 본문: 캔버스 / 그리드 */}
       <div className="relative">
-        {/* 좌측: FishTankCanvas */}
+        {/* 좌측: FishTankPreview */}
         <div style={{ width: "700px" }}>
-          <FishTankCanvas ref={canvasRef} size={size} bowlSrc={appliedBgSrc} />
+          {fishtankDetail ? (
+            <FishTankPreview
+              width={700}
+              height={400}
+              className="relative overflow-hidden rounded-2xl shadow-lg"
+              repositoryName={fishtankDetail.repository_full_name}
+              backgroundName={convertBackgroundName(fishtankDetail.background_name)}
+              fishList={fishtankDetail.fish_list}
+            />
+          ) : (
+            <div className="flex h-[400px] w-full items-center justify-center rounded-2xl bg-sky-200">
+              <p className="font-vt text-2xl text-gray-600">레포지토리를 선택해주세요</p>
+            </div>
+          )}
           <p className="font-vt mt-3 text-2xl text-white">Repo contributions: {contrib}</p>
         </div>
 

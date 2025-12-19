@@ -1,11 +1,18 @@
 import { useMemo, useState, useEffect } from "react";
-import AquariumCanvas from "./AquariumCanvas";
+import { AquariumPreview } from "@/components";
 import { SubTab } from "./AquariumTabs";
 import AquariumBackgroundGrid from "./AquariumBackgroundGrid";
 import AquariumItemGrid from "./AquariumItemGrid";
 import AquariumFishTable from "./AquariumFishTable";
 import { useViewport } from "@/contexts/useViewport";
-import { getMyBackgrounds, applyAquariumBackground, type MyBackground } from "@/apis/aquarium";
+import {
+  getMyBackgrounds,
+  applyAquariumBackground,
+  getAquariumDetail,
+  type MyBackground,
+  type AquariumDetail,
+} from "@/apis/aquarium";
+import type { Fish } from "@/types/fish";
 // 배경 이미지 import
 import bg1 from "@/assets/png/Backgrounds/bg-deep-1.png";
 import bg2 from "@/assets/png/Backgrounds/bg-deep-2.png";
@@ -14,31 +21,33 @@ import bg3 from "@/assets/png/Backgrounds/bg-ocean.png";
 type Item = { id: string; name: string; src: string };
 type BgItem = { id: string; name: string; src: string };
 
+// 로컬 assets 배경 파일 매핑 (id, code, name 기반)
+const localBackgroundMap: Record<string, string> = {
+  // id 기반
+  "1": bg1,
+  "2": bg2,
+  "3": bg3,
+  // code 기반
+  "bg-1": bg1,
+  "bg-2": bg2,
+  "bg-3": bg3,
+  // name 기반 (혹시 모를 경우 대비)
+  "bg-1.png": bg1,
+  "bg-2.png": bg2,
+  "bg-3.png": bg3,
+};
+
 export default function AquariumSection() {
   const { isMobile, width } = useViewport();
   const useVerticalLayout = isMobile || width < 1400;
   const [tab, setTab] = useState<SubTab>(useVerticalLayout ? "fish" : "background"); // 모바일: fish, 와이드: background
-  const totalContrib = 12987; // dummy
+  const [totalContrib, setTotalContrib] = useState<number>(0);
+  const [aquariumDetail, setAquariumDetail] = useState<AquariumDetail | null>(null);
+  const [loadingAquarium, setLoadingAquarium] = useState(true);
 
   const [bgCandidates, setBgCandidates] = useState<BgItem[]>([]);
   const [loadingBg, setLoadingBg] = useState(true);
   const [backgroundsData, setBackgroundsData] = useState<MyBackground[]>([]);
-
-  // 로컬 assets 배경 파일 매핑 (id, code, name 기반)
-  const localBackgroundMap: Record<string, string> = {
-    // id 기반
-    "1": bg1,
-    "2": bg2,
-    "3": bg3,
-    // code 기반
-    "bg-1": bg1,
-    "bg-2": bg2,
-    "bg-3": bg3,
-    // name 기반 (혹시 모를 경우 대비)
-    "bg-1.png": bg1,
-    "bg-2.png": bg2,
-    "bg-3.png": bg3,
-  };
 
   // API에서 배경 목록 가져오기
   useEffect(() => {
@@ -89,6 +98,67 @@ export default function AquariumSection() {
     fetchBackgrounds();
   }, []);
 
+  // API에서 아쿠아리움 상세 정보 가져오기
+  useEffect(() => {
+    const fetchAquariumDetail = async () => {
+      try {
+        setLoadingAquarium(true);
+        const detail = await getAquariumDetail();
+        setAquariumDetail(detail);
+
+        // fish_list의 각 commit_count를 합산
+        const totalContributions = detail.fish_list.reduce(
+          (sum, fish) => sum + fish.commit_count,
+          0,
+        );
+        setTotalContrib(totalContributions);
+      } catch (e) {
+        console.error("Failed to fetch aquarium detail:", e);
+        setAquariumDetail(null);
+        setTotalContrib(0);
+      } finally {
+        setLoadingAquarium(false);
+      }
+    };
+
+    fetchAquariumDetail();
+  }, []);
+
+  // background_name을 AquariumPreview가 기대하는 형식으로 변환
+  // 예: "bg-deep-1" → "Bg Deep 1", "bg-ocean" → "Bg Ocean"
+  const convertBackgroundName = (name: string | null | undefined): string | undefined => {
+    if (!name || name === "기본 배경") return undefined;
+
+    // 백엔드에서 오는 형식: "bg-deep-1", "bg-deep-2", "bg-ocean" 등
+    // AquariumPreview가 기대하는 형식: "Bg Deep 1", "Bg Deep 2", "Bg Ocean"
+    const nameMap: Record<string, string> = {
+      "bg-deep-1": "Bg Deep 1",
+      "bg-deep-2": "Bg Deep 2",
+      "bg-ocean": "Bg Ocean",
+      "Bg Deep 1": "Bg Deep 1",
+      "Bg Deep 2": "Bg Deep 2",
+      "Bg Ocean": "Bg Ocean",
+    };
+
+    return nameMap[name] || name;
+  };
+
+  // AquariumFish를 Fish로 변환
+  const convertToFishList = (aquariumFish: AquariumDetail["fish_list"]): Fish[] => {
+    return aquariumFish.map((fish) => ({
+      id: fish.id,
+      name: fish.name,
+      group_code: fish.group_code,
+      maturity: fish.maturity,
+      repository_name: fish.repository_name,
+      commit_count: fish.commit_count,
+      unlocked_at: fish.unlocked_at,
+      is_visible_in_aquarium: fish.is_visible_in_aquarium,
+      is_visible_in_fishtank: fish.is_visible_in_fishtank,
+      // github_username은 optional이므로 없어도 됨
+    }));
+  };
+
   const itemCandidates: Item[] = useMemo(
     () => [
       { id: "it1", name: "Corals 1", src: "/images/items/coral-1.png" },
@@ -100,19 +170,9 @@ export default function AquariumSection() {
     [],
   );
 
-  const [appliedBgId, setAppliedBgId] = useState<string | null>(null);
   const [selectedBgId, setSelectedBgId] = useState<string | null>(null);
-  const [appliedItemId, setAppliedItemId] = useState<string | null>(null);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
-
-  const appliedBgSrc =
-    (appliedBgId && bgCandidates.find((b) => b.id === appliedBgId)?.src) ||
-    "/images/aquarium_example.png";
-
-  const appliedItemSrc = appliedItemId
-    ? itemCandidates.find((i) => i.id === appliedItemId)?.src
-    : undefined;
 
   const handleApply = async () => {
     if (tab === "background" && selectedBgId) {
@@ -145,9 +205,16 @@ export default function AquariumSection() {
         // background_id를 직접 사용 (API가 내부에서 처리하도록)
         // TODO: API가 background_id를 받도록 수정하거나, OwnBackground.id를 응답에 포함
         await applyAquariumBackground(background.background_id);
-        setAppliedBgId(selectedBgId);
         setMessage("배경이 성공적으로 적용되었습니다!");
         setTimeout(() => setMessage(null), 3000);
+
+        // 배경 적용 후 아쿠아리움 detail 다시 가져오기
+        try {
+          const updatedDetail = await getAquariumDetail();
+          setAquariumDetail(updatedDetail);
+        } catch (e) {
+          console.warn("Failed to refresh aquarium detail after apply:", e);
+        }
       } catch (e) {
         const errorMessage = e instanceof Error ? e.message : "배경 적용에 실패했습니다.";
         setMessage(errorMessage);
@@ -159,7 +226,7 @@ export default function AquariumSection() {
         setTimeout(() => setMessage(null), 3000); // 3초 후 메시지 자동 제거
         return;
       }
-      setAppliedItemId(selectedItemId);
+      // TODO: 아이템 적용 기능 구현
       setMessage(null); // 성공적으로 적용되면 메시지 제거
     }
   };
@@ -179,16 +246,28 @@ export default function AquariumSection() {
           </button>
         </div>
 
-        {/* 상단 수족관 미리보기 (배경 + 아이템 오버레이) */}
+        {/* 상단 수족관 미리보기 */}
         <div className="flex justify-center">
           <div className="w-full" style={{ aspectRatio: "750/440", maxWidth: "750px" }}>
-            <AquariumCanvas
-              width="100%"
-              height="100%"
-              bgSrc={appliedBgSrc}
-              itemSrc={appliedItemSrc}
-              className="h-full w-full"
-            />
+            {loadingAquarium ? (
+              <div className="flex h-full w-full items-center justify-center rounded-2xl bg-sky-200">
+                <p className="font-vt text-xl text-gray-600">로딩 중...</p>
+              </div>
+            ) : aquariumDetail ? (
+              <AquariumPreview
+                width="100%"
+                height="100%"
+                className="relative overflow-hidden rounded-2xl shadow-lg"
+                backgroundName={convertBackgroundName(aquariumDetail.background_name)}
+                fishList={convertToFishList(aquariumDetail.fish_list)}
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center rounded-2xl bg-sky-200">
+                <p className="font-vt text-xl text-gray-600">
+                  아쿠아리움 정보를 불러올 수 없습니다
+                </p>
+              </div>
+            )}
           </div>
         </div>
         <div className="space-y-3">
@@ -335,9 +414,25 @@ export default function AquariumSection() {
 
       {/* 본문: 캔버스 / 그리드 === */}
       <div className="relative">
-        {/* 좌측: AquariumCanvas */}
+        {/* 좌측: AquariumPreview */}
         <div style={{ width: "700px" }}>
-          <AquariumCanvas width={700} height={440} bgSrc={appliedBgSrc} itemSrc={appliedItemSrc} />
+          {loadingAquarium ? (
+            <div className="flex h-[440px] w-full items-center justify-center rounded-2xl bg-sky-200">
+              <p className="font-vt text-2xl text-gray-600">로딩 중...</p>
+            </div>
+          ) : aquariumDetail ? (
+            <AquariumPreview
+              width={700}
+              height={440}
+              className="relative overflow-hidden rounded-2xl shadow-lg"
+              backgroundName={convertBackgroundName(aquariumDetail.background_name)}
+              fishList={convertToFishList(aquariumDetail.fish_list)}
+            />
+          ) : (
+            <div className="flex h-[440px] w-full items-center justify-center rounded-2xl bg-sky-200">
+              <p className="font-vt text-2xl text-gray-600">아쿠아리움 정보를 불러올 수 없습니다</p>
+            </div>
+          )}
           <p className="font-vt mt-3 text-2xl text-white">Repo contributions: {totalContrib}</p>
         </div>
 

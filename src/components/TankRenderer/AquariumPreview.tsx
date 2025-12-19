@@ -2,7 +2,7 @@
 import React from "react";
 import TankRenderer from "./TankRenderer";
 import FishSprite from "./FishSprite";
-import { getFishSpriteSvg } from "@/assets/svg/FishSprites/map";
+import { getFishSpriteSvg, getFishSpriteSvgByGroupAndMaturity } from "@/assets/svg/FishSprites/map";
 import { getBackgroundImage } from "@/assets/png/Backgrounds";
 import { useAuth } from "@/auth/AuthContext";
 import type { Fish } from "@/types/fish";
@@ -55,7 +55,15 @@ export default function AquariumPreview({
 
       {/* 물고기 스프라이트 렌더링 */}
       {visibleFish.map((fish) => {
-        const svgSource = getFishSpriteSvg(fish.name); // species 이름
+        // group_code와 maturity를 조합해서 SVG 찾기 (우선순위 1)
+        // 만약 name이 정확히 "GroupCode_Maturity" 형식이면 그것도 시도
+        let svgSource: string;
+        if (fish.group_code && fish.maturity) {
+          svgSource = getFishSpriteSvgByGroupAndMaturity(fish.group_code, fish.maturity);
+        } else {
+          // fallback: name으로 찾기
+          svgSource = getFishSpriteSvg(fish.name);
+        }
 
         return (
           <FishSprite
