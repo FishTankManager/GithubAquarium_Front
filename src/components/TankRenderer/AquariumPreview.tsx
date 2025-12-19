@@ -58,12 +58,16 @@ export default function AquariumPreview({
         const speciesKey = `${fish.group_code}_${fish.maturity}`;
         const svgSource = getFishSpriteSvg(speciesKey);
 
+        const repoLabel = fish.repository_name?.includes("/")
+          ? fish.repository_name.split("/").pop()!
+          : fish.repository_name;
+
         return (
           <FishSprite
             key={fish.id}
             id={String(fish.id)}
             svgSource={svgSource}
-            topLabel={fish.repository_name}
+            topLabel={repoLabel}
             bottomLabel={`${fish.commit_count} commits`}
             personaWidthPercent={10}
           />
