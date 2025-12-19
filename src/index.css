@@ -81,3 +81,23 @@
   50%  { background-position: 20px 30px; transform: scale(1.03); }
   100% { background-position: 0px 0px;   transform: scale(1); }
 } */
+
+/* 독립 스크롤 + 회색 얇은 스크롤바 */
+.custom-scrollbar {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #9ca3af transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent; /* 트랙(배경)은 안 보이게 */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #9ca3af; /* 바만 회색 */
+  border-radius: 9999px;
+  border: 2px solid transparent;
+}
