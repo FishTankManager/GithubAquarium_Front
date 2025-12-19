@@ -6,7 +6,7 @@ const mockFishList: Fish[] = [
   {
     id: 101,
     name: "SpaceOcto_4", // species
-    github_name: "alice", // 소유자
+    github_username: "alice", // 소유자
     group_code: "SpaceOcto",
     maturity: 3,
     repository_name: "octo-space/frontend",
@@ -18,7 +18,7 @@ const mockFishList: Fish[] = [
   {
     id: 102,
     name: "ShrimpWich_2",
-    github_name: "bob",
+    github_username: "bob",
     group_code: "ShrimpWich",
     maturity: 2,
     repository_name: "shrimpwich/engine",
@@ -30,7 +30,7 @@ const mockFishList: Fish[] = [
   {
     id: 103,
     name: "RBFishbun_1",
-    github_name: "charlie",
+    github_username: "charlie",
     group_code: "Fishbun",
     maturity: 1,
     repository_name: "bakery/fishbun-core",
@@ -42,7 +42,7 @@ const mockFishList: Fish[] = [
   {
     id: 104,
     name: "LaptopSunfish",
-    github_name: "diana",
+    github_username: "diana",
     group_code: "LaptopSunfish",
     maturity: 4,
     repository_name: "suntech/laptop-ui",
