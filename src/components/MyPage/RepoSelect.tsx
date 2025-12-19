@@ -23,10 +23,11 @@ export default function RepoSelect({
         const repositories = await getRepositories();
 
         // Repository 타입을 RepoInfo 타입으로 변환
+        // my_commit_count를 사용하여 현재 사용자의 기여도를 표시
         const repoInfos: RepoInfo[] = repositories.map((repo: Repository) => ({
           id: repo.id.toString(),
           fullName: repo.full_name,
-          contributions: repo.commit_count,
+          contributions: repo.my_commit_count, // 사용자의 기여도 사용
         }));
 
         setRepos(repoInfos);

@@ -13,6 +13,15 @@ export interface FishtankBackground {
   // background_image는 프론트엔드에서 로컬 assets를 사용하므로 제외
 }
 
+export interface RepositoryOwner {
+  id: number;
+  username: string;
+  email?: string;
+  github_id?: number | null;
+  github_username?: string | null;
+  avatar_url?: string;
+}
+
 export interface Repository {
   id: number;
   github_id: number;
@@ -22,11 +31,12 @@ export interface Repository {
   html_url: string;
   stargazers_count: number;
   language: string | null;
-  commit_count: number;
+  commit_count: number; // 레포지토리 전체 커밋 수
+  default_branch: string;
   created_at: string;
   updated_at: string;
-  last_synced_at: string;
-  owner: number | null;
+  owner: RepositoryOwner; // 소유자 정보 (객체)
+  my_commit_count: number; // 현재 로그인한 사용자의 해당 레포지토리 커밋 수
 }
 
 export interface ContributionFishSpecies {
