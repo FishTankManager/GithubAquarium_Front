@@ -12,28 +12,28 @@ const RerollItem: React.FC = () => {
       />
 
       {/* 내용 */}
-      <div className="relative z-10 mt-5 mr-2 flex h-full flex-col items-center justify-center">
+      <div className="relative z-10 flex h-full flex-col items-center justify-center">
         {/* 선반 - 윗줄 */}
         <img
           src="/images/shop/group105.svg"
           alt="shelf-top"
-          className="absolute top-[29%] left-1/2 h-auto w-[85%] -translate-x-1/2"
+          className="absolute top-[32%] left-1/2 h-auto w-[85%] -translate-x-1/2"
         />
         {/* 선반 - 아랫줄 */}
         <img
           src="/images/shop/group105.svg"
           alt="shelf-bottom"
-          className="absolute top-[73%] left-1/2 h-auto w-[85%] -translate-x-1/2"
+          className="absolute top-[76%] left-1/2 h-auto w-[85%] -translate-x-1/2"
         />
 
-        {/* 어항: 윗줄 */}
-        <div className="absolute top-[-1%] left-1/2 flex h-65 w-[20%] -translate-x-1/2 items-center justify-center gap-9">
+        {/* 어항들 컨테이너: 고정 높이 제거하고 %로 배치 */}
+        <div className="absolute top-[8%] left-1/2 flex w-[80%] -translate-x-1/2 justify-around gap-[2%]">
           <RerollCard quantity="1" price={100} />
           <RerollCard quantity="2" price={200} />
           <RerollCard quantity="5" price={500} />
         </div>
-        {/* 어항: 아랫줄 */}
-        <div className="absolute top-[43%] left-1/2 flex h-65 w-[20%] -translate-x-1/2 items-center justify-center gap-9">
+
+        <div className="absolute top-[52%] left-1/2 flex w-[80%] -translate-x-1/2 justify-around gap-[2%]">
           <RerollCard quantity="10" price={1000} />
           <RerollCard quantity="20" price={2000} />
           <RerollCard quantity="30" price={3000} />

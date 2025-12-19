@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Header, Footer } from "../components";
-import { ShopItem } from "../components/ShopPage";
+import { BackgroundItem } from "../components/ShopPage";
 import RerollItem from "../components/ShopPage/RerollItem";
 import LogoText from "@/components/LogoText";
 
@@ -26,7 +26,7 @@ const ShopPage: React.FC = () => {
           <div className="flex flex-col items-center justify-center md:w-1/3">
             <LogoText
               text="Shop"
-              className="font-sixtyfour text-shadow mb-10 text-center text-6xl text-[#C18A8A] md:mb-0"
+              className="font-sixtyfour text-shadow mb-10 text-center text-6xl text-[#C18A8A] drop-shadow-[0_3px_0_rgba(0,0,0,0.25)] md:mb-0"
             />
             <div className="mt-6 flex h-13 items-center justify-center rounded-xl bg-white px-2 py-2 shadow hover:bg-gray-100">
               <img src="/images/shop/starfish.png" alt="star" className="mr-2 h-10 w-10" />
@@ -42,7 +42,7 @@ const ShopPage: React.FC = () => {
                 onClick={() => setShowReroll(false)}
                 className={
                   showReroll
-                    ? "font-vt323 rounded-full bg-[#CDE6EF] px-6 py-3 text-xl text-black shadow hover:bg-[#E3CFCF]"
+                    ? "font-vt323 rounded-full bg-[#CDE6EF] px-6 py-3 text-xl text-black shadow transition-all duration-300 hover:bg-[#E3CFCF]"
                     : "font-vt323 rounded-full bg-white px-6 py-3 text-xl text-black shadow"
                 }
               >
@@ -56,7 +56,7 @@ const ShopPage: React.FC = () => {
                 className={
                   showReroll
                     ? "font-vt323 rounded-full bg-white px-6 py-3 text-xl text-black shadow"
-                    : "font-vt323 rounded-full bg-[#CDE6EF] px-6 py-3 text-xl text-black shadow hover:bg-[#E3CFCF]"
+                    : "font-vt323 rounded-full bg-[#CDE6EF] px-6 py-3 text-xl text-black shadow transition-all duration-300 hover:bg-[#E3CFCF]"
                 }
               >
                 Re-roll
@@ -64,7 +64,7 @@ const ShopPage: React.FC = () => {
             </div>
             {/* 아이템 리스트 */}
             <div className="flex w-full justify-center gap-8">
-              {showReroll ? <RerollItem /> : <ShopItem />}
+              {showReroll ? <RerollItem /> : <BackgroundItem />}
             </div>
           </div>
         </div>

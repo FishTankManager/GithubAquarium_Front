@@ -1,7 +1,7 @@
 import React from "react";
 import PriceBar from "./PriceBar";
 
-const ShopItem: React.FC = () => {
+const BackgroundItem: React.FC = () => {
   return (
     <div className="relative aspect-[757/673] w-full overflow-hidden rounded-xl">
       {/* 배경 */}
@@ -65,4 +65,4 @@ const ShopItem: React.FC = () => {
   );
 };
 
-export default ShopItem;
+export default BackgroundItem;
