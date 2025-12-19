@@ -49,7 +49,7 @@ const FishGrowthCard: React.FC<FishGrowthCardProps> = ({
     return allFishData
       .filter((fish) => fish.group_code === selectedFishGroup.group_code)
       .map((fish) => ({
-        id: fish.id.toString(),
+        id: fish.id,
         fullName: fish.repository_full_name,
         contributions: fish.maturity,
       }));

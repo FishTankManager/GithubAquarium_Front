@@ -125,7 +125,7 @@ export async function getMyBackgrounds(): Promise<MyBackground[]> {
  * @param repoId repo ID
  * @returns FishTank 상세 정보
  */
-export async function getFishtankDetail(repoId: string): Promise<FishtankDetail> {
+export async function getFishtankDetail(repoId: number): Promise<FishtankDetail> {
   try {
     const res = await api.get<FishtankDetail>(`/aquatics/fishtank/${repoId}/`);
     return res.data;
@@ -143,7 +143,7 @@ export async function getFishtankDetail(repoId: string): Promise<FishtankDetail>
  * @param repoId 레포지토리 ID
  * @param backgroundId Background.id (사용자가 소유한 배경의 background_id)
  */
-export async function applyFishtankBackground(repoId: string, backgroundId: number): Promise<void> {
+export async function applyFishtankBackground(repoId: number, backgroundId: number): Promise<void> {
   try {
     await api.post(`/aquatics/fishtank/${repoId}/background/`, {
       background_id: backgroundId,
@@ -163,7 +163,7 @@ export async function applyFishtankBackground(repoId: string, backgroundId: numb
  * @param repoId 레포지토리 ID
  * @returns 선택 가능한 물고기 목록
  */
-export async function getSelectableFish(repoId: string): Promise<SelectableFish[]> {
+export async function getSelectableFish(repoId: number): Promise<SelectableFish[]> {
   try {
     const res = await api.get<{ fishes: SelectableFish[] }>(
       `/aquatics/fishtank/${repoId}/selectable-fish/`,

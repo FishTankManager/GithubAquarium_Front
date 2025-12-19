@@ -20,7 +20,7 @@ interface ContributionFishData {
 }
 
 interface GrowthTimelineProps {
-  repoId: string | null;
+  repoId: number | null;
   contributionFishes?: ContributionFishData[];
 }
 
@@ -56,11 +56,6 @@ export default function GrowthTimeline({ repoId, contributionFishes = [] }: Grow
 
   // ContributionFish 데이터를 기반으로 같은 group_code를 가진 물고기들 중 maturity가 현재 이하인 것들 필터링
   const filteredFishes = useMemo(() => {
-    console.log("GrowthTimeline: filteredFishes calculation", {
-      contributionFishesCount: contributionFishes.length,
-      fishesCount: fishes.length,
-    });
-
     if (contributionFishes.length === 0) {
       console.log("GrowthTimeline: No contributionFishes, using all fishes");
       return fishes; // ContributionFish가 없으면 기존 로직 사용

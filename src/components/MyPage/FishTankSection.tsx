@@ -140,12 +140,7 @@ export default function FishTankSection() {
 
       try {
         console.log("Fetching fishtank detail for repo:", repo.id, repo.fullName);
-        // repo.id는 string이므로 숫자로 변환
-        const repoIdNum = parseInt(repo.id, 10);
-        if (isNaN(repoIdNum)) {
-          console.error("Invalid repo ID:", repo.id);
-          throw new Error(`Invalid repository ID: ${repo.id}`);
-        }
+
         const fishtankDetail = await getFishtankDetail(repo.id);
         console.log("Fishtank detail received:", fishtankDetail);
         console.log(
@@ -255,7 +250,7 @@ export default function FishTankSection() {
     }
 
     try {
-      const embedCode = await getFishtankEmbedCode(Number(repo.id));
+      const embedCode = await getFishtankEmbedCode(repo.id);
       // Markdown 코드를 클립보드에 복사
       await navigator.clipboard.writeText(embedCode.markdown);
       setMessage("Markdown 코드가 클립보드에 복사되었습니다!");
@@ -282,7 +277,7 @@ export default function FishTankSection() {
       }
 
       try {
-        const backgroundId = parseInt(selectedBgId);
+        const backgroundId = parseInt(selectedBgId, 10);
         if (isNaN(backgroundId)) {
           setMessage("Invalid background selected.");
           setTimeout(() => setMessage(null), 3000);
@@ -436,7 +431,10 @@ export default function FishTankSection() {
         <section className="mt-3 rounded-xl">
           {tab === "timeline" && (
             <div className="w-full">
-              <GrowthTimeline repoId={repo?.id || null} contributionFishes={contributionFishes} />
+              <GrowthTimeline
+                repoId={repo ? repo.id : null}
+                contributionFishes={contributionFishes}
+              />
             </div>
           )}
           {tab === "background" &&
@@ -596,7 +594,7 @@ export default function FishTankSection() {
 
       {/* GrowthTimeline */}
       <div className="mt-10 flex justify-center">
-        <GrowthTimeline repoId={repo?.id || null} contributionFishes={contributionFishes} />
+        <GrowthTimeline repoId={repo ? repo.id : null} contributionFishes={contributionFishes} />
       </div>
     </div>
   );
