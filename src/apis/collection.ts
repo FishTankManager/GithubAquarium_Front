@@ -13,6 +13,13 @@ export interface UserFish {
   aquarium: number | null;
 }
 
+export type MyBackground = {
+  background_id: number;
+  name: string;
+  image_url: string;
+  unlocked_at: string; // ISO datetime
+};
+
 const isAxiosError = (e: unknown): e is AxiosError =>
   typeof e === "object" && e !== null && "isAxiosError" in e;
 
@@ -36,6 +43,19 @@ export async function getUserFishList(): Promise<UserFish[]> {
     throwMapped(e, {
       401: "로그인이 필요합니다.",
       500: "서버 오류로 물고기 목록을 불러오지 못했습니다.",
+    });
+  }
+}
+
+/** GET /aquatics/my-backgrounds/ */
+export async function getMyBackgrounds(): Promise<MyBackground[]> {
+  try {
+    const res = await api.get<MyBackground[]>("/aquatics/my-backgrounds/");
+    return res.data;
+  } catch (e) {
+    throwMapped(e, {
+      401: "로그인이 필요합니다.",
+      500: "서버 오류로 보유 배경 목록을 불러오지 못했습니다.",
     });
   }
 }
