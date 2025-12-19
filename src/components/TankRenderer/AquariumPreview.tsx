@@ -38,12 +38,15 @@ export default function AquariumPreview({
       height={height}
       className={`relative overflow-hidden rounded-2xl bg-transparent shadow-lg ${className}`}
     >
-      {/* 배경 이미지 */}
+      {/* 배경 이미지가 있을 때 */}
       {bgImage && (
         <div className="pointer-events-none absolute inset-0 z-0">
           <img src={bgImage} alt="" className="h-full w-full object-cover" />
         </div>
       )}
+
+      {/* 배경 이미지가 없을 때 → 기본 하늘색 배경 */}
+      {!bgImage && <div className="pointer-events-none absolute inset-0 z-0 bg-sky-200" />}
 
       {/* 좌상단: 유저 github username */}
       <div className="pointer-events-none absolute left-2 z-20 rounded px-1 py-1 text-xl font-medium">
