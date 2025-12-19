@@ -39,7 +39,7 @@ export default function FishTank({
       )}
 
       {/* 배경 이미지가 없을 때 → 기본 하늘색 배경 */}
-      {!bgImage && <div className="pointer-events-none absolute inset-0 z-0" />}
+      {!bgImage && <div className="pointer-events-none absolute inset-0 z-0 bg-sky-200" />}
 
       {/* 좌상단 Repository 이름 */}
       <div className="pointer-events-none absolute top-2 left-2 z-20 rounded px-3 text-4xl font-medium text-black">
