@@ -39,7 +39,7 @@ const CollectionPage: React.FC = () => {
   }, []);
 
   const getFishImage = (fish: UserFish | null) => {
-    if (!fish) return undefined;
+    if (!fish) return "/images/collection/questionSquare.png";
 
     // 특정 group_code 리스트
     const fishbunGroups = ["SPFishbun", "RBFishbun", "CPFishbun"];

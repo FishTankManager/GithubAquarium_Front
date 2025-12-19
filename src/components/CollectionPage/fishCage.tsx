@@ -86,7 +86,7 @@ const FishCage: React.FC<FishCageProps> = ({ fish, isSelected }) => {
           <img
             src={fish}
             alt="locked"
-            className="h-full w-full object-contain opacity-30 grayscale"
+            className="h-15 w-15 object-contain pb-1 opacity-80 grayscale"
           />
         ) : (
           <div className="h-full w-full" dangerouslySetInnerHTML={{ __html: svgContent }} />
