@@ -8,13 +8,13 @@ const BACKGROUND_IMAGES: Record<string, string> = {
   "Bg Deep 2": bgDeep2,
 };
 
-export function getBackgroundImage(name?: string): string | undefined {
+export function getBackgroundImage(name?: string): string | null {
   if (!name) return BACKGROUND_IMAGES["Bg Ocean"];
 
   const img = BACKGROUND_IMAGES[name];
   if (!img) {
     console.warn(`[FishTank] Unknown background name: ${name}`);
-    return BACKGROUND_IMAGES["Bg Ocean"];
+    return null;
   }
   return img;
 }
