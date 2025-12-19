@@ -116,7 +116,7 @@ export default function MainPage() {
         <img
           src="/images/main/myaquariumtextbox.png"
           alt="my aquarium"
-          className="absolute z-30 cursor-pointer"
+          className="absolute z-30 cursor-pointer transition-all duration-300 hover:scale-x-105 hover:scale-y-105"
           style={{
             width: `${windowWidth * 0.2}px`,
             bottom: "24%",
@@ -127,7 +127,7 @@ export default function MainPage() {
         <img
           src="/images/main/shoptextbox.png"
           alt="shop"
-          className="absolute z-30 cursor-pointer object-cover"
+          className="absolute z-30 cursor-pointer object-cover transition-all duration-300 hover:scale-x-105 hover:scale-y-105"
           style={{
             width: `${windowWidth * 0.2}px`,
             bottom: "-20%",
