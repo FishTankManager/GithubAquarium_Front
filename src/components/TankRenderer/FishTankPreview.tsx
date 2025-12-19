@@ -47,7 +47,8 @@ export default function FishTank({
 
       {/* 물고기 렌더링 */}
       {visibleFish.map((fish) => {
-        const svgSource = getFishSpriteSvg(fish.name);
+        const speciesKey = `${fish.group_code}_${fish.maturity}`;
+        const svgSource = getFishSpriteSvg(speciesKey);
 
         return (
           <FishSprite
