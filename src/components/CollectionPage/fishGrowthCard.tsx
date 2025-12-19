@@ -1,5 +1,8 @@
-import React from "react";
+import React, { useMemo } from "react";
 import GrowthTimeline from "./GrowthTimeline";
+import RepoSelect from "../CollectionPage/RepoSelect";
+import { UserFish } from "../../apis/collection";
+import { RepoInfo } from "@/types/aquarium";
 
 interface FishStage {
   stage: string;
@@ -7,25 +10,58 @@ interface FishStage {
 }
 
 interface FishGrowthCardProps {
-  name?: string;
+  selectedFishGroup: UserFish | null;
+  allFishData: UserFish[];
+  onFishDataUpdate: (fish: UserFish) => void;
   mainImg?: string;
-  memoryName?: string;
-  rarity?: string;
   starImg?: string;
   fishList?: FishStage[];
 }
 
 const FishGrowthCard: React.FC<FishGrowthCardProps> = ({
-  name,
+  selectedFishGroup,
+  allFishData,
+  onFishDataUpdate,
   mainImg,
-  memoryName,
-  rarity,
-  starImg,
+  starImg = "/images/shop/starfish.png",
   fishList,
 }) => {
-  // 아무 값도 없으면 초기 안내 텍스트 표시
-  const isEmpty =
-    !name && !mainImg && !memoryName && !rarity && !starImg && (!fishList || fishList.length === 0);
+  const isEmpty = !selectedFishGroup || !fishList || fishList.length === 0;
+  // ✅ 1. 현재 선택된 물고기(group_code)가 존재하는 레포지토리 목록만 추출
+  const availableRepos = useMemo<RepoInfo[]>(() => {
+    if (!selectedFishGroup) return [];
+
+    // 전체 물고기 데이터 중 현재 물고기와 같은 종류인 데이터들만 필터링
+    return allFishData
+      .filter((fish) => fish.group_code === selectedFishGroup.group_code)
+      .map((fish) => ({
+        id: fish.id.toString(), // Select 내부 매칭용 ID
+        fullName: fish.repository_full_name,
+        contributions: fish.maturity,
+      }));
+  }, [selectedFishGroup, allFishData]);
+
+  // ✅ 2. 현재 선택된 레포지토리 값 매칭
+  const currentRepoValue = useMemo(() => {
+    if (!selectedFishGroup || availableRepos.length === 0) return null;
+    return (
+      availableRepos.find((r) => r.fullName === selectedFishGroup.repository_full_name) || null
+    );
+  }, [selectedFishGroup, availableRepos]);
+
+  const handleRepoChange = (r: RepoInfo | null) => {
+    if (!r || !selectedFishGroup) return;
+
+    const targetFish = allFishData.find(
+      (fish) =>
+        fish.group_code === selectedFishGroup.group_code &&
+        fish.repository_full_name === r.fullName,
+    );
+
+    if (targetFish) {
+      onFishDataUpdate(targetFish);
+    }
+  };
 
   return (
     <div
@@ -37,7 +73,7 @@ const FishGrowthCard: React.FC<FishGrowthCardProps> = ({
         backgroundSize: "contain",
       }}
     >
-      <div className="flex h-full w-full flex-col px-18 py-6">
+      <div className="flex h-full w-full flex-col items-center justify-center px-6 py-6">
         {isEmpty ? (
           <div className="flex h-full flex-1 items-center justify-center">
             <span className="font-bungee text-center text-[2rem] tracking-widest text-[#89482D]">
@@ -46,24 +82,31 @@ const FishGrowthCard: React.FC<FishGrowthCardProps> = ({
           </div>
         ) : (
           <>
-            {/* 상단 물고기 및 정보 */}
-            <div className="mb-6 flex items-center justify-center gap-4">
-              <div className="mt-5">
-                <div className="font-bungee mb-3 text-[3.2rem] tracking-widest text-[#89482D]">
-                  {name}
+            <div className="mb-8 flex w-full items-center justify-center gap-4">
+              <div className="flex flex-col items-center gap-8">
+                <div className="font-bungee text-[2.2rem] tracking-widest text-[#89482D]">
+                  {selectedFishGroup.group_code}
                 </div>
-                <div className="mb-3 flex items-center justify-center gap-8">
-                  <img src={mainImg} alt="fish" className="h-20 w-20" />
-                  <div>
-                    <div className="font-vt323 text-[2rem] text-[#89482D]">{memoryName}</div>
-                    <div className="flex items-center gap-2 text-[2rem] text-[#89482D]">
-                      Rarity: <img src={starImg} alt="star" className="h-5 w-5" /> {rarity}
+
+                <div className="flex w-full items-center justify-center gap-4 px-8">
+                  <img src={mainImg} alt="fish" className="h-20 w-20 object-contain" />
+
+                  <div className="flex min-w-0 flex-1 flex-col items-start gap-1">
+                    <div>
+                      <RepoSelect
+                        value={currentRepoValue}
+                        onChange={handleRepoChange}
+                        customRepos={availableRepos} // 추가된 props
+                      />
+                    </div>
+
+                    <div className="flex items-center gap-2 text-[1.5rem] text-[#89482D]">
+                      Rarity: <img src={starImg} alt="star" className="h-6 w-6" /> 1
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            {/* 성장 카드 리스트 */}
             <GrowthTimeline fishList={fishList ?? []} />
           </>
         )}
