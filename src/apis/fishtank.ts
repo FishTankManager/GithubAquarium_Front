@@ -129,8 +129,32 @@ export async function getRepositories(): Promise<Repository[]> {
   }
 }
 
+export interface MyBackground {
+  background_id: number;
+  name: string;
+  image_url: string | null;
+  unlocked_at: string;
+}
+
+/**
+ * 유저가 보유한 배경 목록을 반환합니다.
+ * @returns 사용자가 보유한 배경 목록
+ */
+export async function getMyBackgrounds(): Promise<MyBackground[]> {
+  try {
+    const res = await api.get<MyBackground[]>("/aquatics/my-backgrounds/");
+    return res.data;
+  } catch (e) {
+    throwMapped(e, {
+      401: "로그인이 필요합니다.",
+      500: "서버 오류로 배경 목록을 불러오지 못했습니다.",
+    });
+  }
+}
+
 /**
  * 유저가 보유한 배경(OwnBackground)의 원본 Background 데이터를 반환합니다.
+ * @deprecated getMyBackgrounds()를 사용하세요
  * @returns 사용자가 보유한 피쉬탱크 배경 목록
  */
 export async function getFishtankBackgrounds(): Promise<FishtankBackground[]> {
