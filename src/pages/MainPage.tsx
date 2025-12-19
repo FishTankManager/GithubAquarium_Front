@@ -44,9 +44,9 @@ const mockFishList: Fish[] = [
   },
   {
     id: 102,
-    name: "ShrimpWich_2",
+    name: "RBFishbun_2",
     github_username: "eileen914",
-    group_code: "ShrimpWich",
+    group_code: "RBFishbun",
     maturity: 2,
     repository_name: "shrimpwich/engine",
     commit_count: 117,
