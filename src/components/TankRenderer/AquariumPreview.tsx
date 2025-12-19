@@ -53,7 +53,7 @@ export default function AquariumPreview({
         {ownerLabel}
       </div>
 
-      {/* 물고기 스프라이트 렌더링 */}
+      {/* 물고기 렌더링 */}
       {visibleFish.map((fish) => {
         // group_code와 maturity를 조합해서 SVG 찾기 (우선순위 1)
         // 만약 name이 정확히 "GroupCode_Maturity" 형식이면 그것도 시도
@@ -70,7 +70,7 @@ export default function AquariumPreview({
             key={fish.id}
             id={String(fish.id)}
             svgSource={svgSource}
-            topLabel={fish.repository_name}
+            topLabel={repoLabel}
             bottomLabel={`${fish.commit_count} commits`}
             personaWidthPercent={10}
           />
