@@ -43,8 +43,32 @@ function throwMapped(error: unknown, map: Record<number, string> = {}): never {
   throw error;
 }
 
+export interface MyBackground {
+  background_id: number;
+  name: string;
+  image_url: string | null;
+  unlocked_at: string;
+}
+
+/**
+ * 유저가 보유한 배경 목록을 반환합니다.
+ * @returns 사용자가 보유한 배경 목록
+ */
+export async function getMyBackgrounds(): Promise<MyBackground[]> {
+  try {
+    const res = await api.get<MyBackground[]>("/aquatics/my-backgrounds/");
+    return res.data;
+  } catch (e) {
+    throwMapped(e, {
+      401: "로그인이 필요합니다.",
+      500: "서버 오류로 배경 목록을 불러오지 못했습니다.",
+    });
+  }
+}
+
 /**
  * 유저가 보유한 배경(OwnBackground)의 원본 Background 데이터를 반환합니다.
+ * @deprecated getMyBackgrounds()를 사용하세요
  * @returns 사용자가 보유한 아쿠아리움 배경 목록
  */
 export async function getAquariumBackgrounds(): Promise<AquariumBackground[]> {
@@ -60,13 +84,13 @@ export async function getAquariumBackgrounds(): Promise<AquariumBackground[]> {
 }
 
 /**
- * 사용자가 소유한 OwnBackground 중 하나를 aquarium 배경으로 적용합니다.
- * @param ownBackgroundId 유저가 소유한 OwnBackground.id
+ * 사용자가 소유한 배경을 aquarium 배경으로 적용합니다.
+ * @param backgroundId Background.id (사용자가 소유한 배경의 background_id)
  */
-export async function applyAquariumBackground(ownBackgroundId: number): Promise<void> {
+export async function applyAquariumBackground(backgroundId: number): Promise<void> {
   try {
-    await api.post("/aquatics/aquarium/apply-background/", {
-      own_background_id: ownBackgroundId,
+    await api.post("/aquatics/aquarium/background/", {
+      background_id: backgroundId,
     });
   } catch (e) {
     throwMapped(e, {

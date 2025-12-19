@@ -13,6 +13,15 @@ export interface FishtankBackground {
   // background_image는 프론트엔드에서 로컬 assets를 사용하므로 제외
 }
 
+export interface RepositoryOwner {
+  id: number;
+  username: string;
+  email?: string;
+  github_id?: number | null;
+  github_username?: string | null;
+  avatar_url?: string;
+}
+
 export interface Repository {
   id: number;
   github_id: number;
@@ -22,11 +31,12 @@ export interface Repository {
   html_url: string;
   stargazers_count: number;
   language: string | null;
-  commit_count: number;
+  commit_count: number; // 레포지토리 전체 커밋 수
+  default_branch: string;
   created_at: string;
   updated_at: string;
-  last_synced_at: string;
-  owner: number | null;
+  owner: RepositoryOwner; // 소유자 정보 (객체)
+  my_commit_count: number; // 현재 로그인한 사용자의 해당 레포지토리 커밋 수
 }
 
 export interface ContributionFishSpecies {
@@ -119,8 +129,32 @@ export async function getRepositories(): Promise<Repository[]> {
   }
 }
 
+export interface MyBackground {
+  background_id: number;
+  name: string;
+  image_url: string | null;
+  unlocked_at: string;
+}
+
+/**
+ * 유저가 보유한 배경 목록을 반환합니다.
+ * @returns 사용자가 보유한 배경 목록
+ */
+export async function getMyBackgrounds(): Promise<MyBackground[]> {
+  try {
+    const res = await api.get<MyBackground[]>("/aquatics/my-backgrounds/");
+    return res.data;
+  } catch (e) {
+    throwMapped(e, {
+      401: "로그인이 필요합니다.",
+      500: "서버 오류로 배경 목록을 불러오지 못했습니다.",
+    });
+  }
+}
+
 /**
  * 유저가 보유한 배경(OwnBackground)의 원본 Background 데이터를 반환합니다.
+ * @deprecated getMyBackgrounds()를 사용하세요
  * @returns 사용자가 보유한 피쉬탱크 배경 목록
  */
 export async function getFishtankBackgrounds(): Promise<FishtankBackground[]> {
