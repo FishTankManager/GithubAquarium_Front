@@ -12,9 +12,9 @@ import {
   updateAquariumFishVisibility,
   getMyFishes,
   type MyBackground,
-  type AquariumDetail,
   type UserFish,
 } from "@/apis/aquarium";
+import type { AquariumDetail } from "@/types/aquarium";
 import type { Fish } from "@/types/fish";
 // 배경 이미지 import
 import bg1 from "@/assets/png/Backgrounds/bg-deep-1.png";
@@ -54,6 +54,11 @@ export default function AquariumSection() {
   const [bgCandidates, setBgCandidates] = useState<BgItem[]>([]);
   const [loadingBg, setLoadingBg] = useState(true);
   const [backgroundsData, setBackgroundsData] = useState<MyBackground[]>([]);
+  const [selectedBgId, setSelectedBgId] = useState<string | null>(null);
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  // 미리보기용 배경 이름 (AquariumPreview로 전달)
+  const [previewBackgroundName, setPreviewBackgroundName] = useState<string | undefined>(undefined);
 
   // API에서 배경 목록 가져오기
   useEffect(() => {
@@ -104,6 +109,25 @@ export default function AquariumSection() {
     fetchBackgrounds();
   }, []);
 
+  // background_name을 AquariumPreview가 기대하는 형식으로 변환
+  // 예: "bg-deep-1" → "Bg Deep 1", "bg-ocean" → "Bg Ocean"
+  const convertBackgroundName = (name: string | null | undefined): string | undefined => {
+    if (!name || name === "기본 배경") return undefined;
+
+    // 백엔드에서 오는 형식: "bg-deep-1", "bg-deep-2", "bg-ocean" 등
+    // AquariumPreview가 기대하는 형식: "Bg Deep 1", "Bg Deep 2", "Bg Ocean"
+    const nameMap: Record<string, string> = {
+      "bg-deep-1": "Bg Deep 1",
+      "bg-deep-2": "Bg Deep 2",
+      "bg-ocean": "Bg Ocean",
+      "Bg Deep 1": "Bg Deep 1",
+      "Bg Deep 2": "Bg Deep 2",
+      "Bg Ocean": "Bg Ocean",
+    };
+
+    return nameMap[name] || name;
+  };
+
   // API에서 아쿠아리움 상세 정보 가져오기
   const fetchAquariumDetail = async () => {
     try {
@@ -111,12 +135,19 @@ export default function AquariumSection() {
       const detail = await getAquariumDetail();
       setAquariumDetail(detail);
 
+      // 서버 값으로 미리보기 배경 초기화
+      setPreviewBackgroundName(convertBackgroundName(detail.background_name));
+
       // fish_list의 각 commit_count를 합산
-      const totalContributions = detail.fish_list.reduce((sum, fish) => sum + fish.commit_count, 0);
+      const totalContributions = detail.fish_list.reduce(
+        (sum: number, fish: Fish) => sum + fish.commit_count,
+        0,
+      );
       setTotalContrib(totalContributions);
     } catch (e) {
       console.error("Failed to fetch aquarium detail:", e);
       setAquariumDetail(null);
+      setPreviewBackgroundName(undefined);
       setTotalContrib(0);
     } finally {
       setLoadingAquarium(false);
@@ -179,32 +210,13 @@ export default function AquariumSection() {
     }
   };
 
-  // background_name을 AquariumPreview가 기대하는 형식으로 변환
-  // 예: "bg-deep-1" → "Bg Deep 1", "bg-ocean" → "Bg Ocean"
-  const convertBackgroundName = (name: string | null | undefined): string | undefined => {
-    if (!name || name === "기본 배경") return undefined;
-
-    // 백엔드에서 오는 형식: "bg-deep-1", "bg-deep-2", "bg-ocean" 등
-    // AquariumPreview가 기대하는 형식: "Bg Deep 1", "Bg Deep 2", "Bg Ocean"
-    const nameMap: Record<string, string> = {
-      "bg-deep-1": "Bg Deep 1",
-      "bg-deep-2": "Bg Deep 2",
-      "bg-ocean": "Bg Ocean",
-      "Bg Deep 1": "Bg Deep 1",
-      "Bg Deep 2": "Bg Deep 2",
-      "Bg Ocean": "Bg Ocean",
-    };
-
-    return nameMap[name] || name;
-  };
-
   // UserFish를 Fish로 변환 (테이블용 - 모든 물고기)
   // aquariumDetail.fish_list에서 commit_count를 가져와서 매핑
   const convertUserFishToFishList = (userFishes: UserFish[]): Fish[] => {
     // aquariumDetail.fish_list에서 id를 키로 하는 commit_count 맵 생성
     const commitCountMap = new Map<number, number>();
     if (aquariumDetail?.fish_list) {
-      aquariumDetail.fish_list.forEach((fish) => {
+      aquariumDetail.fish_list.forEach((fish: Fish) => {
         commitCountMap.set(fish.id, fish.commit_count);
       });
     }
@@ -251,10 +263,6 @@ export default function AquariumSection() {
     [],
   );
 
-  const [selectedBgId, setSelectedBgId] = useState<string | null>(null);
-  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
-
   const handleApply = async () => {
     if (tab === "background" && selectedBgId) {
       if (selectedBgId === "locked") {
@@ -280,11 +288,6 @@ export default function AquariumSection() {
           return;
         }
 
-        // applyAquariumBackground는 OwnBackground.id를 요구하므로,
-        // background_id로 OwnBackground를 찾아야 하지만,
-        // 현재 API 응답에는 OwnBackground.id가 없으므로
-        // background_id를 직접 사용 (API가 내부에서 처리하도록)
-        // TODO: API가 background_id를 받도록 수정하거나, OwnBackground.id를 응답에 포함
         await applyAquariumBackground(background.background_id);
         setMessage("배경이 성공적으로 적용되었습니다!");
         setTimeout(() => setMessage(null), 3000);
@@ -293,6 +296,8 @@ export default function AquariumSection() {
         try {
           const updatedDetail = await getAquariumDetail();
           setAquariumDetail(updatedDetail);
+          // 서버 값으로 미리보기도 동기화
+          setPreviewBackgroundName(convertBackgroundName(updatedDetail.background_name));
         } catch (e) {
           console.warn("Failed to refresh aquarium detail after apply:", e);
         }
@@ -339,7 +344,7 @@ export default function AquariumSection() {
                 width="100%"
                 height="100%"
                 className="relative overflow-hidden rounded-2xl shadow-lg"
-                backgroundName={convertBackgroundName(aquariumDetail.background_name)}
+                backgroundName={previewBackgroundName}
                 fishList={getPreviewFishList()}
               />
             ) : (
@@ -424,7 +429,13 @@ export default function AquariumSection() {
               <AquariumBackgroundGrid
                 items={bgCandidates}
                 selectedId={selectedBgId}
-                onSelect={setSelectedBgId}
+                onSelect={(id) => {
+                  setSelectedBgId(id);
+                  const bg = backgroundsData.find((b) => b.background_id.toString() === id);
+                  if (bg) {
+                    setPreviewBackgroundName(convertBackgroundName(bg.name));
+                  }
+                }}
               />
             ))}
           {tab === "items" && (
@@ -508,7 +519,7 @@ export default function AquariumSection() {
               width={700}
               height={440}
               className="relative overflow-hidden rounded-2xl shadow-lg"
-              backgroundName={convertBackgroundName(aquariumDetail.background_name)}
+              backgroundName={previewBackgroundName}
               fishList={getPreviewFishList()}
             />
           ) : (
@@ -535,7 +546,13 @@ export default function AquariumSection() {
                   <AquariumBackgroundGrid
                     items={bgCandidates}
                     selectedId={selectedBgId}
-                    onSelect={setSelectedBgId}
+                    onSelect={(id) => {
+                      setSelectedBgId(id);
+                      const bg = backgroundsData.find((b) => b.background_id.toString() === id);
+                      if (bg) {
+                        setPreviewBackgroundName(convertBackgroundName(bg.name));
+                      }
+                    }}
                   />
                 ))}
               {tab === "items" && (
