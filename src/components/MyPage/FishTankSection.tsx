@@ -148,6 +148,16 @@ export default function FishTankSection() {
         }
         const fishtankDetail = await getFishtankDetail(repo.id);
         console.log("Fishtank detail received:", fishtankDetail);
+        console.log(
+          "Fish list details:",
+          fishtankDetail.fish_list.map((fish) => ({
+            id: fish.id,
+            name: fish.name,
+            group_code: fish.group_code,
+            maturity: fish.maturity,
+            github_username: fish.github_username,
+          })),
+        );
 
         // fishtankDetail state에 저장
         setFishtankDetail({

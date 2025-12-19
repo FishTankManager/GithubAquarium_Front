@@ -328,7 +328,11 @@ export default function AquariumSection() {
         <section className="mt-3 rounded-xl">
           {tab === "fish" && (
             <div className="w-full overflow-x-auto">
-              <AquariumFishTable />
+              <AquariumFishTable
+                fishList={
+                  aquariumDetail?.fish_list ? convertToFishList(aquariumDetail.fish_list) : []
+                }
+              />
             </div>
           )}
           {tab === "background" &&
@@ -469,7 +473,9 @@ export default function AquariumSection() {
       {/* 하단: Fish Table */}
       <div className="mt-10 flex justify-center">
         <div className="relative pb-16" style={{ maxWidth: "1000px", width: "100%" }}>
-          <AquariumFishTable />
+          <AquariumFishTable
+            fishList={aquariumDetail?.fish_list ? convertToFishList(aquariumDetail.fish_list) : []}
+          />
           <button
             onClick={() => console.log("SAVE & APPLY clicked")}
             className="font-vt absolute top-full right-0 -mt-10 rounded-full bg-[#3F3F3F]/80 px-8 py-1 text-2xl text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
