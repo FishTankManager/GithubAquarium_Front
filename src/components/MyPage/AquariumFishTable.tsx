@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FishIcon from "./FishIcon";
 import { Maturity } from "@/types/aquarium";
 import { useViewport } from "@/contexts/useViewport";
@@ -7,6 +7,7 @@ import { getFishSpriteSvgByGroupAndMaturity } from "@/assets/svg/FishSprites/map
 
 interface AquariumFishTableProps {
   fishList?: Fish[]; // aquarium preview에 표시되는 물고기 목록
+  onSave?: (fishSettings: Array<{ id: number; visible: boolean }>) => Promise<void>; // SAVE & APPLY 버튼 클릭 시 호출
 }
 
 // maturity 숫자를 Maturity 문자열로 변환
@@ -22,22 +23,30 @@ const getMaturityFromNumber = (maturity: number): Maturity => {
   return maturityMap[maturity] || "Hatchling";
 };
 
-export default function AquariumFishTable({ fishList = [] }: AquariumFishTableProps) {
+export default function AquariumFishTable({ fishList = [], onSave }: AquariumFishTableProps) {
   const { isMobile, width } = useViewport();
 
-  // aquarium에 표시되는 물고기만 필터링하고 변환
-  const visibleFish = fishList.filter((fish) => fish.is_visible_in_aquarium);
-
-  const rows = visibleFish.map((fish) => ({
+  // 모든 물고기를 표시 (is_visible_in_aquarium과 관계없이)
+  const rows = fishList.map((fish) => ({
     id: fish.id.toString(),
+    fishId: fish.id, // API 호출용 실제 ID
     maturity: getMaturityFromNumber(fish.maturity),
     repo: fish.repository_name,
     contribution: fish.commit_count,
     group_code: fish.group_code,
     maturityNumber: fish.maturity,
+    isVisible: fish.is_visible_in_aquarium, // 초기 선택 상태를 위해 저장
   }));
 
+  // 초기 상태: is_visible_in_aquarium이 true인 물고기만 선택된 상태
   const [selectedFish, setSelectedFish] = useState<Set<string>>(new Set());
+
+  // rows가 변경될 때마다 초기 선택 상태 업데이트 (is_visible_in_aquarium이 true인 것만 선택)
+  useEffect(() => {
+    const visibleIds = rows.filter((r) => r.isVisible).map((r) => r.id);
+    setSelectedFish(new Set(visibleIds));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rows.length]);
 
   const toggleFishSelection = (fishId: string) => {
     setSelectedFish((prev) => {
@@ -49,6 +58,18 @@ export default function AquariumFishTable({ fishList = [] }: AquariumFishTablePr
       }
       return newSet;
     });
+  };
+
+  const handleSave = async () => {
+    if (!onSave) return;
+
+    // 모든 물고기에 대한 visibility 설정 생성
+    const fishSettings = rows.map((r) => ({
+      id: r.fishId,
+      visible: selectedFish.has(r.id),
+    }));
+
+    await onSave(fishSettings);
   };
 
   // 중간 크기 화면에서도 가로 스크롤 사용 (약 1000px 이하)
@@ -153,6 +174,17 @@ export default function AquariumFishTable({ fishList = [] }: AquariumFishTablePr
               ))}
             </div>
           </div>
+          {/* SAVE & APPLY 버튼 */}
+          {onSave && (
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={handleSave}
+                className="font-vt rounded-full bg-[#3F3F3F]/80 px-8 py-1 text-2xl text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
+              >
+                SAVE & APPLY
+              </button>
+            </div>
+          )}
         </div>
       </section>
     );
@@ -244,6 +276,17 @@ export default function AquariumFishTable({ fishList = [] }: AquariumFishTablePr
             </div>
           ))}
         </div>
+        {/* SAVE & APPLY 버튼 */}
+        {onSave && (
+          <div className="mt-6 flex justify-end">
+            <button
+              onClick={handleSave}
+              className="font-vt rounded-full bg-[#3F3F3F]/80 px-8 py-1 text-2xl text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
+            >
+              SAVE & APPLY
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

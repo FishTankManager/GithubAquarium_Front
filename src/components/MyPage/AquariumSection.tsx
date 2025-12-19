@@ -9,8 +9,11 @@ import {
   getMyBackgrounds,
   applyAquariumBackground,
   getAquariumDetail,
+  updateAquariumFishVisibility,
+  getMyFishes,
   type MyBackground,
   type AquariumDetail,
+  type UserFish,
 } from "@/apis/aquarium";
 import type { Fish } from "@/types/fish";
 // 배경 이미지 import
@@ -44,6 +47,7 @@ export default function AquariumSection() {
   const [totalContrib, setTotalContrib] = useState<number>(0);
   const [aquariumDetail, setAquariumDetail] = useState<AquariumDetail | null>(null);
   const [loadingAquarium, setLoadingAquarium] = useState(true);
+  const [allFishes, setAllFishes] = useState<UserFish[]>([]);
 
   const [bgCandidates, setBgCandidates] = useState<BgItem[]>([]);
   const [loadingBg, setLoadingBg] = useState(true);
@@ -99,30 +103,56 @@ export default function AquariumSection() {
   }, []);
 
   // API에서 아쿠아리움 상세 정보 가져오기
-  useEffect(() => {
-    const fetchAquariumDetail = async () => {
-      try {
-        setLoadingAquarium(true);
-        const detail = await getAquariumDetail();
-        setAquariumDetail(detail);
+  const fetchAquariumDetail = async () => {
+    try {
+      setLoadingAquarium(true);
+      const detail = await getAquariumDetail();
+      setAquariumDetail(detail);
 
-        // fish_list의 각 commit_count를 합산
-        const totalContributions = detail.fish_list.reduce(
-          (sum, fish) => sum + fish.commit_count,
-          0,
-        );
-        setTotalContrib(totalContributions);
+      // fish_list의 각 commit_count를 합산
+      const totalContributions = detail.fish_list.reduce((sum, fish) => sum + fish.commit_count, 0);
+      setTotalContrib(totalContributions);
+    } catch (e) {
+      console.error("Failed to fetch aquarium detail:", e);
+      setAquariumDetail(null);
+      setTotalContrib(0);
+    } finally {
+      setLoadingAquarium(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAquariumDetail();
+  }, []);
+
+  // 모든 물고기 목록 가져오기 (visibility와 관계없이)
+  useEffect(() => {
+    const fetchAllFishes = async () => {
+      try {
+        const fishes = await getMyFishes();
+        setAllFishes(fishes);
       } catch (e) {
-        console.error("Failed to fetch aquarium detail:", e);
-        setAquariumDetail(null);
-        setTotalContrib(0);
-      } finally {
-        setLoadingAquarium(false);
+        console.error("Failed to fetch all fishes:", e);
+        setAllFishes([]);
       }
     };
 
-    fetchAquariumDetail();
+    fetchAllFishes();
   }, []);
+
+  // 물고기 visibility 업데이트 핸들러
+  const handleFishVisibilityUpdate = async (
+    fishSettings: Array<{ id: number; visible: boolean }>,
+  ) => {
+    try {
+      await updateAquariumFishVisibility(fishSettings);
+      // 업데이트 후 아쿠아리움 상세 정보와 모든 물고기 목록 다시 불러오기
+      await Promise.all([fetchAquariumDetail(), getMyFishes().then(setAllFishes)]);
+    } catch (e) {
+      console.error("Failed to update fish visibility:", e);
+      throw e; // 에러를 다시 throw하여 AquariumFishTable에서 처리 가능하도록
+    }
+  };
 
   // background_name을 AquariumPreview가 기대하는 형식으로 변환
   // 예: "bg-deep-1" → "Bg Deep 1", "bg-ocean" → "Bg Ocean"
@@ -143,7 +173,7 @@ export default function AquariumSection() {
     return nameMap[name] || name;
   };
 
-  // AquariumFish를 Fish로 변환
+  // AquariumFish를 Fish로 변환 (preview용)
   const convertToFishList = (aquariumFish: AquariumDetail["fish_list"]): Fish[] => {
     return aquariumFish.map((fish) => ({
       id: fish.id,
@@ -156,6 +186,22 @@ export default function AquariumSection() {
       is_visible_in_aquarium: fish.is_visible_in_aquarium,
       is_visible_in_fishtank: fish.is_visible_in_fishtank,
       // github_username은 optional이므로 없어도 됨
+    }));
+  };
+
+  // UserFish를 Fish로 변환 (테이블용 - 모든 물고기)
+  const convertUserFishToFishList = (userFishes: UserFish[]): Fish[] => {
+    return userFishes.map((fish) => ({
+      id: fish.id,
+      name: fish.species_name,
+      group_code: fish.group_code,
+      maturity: fish.maturity,
+      repository_name: fish.repository_full_name,
+      commit_count: 0, // UserFish에는 commit_count가 없으므로 0으로 설정 (표시용이므로 문제없음)
+      unlocked_at: null, // UserFish에는 unlocked_at이 없으므로 null
+      is_visible_in_aquarium: fish.is_visible_in_aquarium,
+      is_visible_in_fishtank: fish.is_visible_in_fishtank,
+      github_username: fish.github_username,
     }));
   };
 
@@ -306,32 +352,30 @@ export default function AquariumSection() {
           </div>
 
           {tab !== "fish" && (
-            <button
-              onClick={handleApply}
-              className="font-vt rounded-full bg-[#3F3F3F]/80 px-6 py-1.5 text-base whitespace-nowrap text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none sm:text-xl"
-            >
-              APPLY
-            </button>
+            <div className="relative">
+              {/* 메시지 표시 영역 - APPLY 버튼 위에 absolute로 고정 */}
+              {message && (
+                <div className="font-vt absolute right-0 bottom-full z-10 mb-2 rounded-md bg-[#00355B] px-3 py-1 text-xs whitespace-nowrap text-white shadow-lg sm:text-sm">
+                  {message}
+                </div>
+              )}
+              <button
+                onClick={handleApply}
+                className="font-vt rounded-full bg-[#3F3F3F]/80 px-6 py-1.5 text-base whitespace-nowrap text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none sm:text-xl"
+              >
+                APPLY
+              </button>
+            </div>
           )}
         </div>
-
-        {/* 잠겨있는 아이템/배경 선택 시 메시지 표시 영역 */}
-        {message && (
-          <div className="mb-3 flex justify-center">
-            <div className="font-vt rounded-md bg-[#00355B] px-6 py-1 text-base text-white shadow-lg sm:text-lg">
-              {message}
-            </div>
-          </div>
-        )}
 
         {/* 탭 컨텐츠 */}
         <section className="mt-3 rounded-xl">
           {tab === "fish" && (
             <div className="w-full overflow-x-auto">
               <AquariumFishTable
-                fishList={
-                  aquariumDetail?.fish_list ? convertToFishList(aquariumDetail.fish_list) : []
-                }
+                fishList={convertUserFishToFishList(allFishes)}
+                onSave={handleFishVisibilityUpdate}
               />
             </div>
           )}
@@ -398,21 +442,20 @@ export default function AquariumSection() {
             </button>
           </div>
 
-          {/* 잠겨있는 아이템/배경 선택 시 메시지 표시 영역 */}
-          {message && (
-            <div className="flex justify-end">
-              <div className="font-vt rounded-md bg-[#00355B] px-6 py-1 text-xl text-white shadow-lg">
+          <div className="relative">
+            {/* 메시지 표시 영역 - APPLY 버튼 위에 absolute로 고정 */}
+            {message && (
+              <div className="font-vt absolute right-0 bottom-full z-10 mb-2 rounded-md bg-[#00355B] px-3 py-1 text-sm whitespace-nowrap text-white shadow-lg">
                 {message}
               </div>
-            </div>
-          )}
-
-          <button
-            onClick={handleApply}
-            className="font-vt rounded-full bg-[#3F3F3F]/80 px-8 py-1 text-2xl text-[#D7B9B9] hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
-          >
-            APPLY
-          </button>
+            )}
+            <button
+              onClick={handleApply}
+              className="font-vt rounded-full bg-[#3F3F3F]/80 px-8 py-1 text-2xl text-[#D7B9B9] hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
+            >
+              APPLY
+            </button>
+          </div>
         </div>
       </div>
 
@@ -474,14 +517,9 @@ export default function AquariumSection() {
       <div className="mt-10 flex justify-center">
         <div className="relative pb-16" style={{ maxWidth: "1000px", width: "100%" }}>
           <AquariumFishTable
-            fishList={aquariumDetail?.fish_list ? convertToFishList(aquariumDetail.fish_list) : []}
+            fishList={convertUserFishToFishList(allFishes)}
+            onSave={handleFishVisibilityUpdate}
           />
-          <button
-            onClick={() => console.log("SAVE & APPLY clicked")}
-            className="font-vt absolute top-full right-0 -mt-10 rounded-full bg-[#3F3F3F]/80 px-8 py-1 text-2xl text-[#D7B9B9] shadow transition-colors hover:bg-[#CA9B9B]/20 focus:ring-2 focus:ring-[#CA9B9B] focus:outline-none"
-          >
-            SAVE & APPLY
-          </button>
         </div>
       </div>
     </div>
