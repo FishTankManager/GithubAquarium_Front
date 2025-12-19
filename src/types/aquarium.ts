@@ -15,7 +15,7 @@ export type CanvasSize = {
 };
 
 export interface RepoInfo {
-  id: string;
+  id: number;
   fullName: string;
   contributions: number;
 }

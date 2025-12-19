@@ -25,7 +25,7 @@ export default function RepoSelect({
         // Repository 타입을 RepoInfo 타입으로 변환
         // my_commit_count를 사용하여 현재 사용자의 기여도를 표시
         const repoInfos: RepoInfo[] = repositories.map((repo: Repository) => ({
-          id: repo.id.toString(),
+          id: repo.id,
           fullName: repo.full_name,
           contributions: repo.my_commit_count, // 사용자의 기여도 사용
         }));
@@ -62,8 +62,12 @@ export default function RepoSelect({
       ) : (
         <select
           className={`font-abeezee ${selectWidth} appearance-none rounded-md border border-white/50 bg-[#3E548E] px-3 py-2 pr-10 pl-7 text-white shadow-xl hover:shadow-2xl focus:ring-2 focus:ring-blue-300 focus:outline-none`}
-          value={value?.id ?? ""}
-          onChange={(e) => onChange(repos.find((d) => d.id === e.target.value) ?? null)}
+          value={value ? String(value.id) : ""}
+          onChange={(e) => {
+            const valueNum = Number(e.target.value); // ★
+            const selected = repos.find((d) => d.id === valueNum); // ★
+            onChange(selected ?? null);
+          }}
         >
           <option value="" disabled hidden className="text-[#B2B2B2]">
             Select a repository to visit!

@@ -31,7 +31,7 @@ export default function RepoSelect({ value, onChange, customRepos }: RepoSelectP
         const repositories = await getRepositories();
 
         const repoInfos: RepoInfo[] = repositories.map((repo: Repository) => ({
-          id: repo.id.toString(),
+          id: repo.id,
           fullName: repo.full_name,
           contributions: repo.commit_count,
         }));
@@ -71,7 +71,8 @@ export default function RepoSelect({ value, onChange, customRepos }: RepoSelectP
             className={`font-abeezee /* 안쪽 그림자 적용 */ w-full cursor-pointer appearance-none rounded-md border border-[#89482D]/50 bg-[#DFC39D] px-3 py-2 pr-8 text-[0.85rem] text-[#89482D] shadow-inner transition-all duration-200 hover:shadow-[inset_-4px_4px_4px_0_rgba(137,72,45,0.2)] focus:shadow-[inset_-4px_4px_6px_0_rgba(137,72,45,0.3)] focus:ring-0 focus:outline-none`}
             value={value?.id ?? ""}
             onChange={(e) => {
-              const selected = repos.find((d) => d.id === e.target.value);
+              const value = Number(e.target.value);
+              const selected = repos.find((d) => d.id === value) ?? null;
               onChange(selected ?? null);
               e.currentTarget.blur();
             }}
