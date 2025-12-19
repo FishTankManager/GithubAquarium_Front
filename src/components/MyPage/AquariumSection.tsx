@@ -43,7 +43,7 @@ const localBackgroundMap: Record<string, string> = {
 export default function AquariumSection() {
   const { isMobile, width } = useViewport();
   const useVerticalLayout = isMobile || width < 1400;
-  const [tab, setTab] = useState<SubTab>(useVerticalLayout ? "fish" : "background"); // 모바일: fish, 와이드: background
+  const [tab, setTab] = useState<SubTab>("background"); // 기본 탭: background
   const [totalContrib, setTotalContrib] = useState<number>(0);
   const [aquariumDetail, setAquariumDetail] = useState<AquariumDetail | null>(null);
   const [loadingAquarium, setLoadingAquarium] = useState(true);

@@ -70,7 +70,7 @@ export default function AquariumPreview({
             key={fish.id}
             id={String(fish.id)}
             svgSource={svgSource}
-            topLabel={repoLabel}
+            topLabel={fish.repository_name}
             bottomLabel={`${fish.commit_count} commits`}
             personaWidthPercent={10}
           />
