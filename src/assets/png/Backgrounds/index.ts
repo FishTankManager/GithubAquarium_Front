@@ -1,6 +1,6 @@
-import bg1 from "@/assets/png/Backgrounds/bg-1.png";
-import bg2 from "@/assets/png/Backgrounds/bg-2.png";
-import bg3 from "@/assets/png/Backgrounds/bg-3.png";
+import bg1 from "@/assets/png/Backgrounds/bg-deep-1.png";
+import bg2 from "@/assets/png/Backgrounds/bg-deep-2.png";
+import bg3 from "@/assets/png/Backgrounds/bg-ocean.png";
 
 const BACKGROUND_IMAGES: Record<string, string> = {
   "Bg Ocean": bg1,
