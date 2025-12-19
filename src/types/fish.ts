@@ -4,12 +4,12 @@
 export interface Fish {
   id: number;
   name: string; // 물고기 종 이름
-  github_username: string; //소유자
+  github_username?: string | null; // 기여자의 GitHub Username (optional - null 가능)
   group_code: string; // 물고기 종 그룹 코드
   maturity: number; // 성장 단계 (1~6)
   repository_name: string; // 출처 레포지토리 풀네임
   commit_count: number; // 해당 레포에 기여한 커밋 수
-  unlocked_at: string; // 해금 시각 (ISO string)
+  unlocked_at: string | null; // 해금 시각 (ISO string, null 가능)
   is_visible_in_aquarium: boolean;
   is_visible_in_fishtank: boolean;
 }

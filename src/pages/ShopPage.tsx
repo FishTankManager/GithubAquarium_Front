@@ -144,7 +144,7 @@ const ShopPage: React.FC = () => {
       <img
         src="/images/shop/background3.png"
         alt="background"
-        className="absolute top-0 left-0 z-0 h-full w-full object-cover"
+        className="fixed top-0 left-0 -z-10 h-full w-full object-cover"
       />
 
       <main className="relative z-10 mx-auto mt-20 max-w-7xl px-8 pt-18 pb-20">
@@ -155,7 +155,7 @@ const ShopPage: React.FC = () => {
               text="Shop"
               className="font-sixtyfour text-shadow mb-10 text-center text-6xl text-[#C18A8A] drop-shadow-[0_3px_0_rgba(0,0,0,0.25)] md:mb-0"
             />
-            <div className="mt-6 flex h-13 items-center justify-center rounded-xl bg-white px-2 py-2 shadow hover:bg-gray-100">
+            <div className="mt-6 flex h-13 items-center justify-center rounded-xl bg-white px-4 py-2 shadow transition-colors hover:bg-gray-100">
               <img src="/images/shop/starfish.png" alt="star" className="mr-2 h-10 w-10" />
               <span className="font-vt323 text-3xl text-gray-800">
                 {shopMyInfo.currency.balance}

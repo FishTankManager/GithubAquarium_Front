@@ -1,17 +1,6 @@
 import { api } from "./axios";
 import type { AxiosError } from "axios";
-
-export interface FishtankBackground {
-  id: number; // OwnBackground의 id
-  background: {
-    id: number;
-    name: string;
-    code: string;
-    svg_template?: string;
-  };
-  unlocked_at: string;
-  // background_image는 프론트엔드에서 로컬 assets를 사용하므로 제외
-}
+import type { Fish } from "@/types/fish";
 
 export interface RepositoryOwner {
   id: number;
@@ -39,21 +28,6 @@ export interface Repository {
   my_commit_count: number; // 현재 로그인한 사용자의 해당 레포지토리 커밋 수
 }
 
-export interface ContributionFishSpecies {
-  id: number;
-  name: string;
-  maturity: number;
-  required_commits: number;
-  svg_template: string;
-  group_code: string;
-}
-
-export interface ContributionFish {
-  id: number;
-  is_visible_in_fishtank: boolean;
-  species: ContributionFishSpecies;
-}
-
 export interface SelectableFish {
   id: number | null; // 할당되지 않은 물고기는 null
   username: string | null; // 할당되지 않은 물고기는 null
@@ -67,18 +41,12 @@ export interface SelectableFish {
   svg_template?: string; // SVG 템플릿 코드
 }
 
-export interface Contributor {
-  id: number;
-  user: string;
-  commit_count: number;
-  fish: ContributionFish | null;
-}
-
 export interface FishtankDetail {
   id: number;
-  repository: string;
-  svg_path: string | null;
-  contributors: Contributor[];
+  repository_full_name: string;
+  svg_url: string | null;
+  background_name: string;
+  fish_list: Fish[]; // types/fish.ts의 Fish 인터페이스 사용
 }
 
 /** AxiosError 타입 가드 */
@@ -153,23 +121,6 @@ export async function getMyBackgrounds(): Promise<MyBackground[]> {
 }
 
 /**
- * 유저가 보유한 배경(OwnBackground)의 원본 Background 데이터를 반환합니다.
- * @deprecated getMyBackgrounds()를 사용하세요
- * @returns 사용자가 보유한 피쉬탱크 배경 목록
- */
-export async function getFishtankBackgrounds(): Promise<FishtankBackground[]> {
-  try {
-    const res = await api.get<FishtankBackground[]>("/aquatics/fishtank/backgrounds/");
-    return res.data;
-  } catch (e) {
-    throwMapped(e, {
-      401: "로그인이 필요합니다.",
-      500: "서버 오류로 배경 목록을 불러오지 못했습니다.",
-    });
-  }
-}
-
-/**
  * repo ID를 기반으로 FishTank 내부 정보(기여자, 물고기)를 조회합니다.
  * @param repoId repo ID
  * @returns FishTank 상세 정보
@@ -188,13 +139,13 @@ export async function getFishtankDetail(repoId: string): Promise<FishtankDetail>
 }
 
 /**
- * 사용자가 소유한 OwnBackground 중 하나를 fishtank 배경으로 적용합니다.
+ * 사용자가 소유한 배경을 fishtank 배경으로 적용합니다.
  * @param repoId 레포지토리 ID
- * @param backgroundId 유저가 소유한 OwnBackground.background.id
+ * @param backgroundId Background.id (사용자가 소유한 배경의 background_id)
  */
 export async function applyFishtankBackground(repoId: string, backgroundId: number): Promise<void> {
   try {
-    await api.post(`/aquatics/fishtank/${repoId}/apply-background/`, {
+    await api.post(`/aquatics/fishtank/${repoId}/background/`, {
       background_id: backgroundId,
     });
   } catch (e) {
@@ -223,34 +174,6 @@ export async function getSelectableFish(repoId: string): Promise<SelectableFish[
       401: "로그인이 필요합니다.",
       404: "피쉬탱크를 찾을 수 없습니다.",
       500: "서버 오류로 물고기 목록을 불러오지 못했습니다.",
-    });
-  }
-}
-
-export interface FishtankSpriteData {
-  background_url: string;
-  background_id: number | null;
-  fishes: Array<{
-    id: number;
-    label: string;
-    svg_source: string;
-  }>;
-}
-
-/**
- * 특정 Repository의 Fishtank 스프라이트 데이터를 조회합니다.
- * @param repoId 레포지토리 ID
- * @returns 배경 URL과 물고기 스프라이트 데이터
- */
-export async function getFishtankSprites(repoId: string): Promise<FishtankSpriteData> {
-  try {
-    const res = await api.get<FishtankSpriteData>(`/aquatics/fishtank/${repoId}/sprites/`);
-    return res.data;
-  } catch (e) {
-    throwMapped(e, {
-      401: "로그인이 필요합니다.",
-      404: "피쉬탱크를 찾을 수 없습니다.",
-      500: "서버 오류로 스프라이트 데이터를 불러오지 못했습니다.",
     });
   }
 }

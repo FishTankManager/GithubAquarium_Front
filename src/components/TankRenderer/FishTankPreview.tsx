@@ -3,7 +3,8 @@ import React from "react";
 import TankRenderer from "./TankRenderer";
 import FishSprite from "./FishSprite";
 import type { Fish } from "@/types/fish";
-import { getFishSpriteSvg } from "@/assets/svg/FishSprites/map";
+import { getFishSpriteSvg, getFishSpriteSvgByGroupAndMaturity } from "@/assets/svg/FishSprites/map";
+import * as SPRITES from "@/assets/svg/FishSprites";
 import { getBackgroundImage } from "@/assets/png/Backgrounds";
 
 type FishTankProps = {
@@ -47,15 +48,57 @@ export default function FishTank({
 
       {/* 물고기 렌더링 */}
       {visibleFish.map((fish) => {
-        const speciesKey = `${fish.group_code}_${fish.maturity}`;
-        const svgSource = getFishSpriteSvg(speciesKey);
+        // group_code와 maturity를 조합해서 SVG 찾기 (우선순위 1)
+        let svgSource: string;
+        const hasGroupCode = fish.group_code && fish.group_code.trim() !== "";
+        const hasMaturity = fish.maturity && fish.maturity > 0;
+
+        if (hasGroupCode && hasMaturity) {
+          const expectedKey = `${fish.group_code}_${fish.maturity}`;
+          svgSource = getFishSpriteSvgByGroupAndMaturity(fish.group_code, fish.maturity);
+
+          // 디버깅: 매핑 확인
+          const defaultSvg = SPRITES["LaptopSunfish"] ?? "";
+          if (!svgSource || svgSource === defaultSvg) {
+            console.warn(`[FishTankPreview] Failed to find SVG for fish:`, {
+              id: fish.id,
+              name: fish.name,
+              group_code: fish.group_code,
+              maturity: fish.maturity,
+              expected: expectedKey,
+              availableKeys: Object.keys(SPRITES).filter((k) => k.startsWith(fish.group_code)),
+            });
+          } else {
+            console.log(`[FishTankPreview] Successfully found SVG for fish:`, {
+              id: fish.id,
+              name: fish.name,
+              group_code: fish.group_code,
+              maturity: fish.maturity,
+              key: expectedKey,
+            });
+          }
+        } else {
+          // fallback: name으로 찾기
+          console.warn(
+            `[FishTankPreview] Missing group_code or maturity for fish, using name fallback:`,
+            {
+              id: fish.id,
+              name: fish.name,
+              group_code: fish.group_code,
+              maturity: fish.maturity,
+              hasGroupCode,
+              hasMaturity,
+            },
+          );
+          svgSource = getFishSpriteSvg(fish.name);
+        }
 
         return (
           <FishSprite
             key={fish.id}
             id={String(fish.id)}
             svgSource={svgSource}
-            topLabel={fish.github_username}
+            topLabel={fish.github_username || "Unknown"}
             bottomLabel={`${fish.commit_count} commits`}
             personaWidthPercent={10}
           />

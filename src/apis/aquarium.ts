@@ -125,3 +125,52 @@ export async function getAquariumDetail(): Promise<AquariumDetail> {
     });
   }
 }
+
+/**
+ * 아쿠아리움 물고기 노출 설정을 벌크로 업데이트합니다.
+ * @param fishSettings 물고기별 노출 설정 배열
+ */
+export async function updateAquariumFishVisibility(
+  fishSettings: Array<{ id: number; visible: boolean }>,
+): Promise<void> {
+  try {
+    await api.post("/aquatics/aquarium/fishes/visibility/", {
+      fish_settings: fishSettings,
+    });
+  } catch (error) {
+    throwMapped(error, {
+      400: "잘못된 요청입니다. 물고기 ID를 확인해주세요.",
+      401: "로그인이 필요합니다.",
+      500: "서버 오류로 물고기 노출 설정을 업데이트하지 못했습니다.",
+    });
+  }
+}
+
+/**
+ * 유저가 보유한 모든 물고기 목록을 반환합니다.
+ * @returns 사용자가 보유한 모든 물고기 목록 (visibility와 관계없이)
+ */
+export interface UserFish {
+  id: number;
+  species_name: string;
+  repository_full_name: string;
+  group_code: string;
+  maturity: number;
+  github_username: string;
+  commit_count: number;
+  is_visible_in_fishtank: boolean;
+  is_visible_in_aquarium: boolean;
+  aquarium: number | null;
+}
+
+export async function getMyFishes(): Promise<UserFish[]> {
+  try {
+    const res = await api.get<UserFish[]>("/aquatics/my-fishes/");
+    return res.data;
+  } catch (e) {
+    throwMapped(e, {
+      401: "로그인이 필요합니다.",
+      500: "서버 오류로 물고기 목록을 불러오지 못했습니다.",
+    });
+  }
+}

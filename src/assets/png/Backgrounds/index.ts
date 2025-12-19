@@ -1,11 +1,11 @@
-import bgOcean from "@/assets/png/Backgrounds/bg-ocean.png";
-import bgDeep1 from "@/assets/png/Backgrounds/bg-deep-1.png";
-import bgDeep2 from "@/assets/png/Backgrounds/bg-deep-2.png";
+import bg1 from "@/assets/png/Backgrounds/bg-deep-1.png";
+import bg2 from "@/assets/png/Backgrounds/bg-deep-2.png";
+import bg3 from "@/assets/png/Backgrounds/bg-ocean.png";
 
 const BACKGROUND_IMAGES: Record<string, string> = {
-  "Bg Ocean": bgOcean,
-  "Bg Deep 1": bgDeep1,
-  "Bg Deep 2": bgDeep2,
+  "Bg Ocean": bg1,
+  "Bg Deep 1": bg2,
+  "Bg Deep 2": bg3,
 };
 
 export function getBackgroundImage(name?: string): string | null {

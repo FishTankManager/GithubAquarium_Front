@@ -1,31 +1,97 @@
-// src/components/collection/EmptyCage.tsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 interface FishCageProps {
-  fish?: string;
-  isSelected?: boolean;
+  fish?: string; // SVG 이미지 경로
+  isSelected: boolean;
 }
 
 const FishCage: React.FC<FishCageProps> = ({ fish, isSelected }) => {
-  // 1. fish 유무에 따라 기본 크기 클래스를 설정합니다.
-  // 2. fish가 있을 때만 선택(isSelected)에 따른 크기 변화를 줍니다.
-  const imageClass = fish
-    ? isSelected
-      ? "h-35 w-35"
-      : "h-30 w-30" // 물고기가 있을 때 크기 (선택 시 더 커짐)
-    : "h-15 w-15 opacity-80"; // 물음표(빈 칸)일 때 크기 (고정)
+  const [svgContent, setSvgContent] = useState<string>("");
+  const [pos, setPos] = useState({ x: 50, y: 55 });
+  const [facing, setFacing] = useState(1);
+  const isQuestion = fish?.includes("questionSquare");
+
+  // 1. SVG 소스 가져오기 (애니메이션 활성화를 위해 인라이닝)
+  useEffect(() => {
+    if (!fish || isQuestion) {
+      setSvgContent("");
+      return;
+    }
+    fetch(fish)
+      .then((res) => res.text())
+      .then((data) => {
+        const uniqueId = Math.random().toString(36).substr(2, 9);
+        setSvgContent(data.replaceAll(/\*\{id\}/g, uniqueId));
+      })
+      .catch((err) => console.error("SVG fetch error:", err));
+  }, [fish, isQuestion]);
+
+  // 2. 어항 내부 이동 로직
+  useEffect(() => {
+    // 선택되었거나 물음표일 때는 이동하지 않고 중앙 고정
+    if (isSelected || isQuestion || !fish) {
+      setPos({ x: 50, y: 55 });
+      return;
+    }
+
+    let cancelled = false;
+
+    const move = async () => {
+      while (!cancelled && !isSelected) {
+        const targetX = Math.random() * 40 + 30; // 30% ~ 70% 사이
+        const targetY = Math.random() * 20 + 40; // 40% ~ 60% 사이
+
+        // 함수형 업데이트를 사용하여 의존성 문제 해결
+        setPos((prev) => {
+          const dx = targetX - prev.x;
+          if (Math.abs(dx) > 1) {
+            setFacing(dx > 0 ? 1 : -1);
+          }
+          return { x: targetX, y: targetY };
+        });
+
+        // 랜덤한 대기 시간
+        await new Promise((res) => setTimeout(res, Math.random() * 2000 + 2000));
+      }
+    };
+
+    move();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isSelected, fish, isQuestion]);
 
   return (
-    <div className="relative flex h-35 w-35 items-center justify-center">
-      {/* 어항 배경 */}
-      <img src="/images/collection/fishcagecut.png" alt="fish cage" className="h-35 w-35" />
-
-      {/* 물고기 또는 물음표 이미지 */}
+    <div className="relative flex h-36 w-36 items-center justify-center">
+      {/* 어항 틀 */}
       <img
-        src={fish ? fish : "/images/collection/questionSquare.png"}
-        alt="fish"
-        className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 object-contain transition-all duration-200 ${imageClass}`}
+        src="/images/collection/fishcagecut.png"
+        alt="cage"
+        className="pointer-events-none absolute inset-0 h-full w-full object-contain"
       />
+
+      {/* 물고기 영역 */}
+      <div
+        className={`pointer-events-none absolute flex items-center justify-center transition-all duration-1000 ease-in-out ${
+          isSelected ? "z-10 h-20 w-20" : "z-0 h-12 w-12"
+        }`}
+        style={{
+          left: `${pos.x}%`,
+          top: `${pos.y}%`,
+          transform: `translate(-50%, -50%) scaleX(${facing})`,
+        }}
+      >
+        {isQuestion ? (
+          <img
+            src={fish}
+            alt="locked"
+            className="h-full w-full object-contain opacity-30 grayscale"
+          />
+        ) : (
+          <div className="h-full w-full" dangerouslySetInnerHTML={{ __html: svgContent }} />
+        )}
+      </div>
     </div>
   );
 };

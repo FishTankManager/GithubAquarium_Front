@@ -40,9 +40,16 @@ const CollectionPage: React.FC = () => {
 
   const getFishImage = (fish: UserFish | null) => {
     if (!fish) return undefined;
+
+    // 특정 group_code 리스트
+    const fishbunGroups = ["SPFishbun", "RBFishbun", "CPFishbun"];
+
     try {
+      // 해당 그룹에 속하면 Fishbun 폴더를 참조하고, 아니면 기존처럼 group_code 폴더를 참조
+      const folderName = fishbunGroups.includes(fish.group_code) ? "Fishbun" : fish.group_code;
+
       return new URL(
-        `../assets/svg/FishSprites/${fish.group_code}/${fish.group_code}_1.svg`,
+        `../assets/svg/FishSprites/${folderName}/${fish.group_code}_${fish.maturity}.svg`,
         import.meta.url,
       ).href;
     } catch {
@@ -52,13 +59,25 @@ const CollectionPage: React.FC = () => {
 
   const getGrowthTimelineData = (fish: UserFish | null) => {
     if (!fish) return [];
+
+    const fishbunGroups = ["SPFishbun", "RBFishbun", "CPFishbun"];
+    const isFishbun = fishbunGroups.includes(fish.group_code);
+
+    // ✅ 특정 그룹이면 "Fishbun", 아니면 자기 자신의 group_code를 폴더명으로 사용
+    const folderName = isFishbun ? "Fishbun" : fish.group_code;
+
+    // ✅ Fishbun 그룹이면 3단계까지만, 아니면 6단계까지 정의
     const stages = [
       { name: "Hatchling", threshold: 1, suffix: "_1" },
       { name: "Juvenile", threshold: 2, suffix: "_2" },
       { name: "Youngling", threshold: 3, suffix: "_3" },
-      { name: "Adult", threshold: 4, suffix: "_4" },
-      { name: "Advanced", threshold: 5, suffix: "_5" },
-      { name: "Master", threshold: 6, suffix: "_6" },
+      ...(!isFishbun
+        ? [
+            { name: "Adult", threshold: 4, suffix: "_4" },
+            { name: "Advanced", threshold: 5, suffix: "_5" },
+            { name: "Master", threshold: 6, suffix: "_6" },
+          ]
+        : []),
     ];
 
     return stages.map((stage) => ({
@@ -66,7 +85,8 @@ const CollectionPage: React.FC = () => {
       img:
         fish.maturity >= stage.threshold
           ? new URL(
-              `../assets/svg/FishSprites/${fish.group_code}/${fish.group_code}${stage.suffix}.svg`,
+              /* ✅ folderName 변수를 사용하여 경로를 동적으로 변경합니다 */
+              `../assets/svg/FishSprites/${folderName}/${fish.group_code}${stage.suffix}.svg`,
               import.meta.url,
             ).href
           : "/images/collection/questionSquare.png",
@@ -87,7 +107,7 @@ const CollectionPage: React.FC = () => {
       }}
     >
       <Header />
-      <main className="mx-auto flex max-w-6xl flex-col gap-12 px-6 pt-28 pb-20">
+      <main className="mx-auto flex max-w-6xl flex-col gap-12 px-6 pt-28 pb-28">
         <LogoText
           text="COLLECTION"
           className="font-Bungee text-shadow mb-12 text-center text-6xl drop-shadow-[0_3px_0_rgba(0,0,0,0.25)]"
