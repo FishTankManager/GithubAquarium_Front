@@ -1,3 +1,12 @@
+import type { Fish } from "./fish";
+
+export interface AquariumDetail {
+  id: number;
+  svg_url: string; // 생성된 아쿠아리움 SVG 파일 경로
+  background_name: string; // 적용된 배경 이름 ("bg-1")
+  fish_list: Fish[]; // 아쿠아리움에 배치된 물고기 목록
+}
+
 export type Maturity = "Hatchling" | "Juvenile" | "Youngling" | "Adult" | "Advanced" | "Master";
 
 export type CanvasSize = {

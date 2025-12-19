@@ -1,5 +1,6 @@
 import { api } from "./axios";
 import type { AxiosError } from "axios";
+import type { AquariumDetail } from "@/types/aquarium";
 
 export interface AquariumBackground {
   id: number;
@@ -76,29 +77,6 @@ export async function applyAquariumBackground(ownBackgroundId: number): Promise<
       500: "서버 오류로 배경을 적용하지 못했습니다.",
     });
   }
-}
-
-/* =========================
- *  /aquatics/aquarium/ 타입
- * ========================= */
-
-export interface AquariumFish {
-  id: number;
-  name: string; // 물고기 종 이름
-  group_code: string; // 종 그룹 코드
-  maturity: number; // 성장 단계 (1~6)
-  repository_name: string; // 출처 레포지토리 이름
-  commit_count: number; // 해당 레포에 기여한 커밋 수
-  unlocked_at: string; // 해금 시각 (ISO 문자열)
-  is_visible_in_aquarium: boolean;
-  is_visible_in_fishtank: boolean;
-}
-
-export interface AquariumDetail {
-  id: number;
-  svg_url: string; // 생성된 아쿠아리움 SVG 파일 절대 경로
-  background_name: string; // Background name (예: "bg-1" / 기본 배경)
-  fish_list: AquariumFish[]; // 아쿠아리움에 배치된 물고기 목록
 }
 
 /* =========================

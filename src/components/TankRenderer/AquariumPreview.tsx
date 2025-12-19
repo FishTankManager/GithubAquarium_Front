@@ -53,9 +53,10 @@ export default function AquariumPreview({
         {ownerLabel}
       </div>
 
-      {/* 물고기 스프라이트 렌더링 */}
+      {/* 물고기 렌더링 */}
       {visibleFish.map((fish) => {
-        const svgSource = getFishSpriteSvg(fish.name); // species 이름
+        const speciesKey = `${fish.group_code}_${fish.maturity}`;
+        const svgSource = getFishSpriteSvg(speciesKey);
 
         return (
           <FishSprite
