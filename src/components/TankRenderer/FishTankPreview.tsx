@@ -54,7 +54,7 @@ export default function FishTank({
             key={fish.id}
             id={String(fish.id)}
             svgSource={svgSource}
-            topLabel={fish.github_name}
+            topLabel={fish.github_username}
             bottomLabel={`${fish.commit_count} commits`}
             personaWidthPercent={10}
           />
