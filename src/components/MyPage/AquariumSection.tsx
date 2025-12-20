@@ -47,8 +47,6 @@ export default function AquariumSection() {
   const convertBackgroundName = (name: string | null | undefined): string | undefined => {
     if (!name || name === "기본 배경") return undefined;
 
-    // 백엔드에서 오는 형식: "bg-deep-1", "bg-deep-2", "bg-ocean" 등
-    // AquariumPreview가 기대하는 형식: "Bg Deep 1", "Bg Deep 2", "Bg Ocean"
     const nameMap: Record<string, string> = {
       "bg-deep-1": "Bg Deep 1",
       "bg-deep-2": "Bg Deep 2",
@@ -58,7 +56,7 @@ export default function AquariumSection() {
       "Bg Ocean": "Bg Ocean",
     };
 
-    return nameMap[name] || name;
+    return nameMap[name]; // 🔴 매핑 안 되면 undefined
   };
 
   // API에서 배경 목록 가져오기
@@ -212,7 +210,9 @@ export default function AquariumSection() {
       name: fish.species_name,
       group_code: fish.group_code,
       maturity: fish.maturity,
-      repository_name: fish.repository_full_name,
+      repository_name: fish.repository_full_name
+        ? (fish.repository_full_name.split("/").pop() ?? fish.repository_full_name)
+        : fish.repository_full_name,
       commit_count: commitCountMap.get(fish.id) ?? fish.commit_count ?? 0, // aquariumDetail에서 가져오거나 UserFish에서 가져오거나 0
       unlocked_at: null, // UserFish에는 unlocked_at이 없으므로 null
       is_visible_in_aquarium: localFishVisibility.get(fish.id) ?? fish.is_visible_in_aquarium, // 로컬 상태 우선 사용

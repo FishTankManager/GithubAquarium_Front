@@ -141,7 +141,10 @@ export default function FishTankSection() {
 
         // fishtankDetail state에 저장
         setFishtankDetail({
-          repository_full_name: fishtankDetail.repository_full_name,
+          repository_full_name: fishtankDetail.repository_full_name
+            ? (fishtankDetail.repository_full_name.split("/").pop() ??
+              fishtankDetail.repository_full_name)
+            : fishtankDetail.repository_full_name,
           background_name: fishtankDetail.background_name,
           fish_list: fishtankDetail.fish_list,
         });

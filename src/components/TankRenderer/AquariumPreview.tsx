@@ -15,6 +15,12 @@ type AquariumPreviewProps = {
   fishList: Fish[]; // GET /aquatics/aquarium/ 의 fish_list 모양
 };
 
+function getRepoOnlyName(fullName?: string | null): string {
+  if (!fullName) return "";
+  // "owner/repo" -> "repo", "/" 없는 경우는 원본 유지
+  return fullName.split("/").pop() ?? fullName;
+}
+
 export default function AquariumPreview({
   width = 400,
   height = 400,
@@ -65,12 +71,14 @@ export default function AquariumPreview({
           svgSource = getFishSpriteSvg(fish.name);
         }
 
+        const repoLabel = getRepoOnlyName(fish.repository_name);
+
         return (
           <FishSprite
             key={fish.id}
             id={String(fish.id)}
             svgSource={svgSource}
-            topLabel={fish.repository_name}
+            topLabel={repoLabel}
             bottomLabel={`${fish.commit_count} commits`}
             personaWidthPercent={10}
           />

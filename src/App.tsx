@@ -3,12 +3,14 @@ import { MainPage, MyPage, ShopPage, GitHubCallbackPage } from "./pages";
 import CollectionPage from "./pages/CollectionPage";
 import { AuthProvider } from "@/auth/AuthContext";
 import { ViewportProvider } from "@/contexts/ViewportContext";
+import ScrollToTop from "@/components/ScrollToTop";
 
 function App() {
   return (
     <AuthProvider>
       <ViewportProvider>
         <BrowserRouter>
+          <ScrollToTop />
           <Routes>
             <Route path="/" element={<MainPage />} />
             <Route path="/my" element={<MyPage />} />
